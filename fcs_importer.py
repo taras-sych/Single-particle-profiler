@@ -14,11 +14,6 @@ Classes with data types
 
 import numpy as np
 
-import tkinter as tk
-from tkinter import ttk
-
-
-
 class XY_plot:
     def __init__ (self, x_arg, y_arg):
         self.x = x_arg
@@ -52,8 +47,6 @@ class Full_dataset_fcs:
     def __init__ (self, repetitions_arg, dataset_list_arg):
         self.repetitions = repetitions_arg
         self.datasets_list = dataset_list_arg
-        self.threshold_ch1 = 0
-        self.threshold_ch2 = 0
         
     
         
@@ -97,10 +90,6 @@ def Fill_datasets_fcs (list_file, repetitions):
     
     i=0;
     while i<repetitions:
-
-        
-
-
         
         #----save positions of lines "Repetition = i"
         rep_list = []
@@ -269,7 +258,6 @@ def Fill_datasets_fcs (list_file, repetitions):
 def Correct_channels(channels_list):
     
     
-    
     x1 = channels_list[0].fluct_arr.x
     y1 = channels_list[0].fluct_arr.y
     x2 = channels_list[1].fluct_arr.x
@@ -277,6 +265,7 @@ def Correct_channels(channels_list):
     
     if len(y1) > len(y2):
         nn = len(y1) - len(y2)
+        print(nn)
         for inin in range (0,nn):
             y1 = np.delete(y1,len(y1)-1)
             x1 = np.delete(x1,len(y1)-1)
