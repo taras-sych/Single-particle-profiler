@@ -27,10 +27,8 @@ import numpy as np
 from scipy.signal import find_peaks
 
 from scipy.optimize import curve_fit
+import random
 
-
-global counter
-counter = 0
 
 global file_index
 global rep_index
@@ -46,6 +44,23 @@ global fit_list_x
 global fit_list_y
 
 global Fit_params
+
+global initialdirectory
+initialdirectory = ''
+
+global change_normal
+change_normal = False
+
+def Message_generator():
+	messages = [
+    'You shall not pass!',  
+    'Danger!',
+    'She is dead, Jim!',
+    'My life for the horde!' 
+	] 
+	index = random.randint(0, len(messages)-1)
+	return messages[index]
+
 
 def Gauss(x, a, x0, sigma):
 
@@ -304,29 +319,37 @@ def Plot_gp():
 	
 
 def Which_tab():
-	if tabs.index(tabs.select()) == 0:
-		Plot_main()
 
-		ffp.canvas3.draw()
+	try:
+		if tabs.index(tabs.select()) == 0:
+			Plot_main()
 
-		ffp.figure3.tight_layout()
-		
+			ffp.canvas3.draw()
 
-	if tabs.index(tabs.select()) == 1:
-		Plot_gp()
+			ffp.figure3.tight_layout()
+			
 
-		gp.canvas3.draw()
+		if tabs.index(tabs.select()) == 1:
+			Plot_gp()
 
-		gp.figure3.tight_layout()
+			gp.canvas3.draw()
 
+			gp.figure3.tight_layout()
 
+	except:
+		tk.messagebox.showerror(title='Error', message=Message_generator())
 
 
 
 def Threshold_fun():
 
+	if len(tree_list_name) > 0:
 
-	th_win = Threshold_window(win_width, win_height, dpi_all)
+		th_win = Threshold_window(win_width, win_height, dpi_all)
+
+	if len(tree_list_name) == 0:
+
+		tk.messagebox.showerror(title='Error', message=Message_generator())
 
 
 
@@ -347,24 +370,31 @@ class Left_frame :
 				y1z = stats.zscore(y1)
 				y2z = stats.zscore(y2)
 
-				y1 = y1z - min(y1z)
-				y2 = y2z - min(y2z)
+				data_list_current[file_index].threshold_ch1 = 1
+				data_list_current[file_index].threshold_ch2 = 1
+
+				self.Plot_this_data(data_list_current[file_index], rep_index)
+
 
 			if self.normalization_index == "mean":
 
 				y1 = y1/np.mean(y1)
 				y2 = y2/np.mean(y2)
 
-			data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1
-			data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2
+				data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
+
+				data_list_current[file_index].threshold_ch1 = 0
+				data_list_current[file_index].threshold_ch2 = 0
+
+				self.Plot_this_data(data_list_current[file_index], rep_index)
 
 
 
 
 
 
-		data_list_current[file_index].threshold_ch1 = 0
-		data_list_current[file_index].threshold_ch2 = 0
+		#data_list_current[file_index].threshold_ch1 = 0
+		#data_list_current[file_index].threshold_ch2 = 0
 
 
 
@@ -440,50 +470,77 @@ class Left_frame :
 		self.figure2.tight_layout()
 
 
-	def Normalize_index(self, event):
 
-		self.normalization_index = self.Normalization.get()
 
 	def Import(self):
 
+		
+
+
+		
+
 		global tree_list
 		global tree_list_name
+		global initialdirectory
+
+		if initialdirectory == '':
+			initialdirectory = __file__
+
+		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('All files', '*'), ]
 		
-		filename =  tk.filedialog.askopenfilename(initialdir=os.path.dirname(__file__),title = "Select file")
 
-		name = os.path.basename(filename)
+		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(initialdirectory),title = "Select file", filetypes = ftypes)
 
-		file = codecs.open (filename, encoding='latin')
+		
+		filename = filenames[0]
+		#print (filename)
 
-		lines = file.readlines()
+		
+		for filename in filenames:
+			if filename != "":
 
-		if filename.endswith('.fcs'):
-			dataset = fcs_importer.Fill_datasets_fcs(lines, fcs_importer.Find_repetitions (lines))
+				initialdirectory = os.path.dirname(filename)
 
-		if filename.endswith('.SIN'): 
-			dataset = fcs_importer.Fill_datasets_sin(lines)
+				progress_window = tk.Toplevel()
+				progress_label = tk.Label(progress_window, text="Patience, my friend!")
+				progress_label.pack()
 
-		dataset1 = copy.deepcopy(dataset)
-
-
-		treetree = Data_tree (self.tree, name, dataset.repetitions)
-		tree_list.append(treetree)
-
-		tree_list_name.append(name)
+				#progress_window.grab_set()
 
 
-		data_list_raw.append(dataset)
+				name = os.path.basename(filename)
+
+				file = codecs.open (filename, encoding='latin')
+
+				lines = file.readlines()
+
+				if filename.endswith('.fcs'):
+					dataset = fcs_importer.Fill_datasets_fcs(lines, fcs_importer.Find_repetitions (lines))
+
+				if filename.endswith('.SIN'): 
+					dataset = fcs_importer.Fill_datasets_sin(lines)
+
+				dataset1 = copy.deepcopy(dataset)
 
 
-		data_list_current.append(dataset1)
+				treetree = Data_tree (self.tree, name, dataset.repetitions)
+				tree_list.append(treetree)
+
+				tree_list_name.append(name)
+
+
+				data_list_raw.append(dataset)
+
+
+				data_list_current.append(dataset1)
 
 
 
-		repetitions_list.append(dataset.repetitions)
+				repetitions_list.append(dataset.repetitions)
 
-		peaks_list.append([None] * dataset.repetitions)
+				peaks_list.append([None] * dataset.repetitions)
 
-
+				progress_window.destroy()
 
 
 	def Plot_data(self, event):
@@ -493,14 +550,21 @@ class Left_frame :
 
 		index = self.tree.selection()
 		num1, num = index[0].split('I')
+
+
 		
 
 		num = int(num, 16)
 
 		sum1 = num 
 		file = 0
+
 		rep = 0
+		
+
+
 		for i in range (len(data_list_raw)):
+			print ("I am here")
 			rep = 0
 			sum1-=1
 			file+=1
@@ -536,12 +600,41 @@ class Left_frame :
 
 		rep = rep1-1
 
-		self.Plot_this_data(data_list_current[file_index], rep)
+		self.Plot_this_data(data_list_raw[file_index], rep)
+
+	def Delete_dataset(self):
+		global file_index
+		index = self.tree.selection()
+		for sel in index:
+			self.tree.delete(sel)
+
+	def Delete_all_datasets(self):
+		global data_list_raw
+		global data_list_current
+		global tree_list
+		global tree_list_name
+
+
+
+		for dataset in self.tree.get_children():
+			self.tree.delete(dataset)
+		self.traces.clear()
+		self.corr.clear()
+		self.canvas1.draw()
+		self.canvas2.draw()
+		self.figure1.tight_layout()
+		self.figure2.tight_layout()
+
+		data_list_raw = []
+		data_list_current = []
+		tree_list = []
+		tree_list_name = []
+
 
 	def __init__ (self, frame0, win_width, win_height, dpi_all):
 
 
-		self.normalization_index = "z-score"
+		
 
 		self.frame01 = tk.Frame(frame0)
 		self.frame01.pack(side="top", fill="x")
@@ -550,10 +643,10 @@ class Left_frame :
 		self.Import_Button = tk.Button(self.frame01, text="Import", command=self.Import)
 		self.Import_Button.pack(side = "left", anchor = "nw")
 
-		self.Clear_Button = tk.Button(self.frame01, text="Clear", command=Norm)
+		self.Clear_Button = tk.Button(self.frame01, text="Delete dataset", command=self.Delete_dataset)
 		self.Clear_Button.pack(side = "left", anchor = "nw")
 
-		self.Clear_all_Button = tk.Button(self.frame01, text="Clear all", command=Norm)
+		self.Clear_all_Button = tk.Button(self.frame01, text="Delete all", command=self.Delete_all_datasets)
 		self.Clear_all_Button.pack(side = "left", anchor = "nw")
 
 
@@ -566,9 +659,9 @@ class Left_frame :
 		self.scrollbar.pack(side = "left", fill = "y")
 
 
-		self.Datalist = tk.Listbox(self.frame02)
+		self.Datalist = tk.Listbox(self.frame02, width = 100, height = 10)
 		self.Datalist.pack(side = "left", anchor = "nw")
-		self.Datalist.config(width = 40, height = 10)
+		
 		
 		
 		self.tree=CheckboxTreeview(self.Datalist)
@@ -580,11 +673,9 @@ class Left_frame :
 		self.scrollbar.config(command = self.tree.yview)
 
 		self.tree.bind('<<TreeviewSelect>>', self.Plot_data)
-		
 
-
-
-		self.frame021 = tk.Frame(self.frame02)
+		self.Datalist.config(width = 100, height = 10)
+		"""self.frame021 = tk.Frame(self.frame02)
 		self.frame021.pack(side="top", fill="x")
 
 		self.Norm_button = tk.Button(self.frame021, text="Normalize", command=self.Normalize)
@@ -601,7 +692,7 @@ class Left_frame :
 		self.Normalization.set("z-score")
 
 		self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)
-
+		"""
 
 		self.frame023 = tk.Frame(self.frame02)
 		self.frame023.pack(side="top", fill="x")
@@ -833,83 +924,88 @@ class GP_frame :
 	def Fit_gaus(self):
 
 		
+		try:
 		
-		global fit_list_x
-		global fit_list_y
-		global Fit_params
+			global fit_list_x
+			global fit_list_y
+			global Fit_params
 
-		x = self.gp_xbins
-		y = self.gp_histogram
+			x = self.gp_xbins
+			y = self.gp_histogram
 
-		x1 = np.linspace(min(x), max(x), num=500)
+			x1 = np.linspace(min(x), max(x), num=500)
 
-		if (self.gaus_number == 1):
+			if (self.gaus_number == 1):
 
-			#m1 = float(self.gaus_mean_1.get())
+				#m1 = float(self.gaus_mean_1.get())
 
-			#popt,pcov = curve_fit(Gauss, x, y, bounds=((-np.inf,-0.8 ,-np.inf), (np.inf, 0.6 ,np.inf)))
-			popt,pcov = curve_fit(Gauss, x, y)
+				#popt,pcov = curve_fit(Gauss, x, y, bounds=((-np.inf,-0.8 ,-np.inf), (np.inf, 0.6 ,np.inf)))
+				popt,pcov = curve_fit(Gauss, x, y)
 
-			print(popt)
+				print(popt)
 
 
-			Plot_gp()
-			fit_list_x = x1
-			fit_list_y = Gauss(x1, *popt)
-			Fit_params = popt
+				Plot_gp()
+				fit_list_x = x1
+				fit_list_y = Gauss(x1, *popt)
+				Fit_params = popt
 
-			gp.main.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+				gp.main.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
 
-			gp.canvas3.draw()
+				gp.canvas3.draw()
 
-			gp.figure3.tight_layout()
+				gp.figure3.tight_layout()
 
-			self.fit_parampampams.delete(0,'end')
+				self.fit_parampampams.delete(0,'end')
 
-			self.fit_parampampams.insert(0, "Fitting parameters:") 
-			self.fit_parampampams.insert(1, "A:\t" + str(round (popt[0],3)))
-			self.fit_parampampams.insert(1, "Mean:\t" + str(round(popt[1],3)))
-			self.fit_parampampams.insert(1, "Sigma:\t" + str(round(popt[2],3)))
-			
+				self.fit_parampampams.insert(0, "Fitting parameters:") 
+				self.fit_parampampams.insert(1, "A:\t" + str(round (popt[0],3)))
+				self.fit_parampampams.insert(1, "Mean:\t" + str(round(popt[1],3)))
+				self.fit_parampampams.insert(1, "Sigma:\t" + str(round(popt[2],3)))
+				
 
-		if (self.gaus_number == 2):
+			if (self.gaus_number == 2):
 
-			popt,pcov = curve_fit(Gauss2, x, y)
+				popt,pcov = curve_fit(Gauss2, x, y)
 
-			Fit_params = popt
+				Fit_params = popt
 
-			popt1 = popt[0:3]
+				popt1 = popt[0:3]
 
-			popt2 = popt[3:6]
+				popt2 = popt[3:6]
 
-			print(popt1)
-			print(popt2)
+				print(popt1)
+				print(popt2)
 
-			Plot_gp()
-			fit_list_x = x1
-			fit_list_y = Gauss2(x1, *popt)
+				Plot_gp()
+				fit_list_x = x1
+				fit_list_y = Gauss2(x1, *popt)
 
-			gp.main.plot(x1, Gauss(x1, *popt1), color = 'orange', label='fit')
+				gp.main.plot(x1, Gauss(x1, *popt1), color = 'orange', label='fit')
 
-			gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
+				gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
 
-			gp.main.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
+				gp.main.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
 
-			gp.canvas3.draw()
+				gp.canvas3.draw()
 
-			gp.figure3.tight_layout()
+				gp.figure3.tight_layout()
 
-			self.fit_parampampams.delete(0,'end')
+				self.fit_parampampams.delete(0,'end')
 
-			self.fit_parampampams.insert('end', "Fitting parameters:")
-			self.fit_parampampams.insert('end', "Peak 1:")
-			self.fit_parampampams.insert('end', "A:\t" + str(round (popt[0],3)))
-			self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[1],3)))
-			self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[2],3)))
-			self.fit_parampampams.insert('end', "Peak 2:")
-			self.fit_parampampams.insert('end', "A:\t" + str(round (popt[3],3)))
-			self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[4],3)))
-			self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[5],3)))
+				self.fit_parampampams.insert('end', "Fitting parameters:")
+				self.fit_parampampams.insert('end', "Peak 1:")
+				self.fit_parampampams.insert('end', "A:\t" + str(round (popt[0],3)))
+				self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[1],3)))
+				self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[2],3)))
+				self.fit_parampampams.insert('end', "Peak 2:")
+				self.fit_parampampams.insert('end', "A:\t" + str(round (popt[3],3)))
+				self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[4],3)))
+				self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[5],3)))
+
+		except:
+			tk.messagebox.showerror(title='Error', message=Message_generator())
+
 
 
 
@@ -1036,72 +1132,7 @@ class GP_frame :
 
 class Threshold_window:
 
-	"""
-	def Plot_selected(self, which_channel):
 
-
-
-		yh1 = []
-		yh2 = []
-
-		
-		x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
-		y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
-
-		x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
-		y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
-
-		th1 = data_list_current[file_index].threshold_ch1
-		th2 = data_list_current[file_index].threshold_ch2
-
-		for el in y1:
-			if el >= th1:
-				yh1.append(el)
-
-		for el in y2:
-			if el >= th1:
-				yh2.append(el)
-
-
-		self.peaks.cla()
-		self.hist1.cla()
-		
-		self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.peaks.set_ylabel('Intensity (a.u.)')
-		self.peaks.set_xlabel('Time (s)')
-
-		self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.hist1.set_ylabel('Counts')
-		self.hist1.set_xlabel('Intensity (a.u.)')
-
-		if which_channel == "both":
-			self.peaks.plot(x1, y1, zorder=1)
-			self.peaks.plot(x2, y2, zorder=2)
-			self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=3)
-			self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=4)
-
-
-			
-
-			self.hist1.hist(yh1, bins = 150)
-			self.hist1.hist(yh2, bins = 150)
-
-		if which_channel == "channel 1":
-			self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
-			self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
-			self.hist1.hist(yh1, bins = 150)
-			
-
-		if which_channel == "channel 2":
-			
-			self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
-			self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=2)
-			self.hist1.hist(yh2, bins = 150)
-
-		self.canvas5.draw()
-
-		self.figure5.tight_layout()
-	"""
 
 	def Initial_plot (self):
 
@@ -1235,7 +1266,15 @@ class Threshold_window:
 		self.figure5.tight_layout()
 
 		
+	
+	def Update_thresholds (self):
+		global change_normal
+		change_normal = False
+		self.Peaks()
+
+
 	def Peaks (self):
+		global change_normal
 
 		#print(self.var.get())
 		main_xlim = self.peaks.get_xlim()
@@ -1327,6 +1366,7 @@ class Threshold_window:
 		self.hist1.set_ylabel('Counts')
 		self.hist1.set_xlabel('Intensity (a.u.)')
 
+
 		if which_channel == "both":
 
 			
@@ -1366,9 +1406,9 @@ class Threshold_window:
 				self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
 			self.hist1.hist(yh2, bins = 150)
 
-		
-		self.peaks.set_xlim(main_xlim)
-		self.peaks.set_ylim(main_ylim)
+		if change_normal == False:
+			self.peaks.set_xlim(main_xlim)
+			self.peaks.set_ylim(main_ylim)
 
 		self.canvas5.draw()
 
@@ -1410,78 +1450,158 @@ class Threshold_window:
 
 
 			x1 = data_list_current[file_index].datasets_list[i].channels_list[0].fluct_arr.x
-			y1 = data_list_current[file_index].datasets_list[i].channels_list[0].fluct_arr.y
+			y1c = data_list_current[file_index].datasets_list[i].channels_list[0].fluct_arr.y
+			y1r = data_list_raw[file_index].datasets_list[i].channels_list[0].fluct_arr.y
 
 			x2 = data_list_current[file_index].datasets_list[i].channels_list[1].fluct_arr.x
-			y2 = data_list_current[file_index].datasets_list[i].channels_list[1].fluct_arr.y
+			y2c = data_list_current[file_index].datasets_list[i].channels_list[1].fluct_arr.y
+			y2r = data_list_raw[file_index].datasets_list[i].channels_list[1].fluct_arr.y
+
+
+			peaks1, _ = find_peaks(y1c, height=th1)
+
+			peaks2, _ = find_peaks(y2c, height=th2)
 
 
 		
-			if which_channel == "both":
-				peaks1, _ = find_peaks(y1, height=th1)
-
-				xp1 = []
-				yp1 = []
-				yp2_1 = []
-				for p in peaks1:
-					xp1.append(x1[p])
-					yp1.append(y1[p])
-					yp2_1.append(y2[p])
+			if self.normalization_index_for_plot == "raw":
 
 
-				peaks2, _ = find_peaks(y2, height=th2)
 
-				xp2 = []
-				yp2 = []
-				yp1_2 = []
+				if which_channel == "both":
+					
 
-				for p in peaks2:
-					xp2.append(x2[p])
-					yp2.append(y2[p])
-					yp1_2.append(y1[p])
-
-				
-
-				X_all = yp1 + yp1_2
-				Y_all = yp2_1 + yp2
-				T_all = xp1 + xp2
-
-				
+					xp1 = []
+					yp1 = []
+					yp2_1 = []
+					for p in peaks1:
+						xp1.append(x1[p])
+						yp1.append(y1r[p])
+						yp2_1.append(y2r[p])
 
 
-			if which_channel == "channel 1":
-				peaks1, _ = find_peaks(y1, height=th1)
+					xp2 = []
+					yp2 = []
+					yp1_2 = []
 
-				xp1 = []
-				yp1 = []
-				yp2_1 = []
-				for p in peaks1:
-					xp1.append(x1[p])
-					yp1.append(y1[p])
-					yp2_1.append(y2[p])
+					for p in peaks2:
+						xp2.append(x2[p])
+						yp2.append(y2r[p])
+						yp1_2.append(y1r[p])
+
+					
+
+					X_all = yp1 + yp1_2
+					Y_all = yp2_1 + yp2
+					T_all = xp1 + xp2
+
+					
 
 
-				X_all = yp1
-				Y_all = yp2_1
-				T_all = xp1
+				if which_channel == "channel 1":
+					
 
-			if which_channel == "channel 2":
+					xp1 = []
+					yp1 = []
+					yp2_1 = []
+					for p in peaks1:
+						xp1.append(x1[p])
+						yp1.append(y1r[p])
+						yp2_1.append(y2r[p])
 
 
-				peaks2, _ = find_peaks(y2, height=th2)
+					X_all = yp1
+					Y_all = yp2_1
+					T_all = xp1
 
-				xp2 = []
-				yp2 = []
-				yp1_2 = []
+				if which_channel == "channel 2":
 
-				for p in peaks2:
-					xp2.append(x2[p])
-					yp2.append(y2[p])
-					yp1_2.append(y1[p])
 
-				X_all = yp1_2
-				Y_all = yp2
-				T_all = xp2
+					
+
+					xp2 = []
+					yp2 = []
+					yp1_2 = []
+
+					for p in peaks2:
+						xp2.append(x2[p])
+						yp2.append(y2r[p])
+						yp1_2.append(y1r[p])
+
+					X_all = yp1_2
+					Y_all = yp2
+					T_all = xp2
+
+
+
+
+
+
+			if self.normalization_index_for_plot == "normalized":
+
+				if which_channel == "both":
+					
+
+					xp1 = []
+					yp1 = []
+					yp2_1 = []
+					for p in peaks1:
+						xp1.append(x1[p])
+						yp1.append(y1c[p])
+						yp2_1.append(y2c[p])
+
+
+					xp2 = []
+					yp2 = []
+					yp1_2 = []
+
+					for p in peaks2:
+						xp2.append(x2[p])
+						yp2.append(y2c[p])
+						yp1_2.append(y1c[p])
+
+					
+
+					X_all = yp1 + yp1_2
+					Y_all = yp2_1 + yp2
+					T_all = xp1 + xp2
+
+					
+
+
+				if which_channel == "channel 1":
+					
+
+					xp1 = []
+					yp1 = []
+					yp2_1 = []
+					for p in peaks1:
+						xp1.append(x1[p])
+						yp1.append(y1c[p])
+						yp2_1.append(y2c[p])
+
+
+					X_all = yp1
+					Y_all = yp2_1
+					T_all = xp1
+
+				if which_channel == "channel 2":
+
+
+					
+
+					xp2 = []
+					yp2 = []
+					yp1_2 = []
+
+					for p in peaks2:
+						xp2.append(x2[p])
+						yp2.append(y2c[p])
+						yp1_2.append(y1c[p])
+
+					X_all = yp1_2
+					Y_all = yp2
+					T_all = xp2
 
 
 
@@ -1493,28 +1613,109 @@ class Threshold_window:
 
 			self.win_threshold.destroy()
 
-	def Put_mean(self):
+	def Put_default(self):
 
-		x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
-		y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
+		if self.normalization_index == "z-score":
+			self.ch1_th.delete(0,"end")
+			self.ch1_th.insert(0,str(1))
 
-		x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
-		y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
+			
+			self.ch2_th.delete(0,"end")
+			self.ch2_th.insert(0,str(1))
+
+		if self.normalization_index == "manual":
+
+			x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
+			y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
+
+			x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
+			y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
 
 
-		self.ch1_th.delete(0,"end")
-		self.ch1_th.insert(0,str(round(np.mean(y1),2)))
+			self.ch1_th.delete(0,"end")
+			self.ch1_th.insert(0,str(round(np.mean(y1),2)))
 
-		
-		self.ch2_th.delete(0,"end")
-		self.ch2_th.insert(0,str(round(np.mean(y2),2)))
+			
+			self.ch2_th.delete(0,"end")
+			self.ch2_th.insert(0,str(round(np.mean(y2),2)))
 
 		self.Update_thresholds_button.invoke()
 
 
+	def Normalize(self):
+		global change_normal
+		global file_index
+		global rep_index
 
+		change_normal = True
+
+			
+		for rep in range (repetitions_list[file_index]):
+
+			y1 = data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y
+			y2 = data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y
+			
+				
+			if self.normalization_index == "z-score":
+				y1z = stats.zscore(y1)
+				y2z = stats.zscore(y2)
+
+				data_list_current[file_index].threshold_ch1 = 1
+				data_list_current[file_index].threshold_ch2 = 1
+
+				data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1z
+				data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2z
+
+				self.ch1_th.delete(0,"end")
+				self.ch1_th.insert(0,str(1))
+		
+				self.ch2_th.delete(0,"end")
+				self.ch2_th.insert(0,str(1))
+
+				self.Peaks()
+
+
+			if self.normalization_index == "manual":
+
+				y1 = y1/np.mean(y1)
+				y2 = y2/np.mean(y2)
+
+				data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
+
+				data_list_current[file_index].threshold_ch1 = 0
+				data_list_current[file_index].threshold_ch2 = 0
+
+				self.Peaks()
+
+		#self.Update_thresholds_button.invoke()
+
+
+	def Normalize_index(self, event):
+
+		self.normalization_index = self.Normalization.get()
+		
+		if self.normalization_index == "z-score":
+			print (self.normalization_index)
+			self.Normalize()
+
+
+		if self.normalization_index == "manual":
+			print (self.normalization_index)
+			self.Normalize()
+
+	def Normalize_for_plot_index(self, event):
+		self.normalization_index_for_plot = self.Normalization_for_plot.get()
+		print (self.normalization_index_for_plot)
+
+
+	def Thresholding_type_selection(self, value):
+		print(value)
 
 	def __init__(self, win_width, win_height, dpi_all):
+
+		self.normalization_index = "z-score"
+
+		self.normalization_index_for_plot = "raw"
 
 
 		self.gp_histogram = []
@@ -1576,62 +1777,171 @@ class Threshold_window:
 		self.frame001 = tk.Frame(self.win_threshold)
 		self.frame001.pack(side="top", fill="x")
 
-	
+	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+		
+
+		self.Norm_label = tk.Label(self.frame001, text="Use for plot: ")
+		self.Norm_label.grid(row = 0, column = 0, sticky = 'w')
+
+		self.Normalization_for_plot = ttk.Combobox(self.frame001,values = ["raw", "normalized"], width = 9 )
+		self.Normalization_for_plot.config(state = "readonly")
+		
+		self.Normalization_for_plot.grid(row = 0, column = 1)
+
+		self.Normalization_for_plot.set("raw")
+
+		self.Normalization_for_plot.bind("<<ComboboxSelected>>", self.Normalize_for_plot_index)
+
+		self.var = tk.IntVar()
+
+		self.Peaks_button=tk.Checkbutton(self.frame001, text="Display peaks", variable=self.var, command=self.Update_thresholds)
+		self.Peaks_button.grid(row = 0, column = 3, sticky='w')
+
+		self.Apply_button = tk.Button(self.frame001, text="Apply", command=self.Apply)
+		self.Apply_button.grid(row = 0, column = 4)
+
+		
+
+
+
 
 		self.Type_label = tk.Label(self.frame001, text="Detect: ")
-		self.Type_label.grid(row = 0, column = 0)
+		self.Type_label.grid(row = 2, column = 0, sticky='w')
 
 	
 
-		self.Threshold = ttk.Combobox(self.frame001,values = ["both", "channel 1", "channel 2"] )
+		self.Threshold = ttk.Combobox(self.frame001,values = ["both", "channel 1", "channel 2"], width = 9 )
 		self.Threshold.config(state = "readonly")
-		self.Threshold.grid(row = 0, column = 1)
+		self.Threshold.grid(row = 2, column = 1)
 
 		self.Threshold.set("both")
 
 		self.Threshold.bind("<<ComboboxSelected>>", self.Threshold_callback)
+
+		
 	
+		
+		self.Norm_label = tk.Label(self.frame001, text="Thresholding: ")
+		self.Norm_label.grid(row = 3, column = 0)
+
+		self.Normalization = ttk.Combobox(self.frame001,values = ["manual", "z-score"], width = 9 )
+		self.Normalization.config(state = "readonly")
+								#Threshold.config(font=helv36)
+		self.Normalization.grid(row = 3, column = 1, sticky = 'w')
+						
+		self.Normalization.set("manual")
+						
+		self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)
+
+
+		"""self.thresholding_type = tk.IntVar()
+						
+								self.thresholding_type.set(1)
+						
+								tk.Radiobutton(self.frame001, text = "Manual thresholding", variable = self.thresholding_type, value = 1, command = lambda: self.Thresholding_type_selection(self.thresholding_type.get())).grid(row = 2, column = 0, columnspan = 2, sticky='w')
+								tk.Radiobutton(self.frame001, text = "z score", variable = self.thresholding_type, value = 2, command = lambda: self.Thresholding_type_selection(self.thresholding_type.get())).grid(row = 2, column = 3, columnspan = 2, sticky='w')"""
+
+
+
+
+
 
 		self.ch1_label = tk.Label(self.frame001, text="channel 1: ")
-		self.ch1_label.grid(row = 1, column = 0)
+		self.ch1_label.grid(row = 4, column = 0, sticky='w')
 
 		self.ch1_th = tk.Entry(self.frame001, width = 9)
-		self.ch1_th.grid(row = 1, column = 1)
+		self.ch1_th.grid(row = 4, column = 1, sticky='w')
 
 		self.ch1_th.insert("end", str(data_list_current[file_index].threshold_ch1))
 
 		self.ch2_label = tk.Label(self.frame001, text="channel 2: ")
-		self.ch2_label.grid(row = 2, column = 0)
+		self.ch2_label.grid(row = 5, column = 0, sticky='w')
 
 		
 
 		self.ch2_th = tk.Entry(self.frame001, width = 9)
-		self.ch2_th.grid(row = 2, column = 1)
+		self.ch2_th.grid(row = 5, column = 1, sticky='w')
 
 		self.ch2_th.insert("end", str(data_list_current[file_index].threshold_ch2))
 
-		self.var = tk.IntVar()
 
-		self.Peaks_button=tk.Checkbutton(self.frame001, text="Display peaks", variable=self.var, command=self.Peaks)
-		self.Peaks_button.grid(row = 0, column = 2)
+		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
+		self.Update_thresholds_button.grid(row = 6, column = 0, columnspan = 2, sticky='w')
 
-		#self.Peaks_button = tk.Button(self.frame001, text="Peaks", command=self.Peaks)
-		#self.Peaks_button.grid(row = 0, column = 2)
+		self.Put_mean_button = tk.Button(self.frame001, text="Set to default", command=self.Put_default)
+		self.Put_mean_button.grid(row = 7, column = 0, columnspan = 2, sticky='w')
 
-		self.Apply_button = tk.Button(self.frame001, text="Apply", command=self.Apply)
-		self.Apply_button.grid(row = 0, column = 3)
 
-		#self.Apply_all_button = tk.Button(self.frame001, text="Apply to all", command=Norm)
-		#self.Apply_all_button.grid(row = 0, column = 4)
 
-		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Peaks)
-		self.Update_thresholds_button.grid(row = 1, column = 2, rowspan = 2)
 
-		self.Put_mean_button = tk.Button(self.frame001, text="Set to mean", command=self.Put_mean)
-		self.Put_mean_button.grid(row = 1, column = 3, rowspan = 2)
 
+
+
+		"""self.ch1_label_zscore = tk.Label(self.frame001, text="channel 1: ")
+								self.ch1_label_zscore.grid(row = 3, column = 3, sticky='w')
+						
+								self.ch1_th_zscore = tk.Entry(self.frame001, width = 9)
+								self.ch1_th_zscore.grid(row = 3, column = 4, sticky='w')
+						
+								self.ch1_th_zscore.insert("end", str(data_list_current[file_index].threshold_ch1))
+						
+								self.ch2_label_zscore = tk.Label(self.frame001, text="channel 2: ")
+								self.ch2_label_zscore.grid(row = 4, column = 3, sticky='w')
+						
+								
+						
+								self.ch2_th_zscore = tk.Entry(self.frame001, width = 9)
+								self.ch2_th_zscore.grid(row = 4, column = 4, sticky='w')
+						
+								self.ch2_th_zscore.insert("end", str(data_list_current[file_index].threshold_ch2))
+						
+						
+								self.Update_thresholds_button_zscore = tk.Button(self.frame001, text="Update thresholds", command=self.Peaks)
+								self.Update_thresholds_button_zscore.grid(row = 5, column = 3, columnspan = 2, sticky='w')
+						
+								self.Put_mean_button_zscore = tk.Button(self.frame001, text="Set to mean", command=self.Put_mean)
+								self.Put_mean_button_zscore.grid(row = 6, column = 3, columnspan = 2, sticky='w')"""
+
+		#ttk.Separator(self.frame001, orient="vertical").grid(column=2, row=2, rowspan=5, sticky='ns')
+
+		
 
 		self.Initial_plot()
+		
+
+
+		
+
+		"""self.Norm_button = tk.Button(self.frame001, text="Normalize", command=self.Normalize)
+								self.Norm_button.grid(row = 3, column = 0)
+						
+								self.Normalization = ttk.Combobox(self.frame001,values = ["raw", "z-score", "mean" ] )
+								self.Normalization.config(state = "readonly")
+								#Threshold.config(font=helv36)
+								self.Normalization.grid(row = 3, column = 1)
+						
+								self.Normalization.set("raw")
+						
+								self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)"""
+
+
+
+
+
+
+
+
+
+
+	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+	
 
 
 class Data_tree:
@@ -1645,9 +1955,13 @@ class Data_tree:
 		
 
 		self.folder1=tree.insert( "", "end", text=name)
+		child_id = tree.get_children()[-1]
 		for i in range(0, repetitions):
 			text1 = "repetition " + str (i+1)
 			tree.insert(self.folder1, "end", text=text1)
+
+		tree.focus(child_id)
+		tree.selection_set(child_id)
 
 
 

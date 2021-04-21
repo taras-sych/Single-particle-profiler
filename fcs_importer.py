@@ -14,6 +14,11 @@ Classes with data types
 
 import numpy as np
 
+import tkinter as tk
+from tkinter import ttk
+
+
+
 class XY_plot:
     def __init__ (self, x_arg, y_arg):
         self.x = x_arg
@@ -92,6 +97,10 @@ def Fill_datasets_fcs (list_file, repetitions):
     
     i=0;
     while i<repetitions:
+
+        
+
+
         
         #----save positions of lines "Repetition = i"
         rep_list = []
