@@ -66,19 +66,35 @@ Functions for .fcs
 #--------------------------------------------------- 
 """
 
-def Find_repetitions (list_file):
-    repetitions = 0
+def Find_channels_and_repetitions(list_file):
+	channels_number_list = []
+	repetitions = 0
 
-    for i in range(0,len(list_file)):
-        if list_file[i].__contains__("Repetition = ") :
+	for line1 in list_file:
+		if line1.__contains__("Auto-correlation detector Meta") :
+			str1 , str2 = line1.split('Meta')
+
+			
+			if int(str2) not in channels_number_list:
+				channels_number_list.append(int(str2))
+
+
+			
+
+
+		if line1.__contains__("Repetition = ") :
         
-            str1 , str2 = list_file[i].split(' = ')
-            repetitions_temp = int(str2)
-        
-            if repetitions_temp > repetitions:
-                repetitions = repetitions_temp
+			str1 , str2 = line1.split(' = ')
             
-    return repetitions+1
+        
+			if int(str2) > repetitions:
+				repetitions = int(str2)
+
+	
+
+	return [repetitions+1, max(channels_number_list)]
+	
+
 
 
 def Fill_datasets_fcs (list_file, repetitions):
