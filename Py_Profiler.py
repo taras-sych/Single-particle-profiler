@@ -495,15 +495,23 @@ class Left_frame :
 		filename = filenames[0]
 		#print (filename)
 
-		
-		for filename in filenames:
+		line = "file 1 out of " + str(len(filenames))
+
+		self.pb = ttk.Progressbar(self.framepb, orient='horizontal', mode='determinate', length=280)
+		self.pb.pack(side = "left", anchor = "nw")
+		self.value_label = ttk.Label(self.framepb, text=line)
+		self.value_label.pack(side = "left", anchor = "nw")
+
+		for filename_index in range (0, len(filenames)):
+			filename = filenames[filename_index]
 			if filename != "":
+
+				self.pb['value'] = (filename_index+1)/len(filenames) * 100
+				self.value_label['text'] = "file " + str(filename_index + 1) + " out of " + str(len(filenames))
 
 				initialdirectory = os.path.dirname(filename)
 
-				progress_window = tk.Toplevel()
-				progress_label = tk.Label(progress_window, text="Patience, my friend!")
-				progress_label.pack()
+				
 
 				#progress_window.grab_set()
 
@@ -540,7 +548,10 @@ class Left_frame :
 
 				peaks_list.append([None] * dataset.repetitions)
 
-				progress_window.destroy()
+				root.update()   
+
+		self.pb.destroy()
+		self.value_label.destroy()
 
 
 	def Plot_data(self, event):
@@ -755,6 +766,9 @@ class Left_frame :
 		self.canvas2.get_tk_widget().pack()
 
 		self.figure2.tight_layout()
+
+		self.framepb = tk.Frame(frame0)
+		self.framepb.pack(side="top", fill="x")
 
 	
 
