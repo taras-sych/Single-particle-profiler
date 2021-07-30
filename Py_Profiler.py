@@ -1136,12 +1136,14 @@ class GP_frame :
 		self.frame13 = tk.Frame(frame1)
 		self.frame13.pack(side="top", fill="x")
 
-		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
-		self.ffp_btn.grid(column = 0, row =0, sticky = "w")
-
-
 		self.ffp_export_btn = tk.Button(self.frame13, text="Export", command=self.Export_plot)
-		self.ffp_export_btn.grid(column = 0, row =1, sticky = "w")
+		self.ffp_export_btn.grid(column = 0, row =0, sticky = "w")
+
+		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
+		self.ffp_btn.grid(column = 0, row =1, sticky = "w")
+
+
+		
 
 
 class Threshold_window:
