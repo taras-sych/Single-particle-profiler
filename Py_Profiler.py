@@ -173,9 +173,9 @@ def Plot_main():
 
 		min_x1 = min(iiii for iiii in x1 if iiii > 0)
 
-		print (np.min(x1))
+		#print (np.min(x1))
 
-		print (np.max(x1))
+		#print (np.max(x1))
 
 		all_bins_x = np.logspace(np.log10(min_x1),np.log10(np.max(x1)), num=bins_number)
 
@@ -231,7 +231,7 @@ def Plot_gp():
 
 	list1 = data_frame.tree.get_checked()
 
-	print (data_frame.tree.selection())
+	#print (data_frame.tree.selection())
 
 	for index in list1:
 
@@ -270,7 +270,7 @@ def Plot_gp():
 
 
 		output_file_name = tree_list_name[file1-1][:-4]
-		print(output_file_name)
+		#print(output_file_name)
 
 		file1 = file1-1
 		rep1 = rep1-1
@@ -408,7 +408,7 @@ class Left_frame :
 		global file_index
 		global rep_index
 
-		print(1)
+		#print(1)
 
 		data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
 
@@ -575,7 +575,7 @@ class Left_frame :
 
 
 		for i in range (len(data_list_raw)):
-			print ("I am here")
+			#print ("I am here")
 			rep = 0
 			sum1-=1
 			file+=1
@@ -956,7 +956,7 @@ class GP_frame :
 				#popt,pcov = curve_fit(Gauss, x, y, bounds=((-np.inf,-0.8 ,-np.inf), (np.inf, 0.6 ,np.inf)))
 				popt,pcov = curve_fit(Gauss, x, y)
 
-				print(popt)
+				#print(popt)
 
 
 				Plot_gp()
@@ -988,8 +988,8 @@ class GP_frame :
 
 				popt2 = popt[3:6]
 
-				print(popt1)
-				print(popt2)
+				#print(popt1)
+				#print(popt2)
 
 				Plot_gp()
 				fit_list_x = x1
@@ -1034,9 +1034,9 @@ class GP_frame :
 
 			popt3 = popt[6:9]
 
-			print(popt1)
-			print(popt2)
-			print(popt3)
+			#print(popt1)
+			#print(popt2)
+			#print(popt3)
 
 
 			Plot_gp()
@@ -1627,7 +1627,7 @@ class Threshold_window:
 
 			#print(peaks_list[file_index][i].x)
 
-			self.win_threshold.destroy()
+			#self.win_threshold.destroy()
 
 	def Put_default(self):
 
@@ -1711,17 +1711,17 @@ class Threshold_window:
 		self.normalization_index = self.Normalization.get()
 		
 		if self.normalization_index == "z-score":
-			print (self.normalization_index)
+			#print (self.normalization_index)
 			self.Normalize()
 
 
 		if self.normalization_index == "manual":
-			print (self.normalization_index)
+			#print (self.normalization_index)
 			self.Normalize()
 
 	def Normalize_for_plot_index(self, event):
 		self.normalization_index_for_plot = self.Normalization_for_plot.get()
-		print (self.normalization_index_for_plot)
+		#print (self.normalization_index_for_plot)
 
 
 	def Thresholding_type_selection(self, value):
@@ -1793,10 +1793,7 @@ class Threshold_window:
 		self.frame001 = tk.Frame(self.win_threshold)
 		self.frame001.pack(side="top", fill="x")
 
-	#-------------------------------------------------------------------------------------------------------------------------------------------------------
-	#-------------------------------------------------------------------------------------------------------------------------------------------------------
-	#-------------------------------------------------------------------------------------------------------------------------------------------------------
-	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+
 		
 
 		self.Norm_label = tk.Label(self.frame001, text="Use for plot: ")
@@ -1816,7 +1813,7 @@ class Threshold_window:
 		self.Peaks_button=tk.Checkbutton(self.frame001, text="Display peaks", variable=self.var, command=self.Update_thresholds)
 		self.Peaks_button.grid(row = 0, column = 3, sticky='w')
 
-		self.Apply_button = tk.Button(self.frame001, text="Apply", command=self.Apply)
+		self.Apply_button = tk.Button(self.frame001, text="Apply and Fit", command=self.Apply)
 		self.Apply_button.grid(row = 0, column = 4)
 
 		
@@ -1956,6 +1953,48 @@ class Threshold_window:
 	#-------------------------------------------------------------------------------------------------------------------------------------------------------
 	#-------------------------------------------------------------------------------------------------------------------------------------------------------
 	#-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+class Fitting_window:
+
+	def __init__(self, win_width, win_height, dpi_all):
+
+
+		self.th_width = round(0.7*self.win_threshold.winfo_screenwidth())
+		self.th_height = round(0.4*self.win_threshold.winfo_screenwidth())
+
+		self.line1 = str(self.th_width) + "x" + str(self.th_height)
+
+
+		self.win_threshold.geometry(self.line1)
+
+		self.scrollbar = tk.Scrollbar(self.frame02)
+		self.scrollbar.pack(side = "left", fill = "y")
+
+
+		self.Datalist = tk.Listbox(self.frame02, width = 100, height = 10)
+		self.Datalist.pack(side = "left", anchor = "nw")
+		
+		
+		
+		self.tree=CheckboxTreeview(self.Datalist)
+		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
+		self.tree.pack()
+
+
+		self.tree.config(yscrollcommand = self.scrollbar.set)
+		self.scrollbar.config(command = self.tree.yview)
+
+		self.tree.bind('<<TreeviewSelect>>', self.Plot_data)
+
+		self.Datalist.config(width = 100, height = 10)
+
+		self.frame02 = tk.Frame(frame0)
+		self.frame02.pack(side="top", fill="x")
+
+
 
 	
 
