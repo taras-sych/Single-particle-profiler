@@ -814,13 +814,13 @@ class FFP_frame :
 		
 
 		self.Y_label = tk.Label(self.frame3, text="Y cross: ")
-								self.Y_label.grid(row = 1, column = 0)
-						
-								self.Y_cross = tk.Entry(self.frame3, width = 9)
-								self.Y_cross.grid(row = 1, column = 1)
-						
-								self.Put_cross_button = tk.Button(self.frame3, text="Put cross", command=self.Put_cross)
-								self.Put_cross_button.grid(row = 0, column = 2, rowspan = 2)"""
+		self.Y_label.grid(row = 1, column = 0)
+
+		self.Y_cross = tk.Entry(self.frame3, width = 9)
+		self.Y_cross.grid(row = 1, column = 1)
+
+		self.Put_cross_button = tk.Button(self.frame3, text="Put cross", command=self.Put_cross)
+		self.Put_cross_button.grid(row = 0, column = 2, rowspan = 2)"""
 
 		
 
