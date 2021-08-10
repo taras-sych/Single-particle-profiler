@@ -708,19 +708,18 @@ class Left_frame :
 		self.frame023 = tk.Frame(self.frame02)
 		self.frame023.pack(side="top", fill="x")
 
-		self.Threshold_button = tk.Button(self.frame023, text="Find Peaks", command=Threshold_fun)
+		self.Threshold_button = tk.Button(self.frame023, text="Peak analysis", command=Threshold_fun)
 		self.Threshold_button.grid(row = 0, column = 0)
 
+		self.Diffusion_button = tk.Button(self.frame023, text="Diffusion analysis", command=Norm)
+		self.Diffusion_button.grid(row = 1, column = 0)
 
+		self.Add_to_plot_button = tk.Button(self.frame023, text="Plot", command=Which_tab)
+		self.Add_to_plot_button.grid(row = 2, column = 0)
 
-		self.frame024 = tk.Frame(self.frame02)
-		self.frame024.pack(side="top", fill="x")
+		self.Output_button = tk.Button(self.frame023, text="Output", command=Which_tab)
+		self.Output_button.grid(row = 3, column = 0)
 
-		self.Add_to_plot_button = tk.Button(self.frame024, text="Plot", command=Which_tab)
-		self.Add_to_plot_button.pack(side = "left", anchor = "nw")
-
-		self.frame025 = tk.Frame(self.frame02)
-		self.frame025.pack(side="top", fill="x")
 
 
 
