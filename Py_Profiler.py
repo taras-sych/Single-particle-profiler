@@ -709,16 +709,16 @@ class Left_frame :
 		self.frame023.pack(side="top", fill="x")
 
 		self.Threshold_button = tk.Button(self.frame023, text="Peak analysis", command=Threshold_fun)
-		self.Threshold_button.grid(row = 0, column = 0)
+		self.Threshold_button.grid(row = 0, column = 0, sticky="W")
 
 		self.Diffusion_button = tk.Button(self.frame023, text="Diffusion analysis", command=Norm)
-		self.Diffusion_button.grid(row = 1, column = 0)
+		self.Diffusion_button.grid(row = 1, column = 0, sticky="W")
 
 		self.Add_to_plot_button = tk.Button(self.frame023, text="Plot", command=Which_tab)
-		self.Add_to_plot_button.grid(row = 2, column = 0)
+		self.Add_to_plot_button.grid(row = 2, column = 0, sticky="W")
 
 		self.Output_button = tk.Button(self.frame023, text="Output", command=Which_tab)
-		self.Output_button.grid(row = 3, column = 0)
+		self.Output_button.grid(row = 3, column = 0, sticky="W")
 
 
 
@@ -1228,6 +1228,9 @@ class Threshold_window:
 
 		self.peaks.cla()
 		self.hist1.cla()
+
+		self.peaks.set_title("Intensity traces")
+		self.hist1.set_title("Intensity histogram")
 		
 		self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.peaks.set_ylabel('Intensity (a.u.)')
@@ -1726,6 +1729,62 @@ class Threshold_window:
 	def Thresholding_type_selection(self, value):
 		print(value)
 
+	def Plot_trace(self, event):
+
+		global file_index
+		global rep_index
+
+		index = self.tree_t.selection()
+		num1, num = index[0].split('I')
+
+
+		
+
+		num = int(num, 16)
+
+		sum1 = num 
+		file = 0
+
+		rep = 0
+		
+
+
+		for i in range (len(data_list_raw)):
+			#print ("I am here")
+			rep = 0
+			sum1-=1
+			file+=1
+			if sum1 == 0:
+				file1 = file
+				rep1 = rep
+
+			
+			for j in range (repetitions_list[i]):
+				sum1-=1
+				rep+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+
+
+		if rep1 == 0:
+			rep1+=1
+
+
+
+
+		
+
+		file_index = file1-1
+		rep_index = rep1-1
+
+
+
+		rep = rep1-1
+
+		self.Initial_plot()
+
 	def __init__(self, win_width, win_height, dpi_all):
 
 		self.normalization_index = "z-score"
@@ -1750,27 +1809,72 @@ class Threshold_window:
 
 		self.win_threshold.geometry(self.line1)
 
-		self.frame000 = tk.Frame(self.win_threshold)
-		self.frame000.pack(side="top", fill="x")
+		self.frame002 = tk.Frame(self.win_threshold)
+		self.frame002.pack(side = "left", anchor = "nw")
 
 		
 
-		self.figure5 = Figure(figsize=(self.th_width/dpi_all,self.th_height/(2*dpi_all)), dpi=100)
-
-		gs = self.figure5.add_gridspec(1, 3)
 
 
-		self.peaks = self.figure5.add_subplot(gs[0, :-1])
+		self.scrollbar_t = tk.Scrollbar(self.frame002)
+		self.scrollbar_t.pack(side = "left", fill = "y")
+
+
+		self.Datalist_t = tk.Listbox(self.frame002, width = 100, height = 10)
+		self.Datalist_t.pack(side = "top", anchor = "nw")
+		
+		
+		
+		self.tree_t = CheckboxTreeview(self.Datalist_t)
+		self.tree_t.heading("#0",text="Imported datasets",anchor=tk.W)
+		self.tree_t.pack()
+
+
+		self.tree_t.config(yscrollcommand = self.scrollbar_t.set)
+		self.scrollbar_t.config(command = self.tree_t.yview)
+
+		self.tree_t.bind('<<TreeviewSelect>>', self.Plot_trace)
+
+		self.Datalist_t.config(width = 100, height = 10)
+
+
+		self.frame001 = tk.Frame(self.frame002)
+		self.frame001.pack(side = "top", anchor = "nw")
+
+
+		self.frame000 = tk.Frame(self.win_threshold)
+		self.frame000.pack(side = "left", anchor = "nw")
+
+
+		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi=100)
+						
+		gs = self.figure5.add_gridspec(2, 2)
+
+
+		self.peaks = self.figure5.add_subplot(gs[0, :2])
+
+		self.peaks.set_title("Intensity traces")
 
 		self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.peaks.set_ylabel('Intensity (a.u.)')
 		self.peaks.set_xlabel('Time (s)')
 
-		self.hist1 = self.figure5.add_subplot(gs[0, -1])
+		self.hist1 = self.figure5.add_subplot(gs[1, 0])
+
+		self.hist1.set_title("Intensity histogram")
 
 		self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.hist1.set_ylabel('Counts')
 		self.hist1.set_xlabel('Intensity (a.u.)')
+
+
+		self.gp_hist = self.figure5.add_subplot(gs[1, -1])
+
+		self.gp_hist.set_title("GP histogram")
+
+		self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.gp_hist.set_ylabel('Counts')
+		self.gp_hist.set_xlabel('GP')
 
 
 		self.canvas5 = FigureCanvasTkAgg(self.figure5, self.frame000)
@@ -1789,8 +1893,7 @@ class Threshold_window:
 
 
 
-		self.frame001 = tk.Frame(self.win_threshold)
-		self.frame001.pack(side="top", fill="x")
+		
 
 
 		
@@ -1813,7 +1916,7 @@ class Threshold_window:
 		self.Peaks_button.grid(row = 0, column = 3, sticky='w')
 
 		self.Apply_button = tk.Button(self.frame001, text="Apply and Fit", command=self.Apply)
-		self.Apply_button.grid(row = 0, column = 4)
+		self.Apply_button.grid(row = 2, column = 3)
 
 		
 
@@ -1919,11 +2022,21 @@ class Threshold_window:
 
 		#ttk.Separator(self.frame001, orient="vertical").grid(column=2, row=2, rowspan=5, sticky='ns')
 
+
+
 		
 
 		self.Initial_plot()
+
+		global tree_list
+		global tree_list_name
+		global repetitions_list
+		
 		
 
+		for i in range(0, len(tree_list_name)):
+			name = tree_list_name[i]
+			Data_tree (self.tree_t, name, data_list_current[i].repetitions)
 
 		
 
