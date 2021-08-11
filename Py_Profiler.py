@@ -1283,6 +1283,8 @@ class Threshold_window:
 
 		self.figure5.tight_layout()
 
+		self.Peaks()
+
 		
 	
 	def Update_thresholds (self):
@@ -1375,6 +1377,7 @@ class Threshold_window:
 
 		self.peaks.cla()
 		self.hist1.cla()
+		self.gp_hist.cla()
 		
 		self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.peaks.set_ylabel('Intensity (a.u.)')
@@ -1427,6 +1430,34 @@ class Threshold_window:
 		if change_normal == False:
 			self.peaks.set_xlim(main_xlim)
 			self.peaks.set_ylim(main_ylim)
+
+		
+
+		gp_list_temp = []
+
+		for k in range (len(yp1)):
+			gp_1 = (yp2_1[k] - yp1[k])/(yp2_1[k] + yp1[k])
+
+
+
+			if abs(gp_1) < 1:
+				gp_list_temp.append(gp_1)
+
+		for k in range (len(yp2)):
+			gp_1 = (yp1_2[k] - yp2[k])/(yp1_2[k] + yp2[k])
+
+
+
+			if abs(gp_1) < 1:
+				gp_list_temp.append(gp_1)
+
+
+		self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.gp_hist.set_ylabel('Counts')
+		self.gp_hist.set_xlabel('GP')
+
+		self.gp_hist.hist(gp_list_temp)
+		
 
 		self.canvas5.draw()
 
@@ -1783,7 +1814,7 @@ class Threshold_window:
 
 		rep = rep1-1
 
-		self.Initial_plot()
+		self.Peaks()
 
 	def __init__(self, win_width, win_height, dpi_all):
 
@@ -1834,6 +1865,8 @@ class Threshold_window:
 		self.scrollbar_t.config(command = self.tree_t.yview)
 
 		self.tree_t.bind('<<TreeviewSelect>>', self.Plot_trace)
+
+		#self.tree_t.bind('<<>>', )
 
 		self.Datalist_t.config(width = 100, height = 10)
 
@@ -2023,10 +2056,13 @@ class Threshold_window:
 		#ttk.Separator(self.frame001, orient="vertical").grid(column=2, row=2, rowspan=5, sticky='ns')
 
 
-
+		global change_normal
+		change_normal = True
 		
 
-		self.Initial_plot()
+		self.Peaks()
+
+
 
 		global tree_list
 		global tree_list_name
