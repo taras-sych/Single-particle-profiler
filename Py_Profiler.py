@@ -351,6 +351,15 @@ def Threshold_fun():
 
 		tk.messagebox.showerror(title='Error', message=Message_generator())
 
+def Diffusion_fun():
+	if len(tree_list_name) > 0:
+
+		th_win = Diffusion_window(win_width, win_height, dpi_all)
+
+	if len(tree_list_name) == 0:
+
+		tk.messagebox.showerror(title='Error', message=Message_generator())
+
 
 
 class Left_frame :
@@ -711,7 +720,7 @@ class Left_frame :
 		self.Threshold_button = tk.Button(self.frame023, text="Peak analysis", command=Threshold_fun)
 		self.Threshold_button.grid(row = 0, column = 0, sticky="W")
 
-		self.Diffusion_button = tk.Button(self.frame023, text="Diffusion analysis", command=Norm)
+		self.Diffusion_button = tk.Button(self.frame023, text="Diffusion analysis", command=Diffusion_fun)
 		self.Diffusion_button.grid(row = 1, column = 0, sticky="W")
 
 		self.Add_to_plot_button = tk.Button(self.frame023, text="Plot", command=Which_tab)
@@ -1142,7 +1151,284 @@ class GP_frame :
 		self.ffp_btn.grid(column = 0, row =1, sticky = "w")
 
 
+class Diffusion_window :
+
+	def Temp(self, event):
+		print(1)
+
+	def Update_plot(self, event):
+		self.Plot_curve()
+
+	def Plot_curve(self):
+
+
+		global file_index
+		global rep_index
+
+		self.curves.cla()
+
+
+		if self.ch_01_var.get() == 1:
+
+
+			x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x
+			y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.y
+
+			self.curves.scatter(x1, y1, label = "auto corr ch 1")
+
+
 		
+		if self.ch_02_var.get() == 1:
+
+			x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.x
+			y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.y
+
+			self.curves.scatter(x2, y2, label = "auto corr ch 2")
+
+
+		if self.ch_12_var.get() == 1:
+
+			x3 = data_list_current[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.x
+			y3 = data_list_current[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.y
+
+			self.curves.scatter(x3, y3, label = "cross-corr")
+
+		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.curves.set_ylabel('G(tau)')
+		self.curves.set_xlabel('Delay time')
+		self.curves.set_xscale ('log')
+
+		
+
+		self.curves.legend(loc='upper right')
+
+		self.canvas5.draw()
+
+		self.figure5.tight_layout()
+
+
+	def Choose_curve(self, event):
+
+		global file_index
+		global rep_index
+
+		index = self.tree.selection()
+		num1, num = index[0].split('I')
+
+
+		
+
+		num = int(num, 16)
+
+		sum1 = num 
+		file = 0
+
+		rep = 0
+		
+
+
+		for i in range (len(data_list_raw)):
+			#print ("I am here")
+			rep = 0
+			sum1-=1
+			file+=1
+			if sum1 == 0:
+				file1 = file
+				rep1 = rep
+
+			
+			for j in range (repetitions_list[i]):
+				sum1-=1
+				rep+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+
+
+		if rep1 == 0:
+			rep1+=1
+
+
+
+
+		
+
+		file_index = file1-1
+		rep_index = rep1-1
+
+
+
+		rep = rep1-1
+
+		self.Plot_curve()
+
+	def __init__(self, win_width, win_height, dpi_all):
+
+
+		global file_index
+		global rep_index
+
+		self.win_diff = tk.Toplevel()
+
+		self.th_width = round(0.7*self.win_diff.winfo_screenwidth())
+		self.th_height = round(0.4*self.win_diff.winfo_screenwidth())
+
+		self.line1 = str(self.th_width) + "x" + str(self.th_height)
+
+
+		self.win_diff.geometry(self.line1)
+
+		self.frame002 = tk.Frame(self.win_diff)
+		self.frame002.pack(side = "left", anchor = "nw")
+
+		
+
+
+
+		self.scrollbar = tk.Scrollbar(self.frame002)
+		self.scrollbar.pack(side = "left", fill = "y")
+
+
+		self.Datalist = tk.Listbox(self.frame002, width = 100, height = 10)
+		self.Datalist.pack(side = "top", anchor = "nw")
+		
+		
+		
+		self.tree = CheckboxTreeview(self.Datalist)
+		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
+		self.tree.pack()
+
+
+		self.tree.config(yscrollcommand = self.scrollbar.set)
+		self.scrollbar.config(command = self.tree.yview)
+
+		self.tree.bind('<<TreeviewSelect>>', self.Choose_curve)
+
+
+
+		self.Datalist.config(width = 100, height = 10)
+
+
+		self.frame003 = tk.Frame(self.frame002)
+		self.frame003.pack(side = "top", anchor = "nw")
+
+		self.ch_01_var = tk.IntVar(value=1)
+		self.ch_02_var = tk.IntVar(value=1)
+		self.ch_12_var = tk.IntVar(value=1)
+		self.ch_21_var = tk.IntVar(value=1)
+
+		self.CH_01=tk.Checkbutton(self.frame003, text="CH_01", variable=self.ch_01_var, command=self.Plot_curve)
+		self.CH_01.grid(row = 0, column = 0, sticky='w')
+
+		self.CH_02=tk.Checkbutton(self.frame003, text="CH_02", variable=self.ch_02_var, command=self.Plot_curve)
+		self.CH_02.grid(row = 0, column = 1, sticky='w')
+
+		self.CH_12=tk.Checkbutton(self.frame003, text="CH_12", variable=self.ch_12_var, command=self.Plot_curve)
+		self.CH_12.grid(row = 0, column = 2, sticky='w')
+
+		self.CH_21=tk.Checkbutton(self.frame003, text="CH_21", variable=self.ch_21_var, command=self.Plot_curve)
+		self.CH_21.grid(row = 0, column = 3, sticky='w')
+
+
+		self.frame000 = tk.Frame(self.win_diff)
+		self.frame000.pack(side = "left", anchor = "nw")
+
+
+		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi=100)
+						
+		gs = self.figure5.add_gridspec(4, 1)
+
+
+		self.curves = self.figure5.add_subplot(gs[:3, 0])
+
+		self.curves.set_title("Correlation curves")
+
+		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.curves.set_ylabel('G(tau)')
+		self.curves.set_xlabel('Delay time (s)')
+
+		self.residuals = self.figure5.add_subplot(gs[3, 0])
+
+		#self.hist1.set_title("Intensity histogram")
+
+		self.residuals.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.residuals.set_ylabel('Counts')
+		self.residuals.set_xlabel('Residuals')
+
+
+
+
+		self.canvas5 = FigureCanvasTkAgg(self.figure5, self.frame000)
+		self.canvas5.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas5, self.frame000)
+		self.toolbar.update()
+		self.canvas5.get_tk_widget().pack()
+
+		self.figure5.tight_layout()
+
+
+
+		
+
+
+
+
+		
+		self.frame001 = tk.Frame(self.frame002)
+		self.frame001.pack(side = "top", anchor = "nw")
+
+		
+
+		self.Norm_label = tk.Label(self.frame001, text="FCS curve fitting: ")
+		self.Norm_label.grid(row = 0, column = 0, sticky = 'w')
+
+		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet", "no triplet"], width = 9 )
+		self.Triplet.config(state = "readonly")
+		
+		self.Triplet.grid(row = 1, column = 0, sticky='w')
+
+		self.Triplet.set("triplet")
+
+		self.Triplet.bind("<<ComboboxSelected>>", self.Temp)
+
+		self.Components = ttk.Combobox(self.frame001,values = ["1 component", "2 components", "3 components"], width = 9 )
+		self.Components.config(state = "readonly")
+		
+		self.Components.grid(row = 1, column = 1, sticky='w')
+
+		self.Components.set("1 component")
+
+		self.Components.bind("<<ComboboxSelected>>", self.Temp)
+
+
+
+		self.Fit_button = tk.Button(self.frame001, text="Fit", command=self.Temp)
+		self.Fit_button.grid(row = 2, column = 0, sticky='w')
+
+		self.Fit_all_button = tk.Button(self.frame001, text="Fit all", command=self.Temp)
+		self.Fit_all_button.grid(row = 2, column = 1, sticky='w')
+
+		self.Table_label = tk.Label(self.frame001, text="Fitting parampampams: ")
+		self.Table_label.grid(row = 3, column = 0, sticky = 'w')
+
+
+		
+
+		global tree_list
+		global tree_list_name
+		global repetitions_list
+		
+		
+
+		for i in range(0, len(tree_list_name)):
+			name = tree_list_name[i]
+			Data_tree (self.tree, name, data_list_current[i].repetitions)
+
+
+		self.Plot_curve()
+
 
 
 class Threshold_window:
