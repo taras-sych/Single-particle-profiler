@@ -3,6 +3,10 @@ from tkinter import ttk
 from tkinter import font as tkFont
 import matplotlib.pyplot as plt
 
+
+from pandastable import Table
+from pandas import DataFrame
+
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 #from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2TkAgg)
 # Implement the default Matplotlib key bindings.
@@ -1159,6 +1163,7 @@ class Diffusion_window :
 	def Update_plot(self, event):
 		self.Plot_curve()
 
+
 	def Plot_curve(self):
 
 
@@ -1262,6 +1267,63 @@ class Diffusion_window :
 		rep = rep1-1
 
 		self.Plot_curve()
+
+	def Fitting_frame(self):
+
+		self.frame004.destroy()
+
+		self.frame004 = tk.Frame(self.frame002)
+		self.frame004.pack(side = "top", anchor = "nw")
+
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
+
+			list_of_params = ['offset', 'GN0', 'N(FCS)', 'A', 'txy', 'alpha', 'B', 'T(tri)' ]
+
+			
+
+		Label_1 = tk.Label(self.frame004, text="Param")
+		Label_1.grid(row = 0, column = 0, sticky = 'w')
+
+		Label_1 = tk.Label(self.frame004, text="Init")
+		Label_1.grid(row = 0, column = 1, sticky = 'w')
+
+		Label_1 = tk.Label(self.frame004, text="Var")
+		Label_1.grid(row = 0, column = 2, sticky = 'w')
+
+		Label_1 = tk.Label(self.frame004, text="Min")
+		Label_1.grid(row = 0, column = 3, sticky = 'w')
+
+		Label_1 = tk.Label(self.frame004, text="Max")
+		Label_1.grid(row = 0, column = 4, sticky = 'w')
+
+		full_dict = {}
+		row_index = 1
+
+
+		for param in list_of_params:
+			thisdict = {
+						"Name": tk.Label(self.frame004, text=param),
+							"Init": tk.Entry(self.frame004, width = 5),
+							"Var": tk.Checkbutton(self.frame004, variable=True),
+							"Min": tk.Entry(self.frame004, width = 5),
+							"Max": tk.Entry(self.frame004, width = 5),
+						}
+
+			full_dict[param] = thisdict
+
+			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'w')
+			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'w')
+			thisdict["Var"].grid(row = row_index, column = 2, sticky = 'w')
+			thisdict["Var"].select()
+			thisdict["Min"].grid(row = row_index, column = 3, sticky = 'w')
+			thisdict["Max"].grid(row = row_index, column = 4, sticky = 'w')
+
+			row_index+=1
+
+
+
+
+
 
 	def __init__(self, win_width, win_height, dpi_all):
 
@@ -1414,6 +1476,11 @@ class Diffusion_window :
 		self.Table_label.grid(row = 3, column = 0, sticky = 'w')
 
 
+
+		self.frame004 = tk.Frame(self.frame002)
+		self.frame004.pack(side = "top", anchor = "nw")
+
+		self.Fitting_frame()
 		
 
 		global tree_list
