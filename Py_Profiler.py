@@ -1664,10 +1664,14 @@ class Threshold_window:
 		self.peaks.cla()
 		self.hist1.cla()
 		self.gp_hist.cla()
+
+		self.peaks.set_title("Intensity traces")
 		
 		self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.peaks.set_ylabel('Intensity (a.u.)')
 		self.peaks.set_xlabel('Time (s)')
+
+		self.hist1.set_title("Intensity histograms")
 
 		self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.hist1.set_ylabel('Counts')
@@ -1692,8 +1696,8 @@ class Threshold_window:
 
 			
 
-			self.hist1.hist(yh1, bins = 150)
-			self.hist1.hist(yh2, bins = 150)
+			self.hist1.hist(yh1)
+			self.hist1.hist(yh2)
 
 		if which_channel == "channel 1":
 			self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
@@ -1701,7 +1705,7 @@ class Threshold_window:
 			
 			if (self.var.get() == 1):
 				self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
-			self.hist1.hist(yh1, bins = 150)
+			self.hist1.hist(yh1)
 			
 
 		if which_channel == "channel 2":
@@ -1711,7 +1715,7 @@ class Threshold_window:
 
 			if (self.var.get() == 1):
 				self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
-			self.hist1.hist(yh2, bins = 150)
+			self.hist1.hist(yh2)
 
 		if change_normal == False:
 			self.peaks.set_xlim(main_xlim)
@@ -1738,6 +1742,8 @@ class Threshold_window:
 				gp_list_temp.append(gp_1)
 
 
+		
+		self.gp_hist.set_title("GP histogram")
 		self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.gp_hist.set_ylabel('Counts')
 		self.gp_hist.set_xlabel('GP')
