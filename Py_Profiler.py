@@ -1469,6 +1469,8 @@ class Diffusion_window :
 		self.Fit_button = tk.Button(self.frame001, text="Fit", command=self.Temp)
 		self.Fit_button.grid(row = 2, column = 0, sticky='w')
 
+
+
 		self.Fit_all_button = tk.Button(self.frame001, text="Fit all", command=self.Temp)
 		self.Fit_all_button.grid(row = 2, column = 1, sticky='w')
 
@@ -1499,6 +1501,50 @@ class Diffusion_window :
 
 
 class Threshold_window:
+
+
+	def Fit_gaus(self):
+
+		
+		
+
+			
+		
+		global fit_list_x
+		global fit_list_y
+		global Fit_params
+
+		x = self.x_bins
+		y = self.n
+
+
+
+		x1 = np.linspace(min(x), max(x), num=500)
+
+		if (self.Components.get() == "1 component"):
+
+			popt,pcov = curve_fit(Gauss, x, y)
+
+			
+
+			self.gp_hist.cla()
+
+			self.gp_hist.set_title("Intensity traces")
+			self.gp_hist.bar(self.x_bins, self.n, label = 'raw')
+			#self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+
+			self.canvas5.draw()
+
+			self.figure5.tight_layout()
+
+			
+
+				
+				
+
+			
+
+		
 
 
 
@@ -1815,13 +1861,80 @@ class Threshold_window:
 		self.gp_hist.set_ylabel('Counts')
 		self.gp_hist.set_xlabel('GP')
 
-		self.gp_hist.hist(gp_list_temp)
+		self.n, bins , patches = self.gp_hist.hist(gp_list_temp)
+
+		self.x_bins=[]
+		for ii in range (len(bins)-1):
+			self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
+
+		
+
+
 		
 
 		self.canvas5.draw()
 
 		self.figure5.tight_layout()
 
+	def Fitting_frame(self):
+
+		self.frame004.destroy()
+
+		self.frame004 = tk.Frame(self.frame002)
+		self.frame004.pack(side = "top", anchor = "nw")
+
+		if self.Components.get() == '1 component':
+
+			list_of_params = ['A', 'Mean', 'Sigma' ]
+
+		if self.Components.get() == '2 components':
+
+			list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2' ]
+
+		if self.Components.get() == '3 components':
+
+			list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2', 'A3', 'Mean3', 'Sigma3' ]
+
+			
+
+		Label_1 = tk.Label(self.frame004, text="Param")
+		Label_1.grid(row = 0, column = 0, sticky = 'w')
+
+		Label_1 = tk.Label(self.frame004, text="Init")
+		Label_1.grid(row = 0, column = 1, sticky = 'w')
+
+		Label_1 = tk.Label(self.frame004, text="Var")
+		Label_1.grid(row = 0, column = 2, sticky = 'w')
+
+		Label_1 = tk.Label(self.frame004, text="Min")
+		Label_1.grid(row = 0, column = 3, sticky = 'w')
+
+		Label_1 = tk.Label(self.frame004, text="Max")
+		Label_1.grid(row = 0, column = 4, sticky = 'w')
+
+		full_dict = {}
+		row_index = 1
+
+
+		for param in list_of_params:
+			thisdict = {
+						"Name": tk.Label(self.frame004, text=param),
+							"Init": tk.Entry(self.frame004, width = 5),
+							"Var": tk.Checkbutton(self.frame004, variable=True),
+							"Min": tk.Entry(self.frame004, width = 5),
+							"Max": tk.Entry(self.frame004, width = 5),
+						}
+
+			full_dict[param] = thisdict
+
+			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'w')
+			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'w')
+			thisdict["Var"].grid(row = row_index, column = 2, sticky = 'w')
+			thisdict["Var"].select()
+			thisdict["Min"].grid(row = row_index, column = 3, sticky = 'w')
+			thisdict["Max"].grid(row = row_index, column = 4, sticky = 'w')
+
+			row_index+=1
 
 	def Threshold_callback(self, event):
 
@@ -2118,6 +2231,9 @@ class Threshold_window:
 
 	def Thresholding_type_selection(self, value):
 		print(value)
+
+	def Choose_components (self, event):
+		self.Fitting_frame()
 
 	def Plot_trace(self, event):
 
@@ -2433,6 +2549,32 @@ class Threshold_window:
 			name = tree_list_name[i]
 			Data_tree (self.tree_t, name, data_list_current[i].repetitions)
 
+
+
+		self.frame007 = tk.Frame(self.frame002)
+		self.frame007.pack(side = "top", anchor = "nw")
+
+
+
+		self.Fit_button = tk.Button(self.frame007, text="Fit", command=self.Fit_gaus)
+		self.Fit_button.grid(row = 0, column = 0, sticky='w')
+
+		self.Components = ttk.Combobox(self.frame007,values = ["1 component", "2 components", "3 components"], width = 13 )
+		self.Components.config(state = "readonly")
+		self.Components.grid(row = 0, column = 1)
+		self.Components.set("1 component")
+
+		self.Components.bind("<<ComboboxSelected>>", self.Choose_components)
+
+		self.Param_label = tk.Label(self.frame007, text="Fitting parampampams:")
+		self.Components.grid(row = 1, column = 0, sticky='w', columnspan = 2)
+
+
+		self.frame004 = tk.Frame(self.frame002)
+		self.frame004.pack(side = "top", anchor = "nw")
+
+		self.Fitting_frame()
+
 		
 
 		"""self.Norm_button = tk.Button(self.frame001, text="Normalize", command=self.Normalize)
@@ -2461,7 +2603,8 @@ class Threshold_window:
 	#-------------------------------------------------------------------------------------------------------------------------------------------------------
 	#-------------------------------------------------------------------------------------------------------------------------------------------------------
 
-
+	def Temp(self):
+		print(1)
 
 
 class Fitting_window:
