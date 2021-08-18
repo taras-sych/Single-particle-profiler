@@ -569,6 +569,8 @@ class Left_frame :
 
 	def Plot_data(self, event):
 
+		
+
 		global file_index
 		global rep_index
 
@@ -1529,162 +1531,21 @@ class Threshold_window:
 
 			self.gp_hist.cla()
 
-			self.gp_hist.set_title("Intensity traces")
-			self.gp_hist.bar(self.x_bins, self.n, label = 'raw')
-			#self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+
+			self.gp_hist.set_title("GP histogram")
+			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.gp_hist.set_ylabel('Counts')
+			self.gp_hist.set_xlabel('GP')
+			self.gp_hist.bar(x, y, width=0.2, bottom=None, align='center', label = 'raw')
+			self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
 
 			self.canvas5.draw()
 
 			self.figure5.tight_layout()
 
-			
-
-				
-				
 
 			
 
-		
-
-
-
-	def Initial_plot (self):
-
-		#print(self.var.get())
-
-		th1 = data_list_current[file_index].threshold_ch1
-		th2 = data_list_current[file_index].threshold_ch2
-
-
-		
-
-		x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
-		y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
-
-		x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
-		y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
-
-		if th1 == 0:
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(round(np.mean(y1),2)))
-
-		if th2 == 0:
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(round(np.mean(y2),2)))
-
-
-
-		data_list_current[file_index].threshold_ch1 = float(self.ch1_th.get())
-
-		data_list_current[file_index].threshold_ch2 = float(self.ch2_th.get())
-
-
-		th1 = data_list_current[file_index].threshold_ch1
-		th2 = data_list_current[file_index].threshold_ch2
-
-		yh1 = []
-		yh2 = []
-
-		
-		
-
-		for el in y1:
-			if el >= th1:
-				yh1.append(el)
-
-		for el in y2:
-			if el >= th1:
-				yh2.append(el)
-
-
-
-		which_channel = self.Threshold.get()
-
-		
-		peaks1, _ = find_peaks(y1, height=th1)
-
-		xp1 = []
-		yp1 = []
-		yp2_1 = []
-		for p in peaks1:
-			xp1.append(x1[p])
-			yp1.append(y1[p])
-			yp2_1.append(y2[p])
-
-
-		peaks1, _ = find_peaks(y2, height=th2)
-
-		xp2 = []
-		yp2 = []
-		yp1_2 = []
-
-		for p in peaks1:
-			xp2.append(x2[p])
-			yp2.append(y2[p])
-			yp1_2.append(y1[p])
-		
-
-
-		self.peaks.cla()
-		self.hist1.cla()
-
-		self.peaks.set_title("Intensity traces")
-		self.hist1.set_title("Intensity histogram")
-		
-		self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.peaks.set_ylabel('Intensity (a.u.)')
-		self.peaks.set_xlabel('Time (s)')
-
-		self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.hist1.set_ylabel('Counts')
-		self.hist1.set_xlabel('Intensity (a.u.)')
-
-		if which_channel == "both":
-
-			
-
-			self.peaks.plot(x1, y1, zorder=1)
-			self.peaks.plot(x2, y2, zorder=2)
-
-			self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=3)
-			self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=4)
-
-			
-			if (self.var.get() == 1):
-				self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 5)
-				self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 6)
-
-
-			
-
-			self.hist1.hist(yh1, bins = 150)
-			self.hist1.hist(yh2, bins = 150)
-
-		if which_channel == "channel 1":
-			self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
-			self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
-			
-			if (self.var.get() == 1):
-				self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
-			self.hist1.hist(yh1, bins = 150)
-			
-
-		if which_channel == "channel 2":
-			
-			self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
-			self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=2)
-
-			if (self.var.get() == 1):
-				self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
-			self.hist1.hist(yh2, bins = 150)
-
-		self.canvas5.draw()
-
-		self.figure5.tight_layout()
-
-		self.Peaks()
-
-		
 	
 	def Update_thresholds (self):
 		global change_normal
@@ -1693,9 +1554,10 @@ class Threshold_window:
 
 
 	def Peaks (self):
+		
 		global change_normal
 
-		#print(self.var.get())
+		
 		main_xlim = self.peaks.get_xlim()
 		main_ylim = self.peaks.get_ylim()
 
@@ -1863,9 +1725,14 @@ class Threshold_window:
 
 		self.n, bins , patches = self.gp_hist.hist(gp_list_temp)
 
+		
+
+
 		self.x_bins=[]
 		for ii in range (len(bins)-1):
 			self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
+
+
 
 		
 
@@ -1966,7 +1833,7 @@ class Threshold_window:
 
 
 		for i in range (data_list_current[file_index].repetitions):
-			#print(i)
+			
 	
 
 
@@ -2126,11 +1993,11 @@ class Threshold_window:
 
 
 
-			#print(X_all)
+			
 
 			peaks_list[file_index][i] = copy.deepcopy(Found_peaks(X_all, Y_all, T_all))
 
-			#print(peaks_list[file_index][i].x)
+			
 
 			#self.win_threshold.destroy()
 
@@ -2216,17 +2083,18 @@ class Threshold_window:
 		self.normalization_index = self.Normalization.get()
 		
 		if self.normalization_index == "z-score":
-			#print (self.normalization_index)
+			
 			self.Normalize()
 
 
 		if self.normalization_index == "manual":
-			#print (self.normalization_index)
+			
 			self.Normalize()
 
 	def Normalize_for_plot_index(self, event):
+		
 		self.normalization_index_for_plot = self.Normalization_for_plot.get()
-		#print (self.normalization_index_for_plot)
+		
 
 
 	def Thresholding_type_selection(self, value):
@@ -2236,6 +2104,8 @@ class Threshold_window:
 		self.Fitting_frame()
 
 	def Plot_trace(self, event):
+
+		
 
 		global file_index
 		global rep_index
@@ -2256,7 +2126,7 @@ class Threshold_window:
 
 
 		for i in range (len(data_list_raw)):
-			#print ("I am here")
+			
 			rep = 0
 			sum1-=1
 			file+=1
@@ -2292,6 +2162,8 @@ class Threshold_window:
 		self.Peaks()
 
 	def __init__(self, win_width, win_height, dpi_all):
+
+
 
 		self.normalization_index = "z-score"
 
@@ -2394,18 +2266,7 @@ class Threshold_window:
 
 		self.figure5.tight_layout()
 
-
-
 		
-
-
-
-
-		
-
-
-		
-
 		self.Norm_label = tk.Label(self.frame001, text="Use for plot: ")
 		self.Norm_label.grid(row = 0, column = 0, sticky = 'w')
 
@@ -2535,7 +2396,6 @@ class Threshold_window:
 		change_normal = True
 		
 
-		self.Peaks()
 
 
 
@@ -2577,31 +2437,7 @@ class Threshold_window:
 
 		
 
-		"""self.Norm_button = tk.Button(self.frame001, text="Normalize", command=self.Normalize)
-								self.Norm_button.grid(row = 3, column = 0)
-						
-								self.Normalization = ttk.Combobox(self.frame001,values = ["raw", "z-score", "mean" ] )
-								self.Normalization.config(state = "readonly")
-								#Threshold.config(font=helv36)
-								self.Normalization.grid(row = 3, column = 1)
-						
-								self.Normalization.set("raw")
-						
-								self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)"""
 
-
-
-
-
-
-
-
-
-
-	#-------------------------------------------------------------------------------------------------------------------------------------------------------
-	#-------------------------------------------------------------------------------------------------------------------------------------------------------
-	#-------------------------------------------------------------------------------------------------------------------------------------------------------
-	#-------------------------------------------------------------------------------------------------------------------------------------------------------
 
 	def Temp(self):
 		print(1)
