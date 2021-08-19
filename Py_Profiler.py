@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import font as tkFont
 import matplotlib.pyplot as plt
 
-from lmfit import Model
+import lmfit
 
 
 from pandastable import Table
@@ -1507,6 +1507,17 @@ class Diffusion_window :
 class Threshold_window:
 
 
+	def resid (self, params, x, ydata ):
+
+		a = params['A'].value
+		x0 = params['Mean'].value
+		sigma = params['Sigma'].value
+
+
+		y_model = a * np.exp(-(x - x0)**2 / (2 * sigma**2))
+		return y_model - ydata
+
+
 	def Fit_gaus(self):
 
 		
@@ -1521,36 +1532,56 @@ class Threshold_window:
 		x = self.x_bins
 		y = self.n
 
+		params = lmfit.Parameters()
 
+		row_index = 1
+		for param in self.list_of_params:
+			print (self.fixed_list[row_index-1].get())
+			params.add(param, 
+				float(self.full_dict[param]["Init"].get()), 
+				vary = self.fixed_list[row_index-1].get(), 
+				min = float(self.full_dict[param]["Min"].get()), 
+				max = float(self.full_dict[param]["Max"].get()))
+
+			row_index+=1
+
+ 
 
 		x1 = np.linspace(min(x), max(x), num=500)
 
-		if (self.Components.get() == "1 component"):
 
-			popt,pcov = curve_fit(Gauss, x, y)
+		method = 'L-BFGS-B'
 
+		o1 = lmfit.minimize(self.resid, params, args=(x, y), method=method)
+		print("# Fit using sum of squares:\n")
+		lmfit.report_fit(o1)
 
-			for par_i in range (0, len(self.list_of_params)):
-				param = self.list_of_params[par_i]
-				self.full_dict[param]["Init"].delete(0,"end")
-				self.full_dict[param]["Init"].insert(0,str(round(popt[par_i],2)))
+		"""if (self.Components.get() == "1 component"):
+									
+												popt,pcov = curve_fit(Gauss, x, y)
+									
+									
+												for par_i in range (0, len(self.list_of_params)):
+													param = self.list_of_params[par_i]
+													self.full_dict[param]["Init"].delete(0,"end")
+													self.full_dict[param]["Init"].insert(0,str(round(popt[par_i],2)))"""
 
 
 			
 
-			self.gp_hist.cla()
-
-
-			self.gp_hist.set_title("GP histogram")
-			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-			self.gp_hist.set_ylabel('Counts')
-			self.gp_hist.set_xlabel('GP')
-			self.gp_hist.bar(x, y, width=0.2, bottom=None, align='center', label = 'raw')
-			self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
-
-			self.canvas5.draw()
-
-			self.figure5.tight_layout()
+		"""self.gp_hist.cla()
+									
+									
+												self.gp_hist.set_title("GP histogram")
+												self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+												self.gp_hist.set_ylabel('Counts')
+												self.gp_hist.set_xlabel('GP')
+												self.gp_hist.bar(x, y, width=0.2, bottom=None, align='center', label = 'raw')
+												self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+									
+												self.canvas5.draw()
+									
+												self.figure5.tight_layout()"""
 
 
 			
@@ -1766,6 +1797,11 @@ class Threshold_window:
 			self.list_of_min = ['0', '-1', '-1']
 			self.list_of_max = ['10000', '1', '1']
 
+
+
+
+			
+
 		if self.Components.get() == '2 components':
 
 			self.list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2' ]
@@ -1800,12 +1836,14 @@ class Threshold_window:
 		self.full_dict = {}
 		row_index = 1
 
-
+		self.fixed_list = []
 		for param in self.list_of_params:
+			self.fixed_list.append(tk.IntVar(value = 1))
 			thisdict = {
 						"Name": tk.Label(self.frame004, text=param),
 							"Init": tk.Entry(self.frame004, width = 5),
-							"Var": tk.Checkbutton(self.frame004, variable=True),
+							
+							"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-1]),
 							"Min": tk.Entry(self.frame004, width = 5),
 							"Max": tk.Entry(self.frame004, width = 5),
 						}
@@ -1817,7 +1855,7 @@ class Threshold_window:
 			thisdict["Init"].delete(0,"end")
 			thisdict["Init"].insert(0,self.list_of_inits[row_index-1])
 			thisdict["Var"].grid(row = row_index, column = 2, sticky = 'w')
-			thisdict["Var"].select()
+			
 			thisdict["Min"].grid(row = row_index, column = 3, sticky = 'w')
 			thisdict["Min"].delete(0,"end")
 			thisdict["Min"].insert(0,self.list_of_min[row_index-1])
