@@ -1527,6 +1527,13 @@ class Threshold_window:
 
 			popt,pcov = curve_fit(Gauss, x, y)
 
+
+			for par_i in range (0, len(self.list_of_params)):
+				param = self.list_of_params[par_i]
+				self.full_dict[param]["Init"].delete(0,"end")
+				self.full_dict[param]["Init"].insert(0,str(round(popt[par_i],2)))
+
+
 			
 
 			self.gp_hist.cla()
@@ -1752,15 +1759,15 @@ class Threshold_window:
 
 		if self.Components.get() == '1 component':
 
-			list_of_params = ['A', 'Mean', 'Sigma' ]
+			self.list_of_params = ['A', 'Mean', 'Sigma' ]
 
 		if self.Components.get() == '2 components':
 
-			list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2' ]
+			self.list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2' ]
 
 		if self.Components.get() == '3 components':
 
-			list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2', 'A3', 'Mean3', 'Sigma3' ]
+			self.list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2', 'A3', 'Mean3', 'Sigma3' ]
 
 			
 
@@ -1779,11 +1786,11 @@ class Threshold_window:
 		Label_1 = tk.Label(self.frame004, text="Max")
 		Label_1.grid(row = 0, column = 4, sticky = 'w')
 
-		full_dict = {}
+		self.full_dict = {}
 		row_index = 1
 
 
-		for param in list_of_params:
+		for param in self.list_of_params:
 			thisdict = {
 						"Name": tk.Label(self.frame004, text=param),
 							"Init": tk.Entry(self.frame004, width = 5),
@@ -1792,7 +1799,7 @@ class Threshold_window:
 							"Max": tk.Entry(self.frame004, width = 5),
 						}
 
-			full_dict[param] = thisdict
+			self.full_dict[param] = thisdict
 
 			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'w')
 			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'w')
@@ -2213,7 +2220,7 @@ class Threshold_window:
 
 		self.tree_t.bind('<<TreeviewSelect>>', self.Plot_trace)
 
-		#self.tree_t.bind('<<>>', )
+		
 
 		self.Datalist_t.config(width = 100, height = 10)
 
