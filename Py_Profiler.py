@@ -3,6 +3,8 @@ from tkinter import ttk
 from tkinter import font as tkFont
 import matplotlib.pyplot as plt
 
+from lmfit import Model
+
 
 from pandastable import Table
 from pandas import DataFrame
@@ -1760,14 +1762,23 @@ class Threshold_window:
 		if self.Components.get() == '1 component':
 
 			self.list_of_params = ['A', 'Mean', 'Sigma' ]
+			self.list_of_inits = ['0', '0', '0']
+			self.list_of_min = ['0', '-1', '-1']
+			self.list_of_max = ['10000', '1', '1']
 
 		if self.Components.get() == '2 components':
 
 			self.list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2' ]
+			self.list_of_inits = ['0', '0', '0', '0', '0', '0']
+			self.list_of_min = ['0', '-1', '-1', '0', '-1', '-1']
+			self.list_of_max = ['10000', '1', '1', '10000', '1', '1']
 
 		if self.Components.get() == '3 components':
 
 			self.list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2', 'A3', 'Mean3', 'Sigma3' ]
+			self.list_of_inits = ['0', '0', '0', '0', '0', '0', '0', '0', '0']
+			self.list_of_min = ['0', '-1', '-1', '0', '-1', '-1', '0', '-1', '-1']
+			self.list_of_max = ['10000', '1', '1', '10000', '1', '1', '10000', '1', '1']
 
 			
 
@@ -1803,10 +1814,16 @@ class Threshold_window:
 
 			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'w')
 			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'w')
+			thisdict["Init"].delete(0,"end")
+			thisdict["Init"].insert(0,self.list_of_inits[row_index-1])
 			thisdict["Var"].grid(row = row_index, column = 2, sticky = 'w')
 			thisdict["Var"].select()
 			thisdict["Min"].grid(row = row_index, column = 3, sticky = 'w')
+			thisdict["Min"].delete(0,"end")
+			thisdict["Min"].insert(0,self.list_of_min[row_index-1])
 			thisdict["Max"].grid(row = row_index, column = 4, sticky = 'w')
+			thisdict["Max"].delete(0,"end")
+			thisdict["Max"].insert(0,self.list_of_max[row_index-1])
 
 			row_index+=1
 
