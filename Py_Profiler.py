@@ -1509,12 +1509,23 @@ class Threshold_window:
 
 	def resid (self, params, x, ydata ):
 
-		a = params['A'].value
-		x0 = params['Mean'].value
-		sigma = params['Sigma'].value
+		param_list = []
 
+		for param in self.list_of_params:
 
-		y_model = a * np.exp(-(x - x0)**2 / (2 * sigma**2))
+			param_list.append( np.float64(params[param].value))
+		
+
+		
+		
+		if self.Components.get() == '1 component':
+			y_model = Gauss(x, *param_list)
+
+		if self.Components.get() == '2 components':
+			y_model = Gauss2(x, *param_list)
+
+		if self.Components.get() == '3 components':
+			y_model = Gauss3(x, *param_list)
 		return y_model - ydata
 
 
@@ -1536,7 +1547,7 @@ class Threshold_window:
 
 		row_index = 1
 		for param in self.list_of_params:
-			print (self.fixed_list[row_index-1].get())
+
 			params.add(param, 
 				float(self.full_dict[param]["Init"].get()), 
 				vary = self.fixed_list[row_index-1].get(), 
@@ -1553,35 +1564,63 @@ class Threshold_window:
 		method = 'L-BFGS-B'
 
 		o1 = lmfit.minimize(self.resid, params, args=(x, y), method=method)
-		print("# Fit using sum of squares:\n")
-		lmfit.report_fit(o1)
+		#print("# Fit using sum of squares:\n")
+		#lmfit.report_fit(o1)
 
-		"""if (self.Components.get() == "1 component"):
-									
-												popt,pcov = curve_fit(Gauss, x, y)
-									
-									
-												for par_i in range (0, len(self.list_of_params)):
-													param = self.list_of_params[par_i]
-													self.full_dict[param]["Init"].delete(0,"end")
-													self.full_dict[param]["Init"].insert(0,str(round(popt[par_i],2)))"""
+
+		params = o1.params
+		print ("Chi_Sqr = ", o1.chisqr)
+		print ("Reduced Chi_Sqr = ", o1.redchi)
+		popt = []
+		for param in self.list_of_params:
+			
+			self.full_dict[param]["Init"].delete(0,"end")
+			self.full_dict[param]["Init"].insert(0,str(round(params[param].value,3)))
+			popt.append(np.float64(params[param].value))
 
 
 			
 
-		"""self.gp_hist.cla()
+
+
+
+
+			
+
+		self.gp_hist.cla()
 									
 									
-												self.gp_hist.set_title("GP histogram")
-												self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-												self.gp_hist.set_ylabel('Counts')
-												self.gp_hist.set_xlabel('GP')
-												self.gp_hist.bar(x, y, width=0.2, bottom=None, align='center', label = 'raw')
-												self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
-									
-												self.canvas5.draw()
-									
-												self.figure5.tight_layout()"""
+		self.gp_hist.set_title("GP histogram")
+		self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.gp_hist.set_ylabel('Counts')
+		self.gp_hist.set_xlabel('GP')
+		self.gp_hist.bar(x, y, width=0.2, bottom=None, align='center', label = 'raw')
+		
+
+		if self.Components.get() == '1 component':
+			self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+
+		if self.Components.get() == '2 components':
+			self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
+			popt1 = popt[:3]
+			popt2 = popt[3:6]
+			self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
+			self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+
+		if self.Components.get() == '3 components':
+			self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
+			popt1 = popt[:3]
+			popt2 = popt[3:6]
+			popt3 = popt[6:9]
+			self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
+			self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+			self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
+
+
+
+		self.canvas5.draw()
+
+		self.figure5.tight_layout()
 
 
 			
@@ -1793,7 +1832,7 @@ class Threshold_window:
 		if self.Components.get() == '1 component':
 
 			self.list_of_params = ['A', 'Mean', 'Sigma' ]
-			self.list_of_inits = ['0', '0', '0']
+			self.list_of_inits = ['0.5', '-0.16', '0.5']
 			self.list_of_min = ['0', '-1', '-1']
 			self.list_of_max = ['10000', '1', '1']
 
@@ -1805,14 +1844,14 @@ class Threshold_window:
 		if self.Components.get() == '2 components':
 
 			self.list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2' ]
-			self.list_of_inits = ['0', '0', '0', '0', '0', '0']
+			self.list_of_inits = ['0.5', '-0.16', '0.5', '0.5', '-0.16', '0.5']
 			self.list_of_min = ['0', '-1', '-1', '0', '-1', '-1']
 			self.list_of_max = ['10000', '1', '1', '10000', '1', '1']
 
 		if self.Components.get() == '3 components':
 
 			self.list_of_params = ['A1', 'Mean1', 'Sigma1', 'A2', 'Mean2', 'Sigma2', 'A3', 'Mean3', 'Sigma3' ]
-			self.list_of_inits = ['0', '0', '0', '0', '0', '0', '0', '0', '0']
+			self.list_of_inits = ['0.5', '-0.16', '0.5', '0.5', '-0.16', '0.5', '0.5', '-0.16', '0.5']
 			self.list_of_min = ['0', '-1', '-1', '0', '-1', '-1', '0', '-1', '-1']
 			self.list_of_max = ['10000', '1', '1', '10000', '1', '1', '10000', '1', '1']
 
