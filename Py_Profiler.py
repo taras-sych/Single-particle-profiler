@@ -67,6 +67,10 @@ def Message_generator():
 	index = random.randint(0, len(messages)-1)
 	return messages[index]
 
+def Corr_curve(tc, offset, GN0, A1, txy1, alpha1, AR1, B1, tauT1 ):
+
+	return offset + GN0 * (A1*(((1+((tc/txy1)**alpha1))**-1)*(((1+(tc/((AR1**2)*txy1)))**-0.5)))) * (1 + (B1*np.exp(-tc/tauT1)))
+
 
 def Gauss(x, a, x0, sigma):
 
@@ -1161,6 +1165,98 @@ class GP_frame :
 
 class Diffusion_window :
 
+
+	def Fit_corr_curve(self):
+
+		
+		
+
+
+		x = self.x_fit
+		y = self.y_fit
+
+		params = lmfit.Parameters()
+
+		row_index = 1
+		for param in self.list_of_params:
+
+			params.add(param, 
+				float(self.full_dict[param]["Init"].get()), 
+				vary = self.fixed_list[row_index-1].get(), 
+				min = float(self.full_dict[param]["Min"].get()), 
+				max = float(self.full_dict[param]["Max"].get()))
+
+			row_index+=1
+
+ 
+
+		x1 = np.linspace(min(x), max(x), num=500)
+
+
+		method = 'L-BFGS-B'
+
+		o1 = lmfit.minimize(self.resid, params, args=(x, y), method=method)
+		#print("# Fit using sum of squares:\n")
+		#lmfit.report_fit(o1)
+
+
+		params = o1.params
+		print ("Chi_Sqr = ", o1.chisqr)
+		print ("Reduced Chi_Sqr = ", o1.redchi)
+		popt = []
+		for param in self.list_of_params:
+			
+			self.full_dict[param]["Init"].delete(0,"end")
+			self.full_dict[param]["Init"].insert(0,str(round(params[param].value,3)))
+			popt.append(np.float64(params[param].value))
+
+
+			
+
+
+
+
+
+			
+
+		self.curves.cla()
+									
+									
+		self.curves.set_title("Correlation curves")
+		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.curves.set_ylabel('G(tau)')
+		self.curves.set_xlabel('Delay time')
+		self.curves.set_xscale ('log')
+		self.curves.scatter(x, y, label = 'raw')
+		
+
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
+			self.curves.plot(x1, Corr_curve(x1, *popt), 'r-', label='fit')
+
+
+
+		self.canvas5.draw()
+
+		self.figure5.tight_layout()
+
+
+	def resid (self, params, x, ydata ):
+
+		param_list = []
+
+		for param in self.list_of_params:
+
+			param_list.append( np.float64(params[param].value))
+		
+
+		
+		
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
+			y_model = Corr_curve(x, *param_list)
+
+
+		return y_model - ydata
+
 	def Temp(self, event):
 		print(1)
 
@@ -1183,6 +1279,9 @@ class Diffusion_window :
 			x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x
 			y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.y
 
+			self.x_fit = x1
+			self.y_fit = y1
+
 			self.curves.scatter(x1, y1, label = "auto corr ch 1")
 
 
@@ -1202,6 +1301,7 @@ class Diffusion_window :
 
 			self.curves.scatter(x3, y3, label = "cross-corr")
 
+		self.curves.set_title("Correlation curves")
 		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.curves.set_ylabel('G(tau)')
 		self.curves.set_xlabel('Delay time')
@@ -1281,7 +1381,10 @@ class Diffusion_window :
 
 		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
 
-			list_of_params = ['offset', 'GN0', 'N(FCS)', 'A', 'txy', 'alpha', 'B', 'T(tri)' ]
+			self.list_of_params = ['offset', 'GN0', 'A', 'txy', 'alpha', 'AR', 'B', 'T_tri' ]
+			self.list_of_inits = ['1', '1', '1', '0', '1', '5', '1', '0.005']
+			self.list_of_min = ['0', '0', '0', '0', '0', '0', '0', '0']
+			self.list_of_max = ['10', '5', '1', '100000', '20', '1', '1', '100']
 
 			
 
@@ -1300,27 +1403,34 @@ class Diffusion_window :
 		Label_1 = tk.Label(self.frame004, text="Max")
 		Label_1.grid(row = 0, column = 4, sticky = 'w')
 
-		full_dict = {}
+		self.full_dict = {}
 		row_index = 1
 
-
-		for param in list_of_params:
+		self.fixed_list = []
+		for param in self.list_of_params:
+			self.fixed_list.append(tk.IntVar(value = 1))
 			thisdict = {
 						"Name": tk.Label(self.frame004, text=param),
 							"Init": tk.Entry(self.frame004, width = 5),
-							"Var": tk.Checkbutton(self.frame004, variable=True),
+							"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-1]),
 							"Min": tk.Entry(self.frame004, width = 5),
 							"Max": tk.Entry(self.frame004, width = 5),
 						}
 
-			full_dict[param] = thisdict
+			self.full_dict[param] = thisdict
 
 			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'w')
 			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'w')
+			thisdict["Init"].delete(0,"end")
+			thisdict["Init"].insert(0,self.list_of_inits[row_index-1])
 			thisdict["Var"].grid(row = row_index, column = 2, sticky = 'w')
-			thisdict["Var"].select()
+			
 			thisdict["Min"].grid(row = row_index, column = 3, sticky = 'w')
+			thisdict["Min"].delete(0,"end")
+			thisdict["Min"].insert(0,self.list_of_min[row_index-1])
 			thisdict["Max"].grid(row = row_index, column = 4, sticky = 'w')
+			thisdict["Max"].delete(0,"end")
+			thisdict["Max"].insert(0,self.list_of_max[row_index-1])
 
 			row_index+=1
 
@@ -1470,7 +1580,7 @@ class Diffusion_window :
 
 
 
-		self.Fit_button = tk.Button(self.frame001, text="Fit", command=self.Temp)
+		self.Fit_button = tk.Button(self.frame001, text="Fit", command=self.Fit_corr_curve)
 		self.Fit_button.grid(row = 2, column = 0, sticky='w')
 
 
@@ -1500,7 +1610,7 @@ class Diffusion_window :
 			Data_tree (self.tree, name, data_list_current[i].repetitions)
 
 
-		self.Plot_curve()
+		#self.Plot_curve()
 
 
 
@@ -2664,10 +2774,14 @@ tab = []
 
 frame1=ttk.Frame(tabs)
 frame4 = ttk.Frame(tabs)
+frame5 = ttk.Frame(tabs)
+frame6 = ttk.Frame(tabs)
 
-tabs.add(frame1, text = "FFM plot")
+tabs.add(frame1, text = "Diffusion plot")
 tabs.add(frame4, text = "GP plot")
-tabs_number = 2;
+tabs.add(frame5, text = "Diffusion vs GP")
+tabs.add(frame6, text = "Dot plot")
+tabs_number = 4;
 
 tabs.pack(side = "left", anchor = "nw")
 
