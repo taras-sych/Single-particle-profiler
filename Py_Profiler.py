@@ -36,6 +36,10 @@ from scipy.optimize import curve_fit
 import random
 
 
+
+global binning_list
+binning_list = []
+
 global file_index
 global rep_index
 global tree_list
@@ -88,6 +92,7 @@ def Gauss3(x, a1, x01, sigma1, a2, x02, sigma2, a3, x03, sigma3 ):
 	
 
 def Norm():
+
 	print (1)
 
 def Plot_main():
@@ -554,6 +559,8 @@ class Left_frame :
 				tree_list.append(treetree)
 
 				tree_list_name.append(name)
+
+				binning_list.append(1)
 
 
 				data_list_raw.append(dataset)
@@ -1754,13 +1761,42 @@ class Threshold_window:
 		th2 = data_list_current[file_index].threshold_ch2
 
 
+		int_div = int(rep_index/data_list_current[file_index].binning)
+
 		
 
-		x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
-		y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
 
-		x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
-		y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
+		x1 = []
+		x2 = []
+		y1 = []
+		y2 = []
+
+
+
+		for rep_index_i in range (data_list_current[file_index].repetitions):
+
+			if int(rep_index_i/data_list_current[file_index].binning) == int_div:
+
+				print ("adding repetition ", rep_index_i)
+
+
+				if len(x1) == 0:
+					x_min = 0
+				else:
+					x_min = max(x1) + x1[1] - x1[0]
+
+				x_temp_1 = [elem + x_min for elem in data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.x]
+				x_temp_2 = [elem + x_min for elem in data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.x]
+
+
+				x1.extend(x_temp_1)
+				y1.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+
+				x2.extend(x_temp_2)
+				y2.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
+
+
+
 
 		if th1 == 0:
 			self.ch1_th.delete(0,"end")
@@ -2366,9 +2402,36 @@ class Threshold_window:
 		file_index = file1-1
 		rep_index = rep1-1
 
+		current_repetitions_number = data_list_current[file_index].repetitions
+
+		#print(current_repetitions_number)
+
+		divisors = []
+		for divdiv in range(1, current_repetitions_number+1):
+			if current_repetitions_number % divdiv == 0:
+				divisors.append(divdiv)
+
+		self.Binning_choice.config(values = divisors)
+		self.Binning_choice.set(data_list_current[file_index].binning)
 
 
 		rep = rep1-1
+
+		self.Peaks()
+
+	
+	def Binning(self, event):
+		global file_index
+		global rep_index
+
+		global change_normal
+
+		change_normal = True
+
+
+		data_list_current[file_index].binning = int(self.Binning_choice.get())
+
+		print(data_list_current[file_index].binning)
 
 		self.Peaks()
 
@@ -2478,13 +2541,30 @@ class Threshold_window:
 		self.figure5.tight_layout()
 
 		
+
+		self.Binning_label = tk.Label(self.frame001, text="Binning: ")
+		self.Binning_label.grid(row = 0, column = 0, sticky = 'w')
+
+		divisors = []
+
+
+		self.Binning_choice = ttk.Combobox(self.frame001,values = divisors, width = 4 )
+		self.Binning_choice.config(state = "readonly")
+		
+		self.Binning_choice.grid(row = 0, column = 1, sticky = 'w')
+
+		
+
+		self.Binning_choice.bind("<<ComboboxSelected>>", self.Binning)
+
+
 		self.Norm_label = tk.Label(self.frame001, text="Use for plot: ")
-		self.Norm_label.grid(row = 0, column = 0, sticky = 'w')
+		self.Norm_label.grid(row = 1, column = 0, sticky = 'w')
 
 		self.Normalization_for_plot = ttk.Combobox(self.frame001,values = ["raw", "normalized"], width = 9 )
 		self.Normalization_for_plot.config(state = "readonly")
 		
-		self.Normalization_for_plot.grid(row = 0, column = 1)
+		self.Normalization_for_plot.grid(row = 1, column = 1)
 
 		self.Normalization_for_plot.set("raw")
 
@@ -2493,7 +2573,7 @@ class Threshold_window:
 		self.var = tk.IntVar()
 
 		self.Peaks_button=tk.Checkbutton(self.frame001, text="Display peaks", variable=self.var, command=self.Update_thresholds)
-		self.Peaks_button.grid(row = 0, column = 3, sticky='w')
+		self.Peaks_button.grid(row = 1, column = 3, sticky='w')
 
 		self.Apply_button = tk.Button(self.frame001, text="Apply and Fit", command=self.Apply)
 		self.Apply_button.grid(row = 2, column = 3)
@@ -2527,7 +2607,7 @@ class Threshold_window:
 								#Threshold.config(font=helv36)
 		self.Normalization.grid(row = 3, column = 1, sticky = 'w')
 						
-		self.Normalization.set("manual")
+		self.Normalization.set("z-score")
 						
 		self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)
 
@@ -2619,6 +2699,9 @@ class Threshold_window:
 		for i in range(0, len(tree_list_name)):
 			name = tree_list_name[i]
 			Data_tree (self.tree_t, name, data_list_current[i].repetitions)
+
+
+
 
 
 

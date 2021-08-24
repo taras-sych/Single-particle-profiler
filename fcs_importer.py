@@ -54,6 +54,7 @@ class Full_dataset_fcs:
         self.datasets_list = dataset_list_arg
         self.threshold_ch1 = 0
         self.threshold_ch2 = 0
+        self.binning = 1
         
     
         
