@@ -1446,6 +1446,8 @@ class Diffusion_window :
 
 
 
+
+
 	def __init__(self, win_width, win_height, dpi_all):
 
 
@@ -1592,7 +1594,7 @@ class Diffusion_window :
 
 
 
-		self.Fit_all_button = tk.Button(self.frame001, text="Fit all", command=self.Temp)
+		self.Fit_all_button = tk.Button(self.frame001, text="Fit all", command=self.Apply_to_all)
 		self.Fit_all_button.grid(row = 2, column = 1, sticky='w')
 
 		self.Table_label = tk.Label(self.frame001, text="Fitting parampampams: ")
@@ -1622,6 +1624,12 @@ class Diffusion_window :
 
 
 class Threshold_window:
+
+	def Apply_to_all(self):
+
+		global Output_dictionary
+
+		this_dictionary = {}
 
 
 	def resid (self, params, x, ydata ):
@@ -1770,6 +1778,8 @@ class Threshold_window:
 		x2 = []
 		y1 = []
 		y2 = []
+		y1_raw = []
+		y2_raw = []
 
 
 
@@ -1791,9 +1801,11 @@ class Threshold_window:
 
 				x1.extend(x_temp_1)
 				y1.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+				y1_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
 
 				x2.extend(x_temp_2)
 				y2.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
+				y2_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
 
 
 
@@ -1842,10 +1854,19 @@ class Threshold_window:
 		xp1 = []
 		yp1 = []
 		yp2_1 = []
+
+		yp1_raw = []
+		yp2_1_raw = []
+
+
+
 		for p in peaks1:
 			xp1.append(x1[p])
 			yp1.append(y1[p])
 			yp2_1.append(y2[p])
+
+			yp1_raw.append(y1_raw[p])
+			yp2_1_raw.append(y2_raw[p])
 
 
 		peaks1, _ = find_peaks(y2, height=th2)
@@ -1854,10 +1875,16 @@ class Threshold_window:
 		yp2 = []
 		yp1_2 = []
 
+		yp2_raw = []
+		yp1_2_raw = []
+
 		for p in peaks1:
 			xp2.append(x2[p])
 			yp2.append(y2[p])
 			yp1_2.append(y1[p])
+
+			yp2_raw.append(y2_raw[p])
+			yp1_2_raw.append(y1_raw[p])
 		
 
 
@@ -1926,7 +1953,7 @@ class Threshold_window:
 		gp_list_temp = []
 
 		for k in range (len(yp1)):
-			gp_1 = (yp2_1[k] - yp1[k])/(yp2_1[k] + yp1[k])
+			gp_1 = (yp2_1_raw[k] - yp1_raw[k])/(yp2_1_raw[k] + yp1_raw[k])
 
 
 
@@ -1934,7 +1961,7 @@ class Threshold_window:
 				gp_list_temp.append(gp_1)
 
 		for k in range (len(yp2)):
-			gp_1 = (yp1_2[k] - yp2[k])/(yp1_2[k] + yp2[k])
+			gp_1 = (yp1_2_raw[k] - yp2_raw[k])/(yp1_2_raw[k] + yp2_raw[k])
 
 
 
@@ -1948,7 +1975,7 @@ class Threshold_window:
 		self.gp_hist.set_ylabel('Counts')
 		self.gp_hist.set_xlabel('GP')
 
-		self.n, bins , patches = self.gp_hist.hist(gp_list_temp)
+		self.n, bins, patches = self.gp_hist.hist(gp_list_temp)
 
 		
 
@@ -2055,199 +2082,6 @@ class Threshold_window:
 			self.Peaks()
 
 
-	def Apply(self):
-		global file_index
-
-		data_list_current[file_index].threshold_ch1 = float(self.ch1_th.get())
-
-		data_list_current[file_index].threshold_ch2 = float(self.ch2_th.get())
-
-		
-
-
-		th1 = data_list_current[file_index].threshold_ch1
-		th2 = data_list_current[file_index].threshold_ch2
-
-		
-
-
-
-
-		which_channel = self.Threshold.get()
-
-
-		
-
-
-		for i in range (data_list_current[file_index].repetitions):
-			
-	
-
-
-			x1 = data_list_current[file_index].datasets_list[i].channels_list[0].fluct_arr.x
-			y1c = data_list_current[file_index].datasets_list[i].channels_list[0].fluct_arr.y
-			y1r = data_list_raw[file_index].datasets_list[i].channels_list[0].fluct_arr.y
-
-			x2 = data_list_current[file_index].datasets_list[i].channels_list[1].fluct_arr.x
-			y2c = data_list_current[file_index].datasets_list[i].channels_list[1].fluct_arr.y
-			y2r = data_list_raw[file_index].datasets_list[i].channels_list[1].fluct_arr.y
-
-
-			peaks1, _ = find_peaks(y1c, height=th1)
-
-			peaks2, _ = find_peaks(y2c, height=th2)
-
-
-		
-			if self.normalization_index_for_plot == "raw":
-
-
-
-				if which_channel == "both":
-					
-
-					xp1 = []
-					yp1 = []
-					yp2_1 = []
-					for p in peaks1:
-						xp1.append(x1[p])
-						yp1.append(y1r[p])
-						yp2_1.append(y2r[p])
-
-
-					xp2 = []
-					yp2 = []
-					yp1_2 = []
-
-					for p in peaks2:
-						xp2.append(x2[p])
-						yp2.append(y2r[p])
-						yp1_2.append(y1r[p])
-
-					
-
-					X_all = yp1 + yp1_2
-					Y_all = yp2_1 + yp2
-					T_all = xp1 + xp2
-
-					
-
-
-				if which_channel == "channel 1":
-					
-
-					xp1 = []
-					yp1 = []
-					yp2_1 = []
-					for p in peaks1:
-						xp1.append(x1[p])
-						yp1.append(y1r[p])
-						yp2_1.append(y2r[p])
-
-
-					X_all = yp1
-					Y_all = yp2_1
-					T_all = xp1
-
-				if which_channel == "channel 2":
-
-
-					
-
-					xp2 = []
-					yp2 = []
-					yp1_2 = []
-
-					for p in peaks2:
-						xp2.append(x2[p])
-						yp2.append(y2r[p])
-						yp1_2.append(y1r[p])
-
-					X_all = yp1_2
-					Y_all = yp2
-					T_all = xp2
-
-
-
-
-
-
-			if self.normalization_index_for_plot == "normalized":
-
-				if which_channel == "both":
-					
-
-					xp1 = []
-					yp1 = []
-					yp2_1 = []
-					for p in peaks1:
-						xp1.append(x1[p])
-						yp1.append(y1c[p])
-						yp2_1.append(y2c[p])
-
-
-					xp2 = []
-					yp2 = []
-					yp1_2 = []
-
-					for p in peaks2:
-						xp2.append(x2[p])
-						yp2.append(y2c[p])
-						yp1_2.append(y1c[p])
-
-					
-
-					X_all = yp1 + yp1_2
-					Y_all = yp2_1 + yp2
-					T_all = xp1 + xp2
-
-					
-
-
-				if which_channel == "channel 1":
-					
-
-					xp1 = []
-					yp1 = []
-					yp2_1 = []
-					for p in peaks1:
-						xp1.append(x1[p])
-						yp1.append(y1c[p])
-						yp2_1.append(y2c[p])
-
-
-					X_all = yp1
-					Y_all = yp2_1
-					T_all = xp1
-
-				if which_channel == "channel 2":
-
-
-					
-
-					xp2 = []
-					yp2 = []
-					yp1_2 = []
-
-					for p in peaks2:
-						xp2.append(x2[p])
-						yp2.append(y2c[p])
-						yp1_2.append(y1c[p])
-
-					X_all = yp1_2
-					Y_all = yp2
-					T_all = xp2
-
-
-
-			
-
-			peaks_list[file_index][i] = copy.deepcopy(Found_peaks(X_all, Y_all, T_all))
-
-			
-
-			#self.win_threshold.destroy()
-
 	def Put_default(self):
 
 		if self.normalization_index == "z-score":
@@ -2343,11 +2177,8 @@ class Threshold_window:
 		self.normalization_index_for_plot = self.Normalization_for_plot.get()
 		
 
-
-	def Thresholding_type_selection(self, value):
-		print(value)
-
 	def Choose_components (self, event):
+
 		self.Fitting_frame()
 
 	def Plot_trace(self, event):
@@ -2575,7 +2406,7 @@ class Threshold_window:
 		self.Peaks_button=tk.Checkbutton(self.frame001, text="Display peaks", variable=self.var, command=self.Update_thresholds)
 		self.Peaks_button.grid(row = 1, column = 3, sticky='w')
 
-		self.Apply_button = tk.Button(self.frame001, text="Apply and Fit", command=self.Apply)
+		self.Apply_button = tk.Button(self.frame001, text="Apply and Fit", command=self.Temp)
 		self.Apply_button.grid(row = 2, column = 3)
 
 		
@@ -2612,13 +2443,7 @@ class Threshold_window:
 		self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)
 
 
-		"""self.thresholding_type = tk.IntVar()
-						
-								self.thresholding_type.set(1)
-						
-								tk.Radiobutton(self.frame001, text = "Manual thresholding", variable = self.thresholding_type, value = 1, command = lambda: self.Thresholding_type_selection(self.thresholding_type.get())).grid(row = 2, column = 0, columnspan = 2, sticky='w')
-								tk.Radiobutton(self.frame001, text = "z score", variable = self.thresholding_type, value = 2, command = lambda: self.Thresholding_type_selection(self.thresholding_type.get())).grid(row = 2, column = 3, columnspan = 2, sticky='w')"""
-
+		
 
 
 
