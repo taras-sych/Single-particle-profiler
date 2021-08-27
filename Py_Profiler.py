@@ -248,6 +248,8 @@ def Plot_gp():
 
 	#print (data_frame.tree.selection())
 
+	thisdict = {}
+
 	for index in list1:
 
 		num1, num = index.split('I')
@@ -282,42 +284,34 @@ def Plot_gp():
 			rep1+=1
 
 
+		
 
 
-		output_file_name = tree_list_name[file1-1][:-4]
+		#output_file_name = tree_list_name[file1-1][:-4]
 		#print(output_file_name)
+
+
 
 		file1 = file1-1
 		rep1 = rep1-1
 
+
+		if file1 in thisdict.keys():
+			thisdict[file1].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+		else:
+			thisdict[file1] = []
+			thisdict[file1].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+
 		
-		for k in range (len(peaks_list[file1][rep1].x)):
-			gp_1 = (peaks_list[file1][rep1].x[k] - peaks_list[file1][rep1].y[k])/(peaks_list[file1][rep1].x[k] + peaks_list[file1][rep1].y[k])
-
-
-
-			if abs(gp_1) != 1:
-				gp_list.append(gp_1)
-				#print (peaks_list[file1][rep1].x[k], peaks_list[file1][rep1].y[k], gp_1)
+		
 		
 
 
 
-	gp.gp_all_points = copy.deepcopy(gp_list)
 	
-	n, bins, patches = gp.main.hist(gp_list, bins = 'auto')
-
-	
-	x_bins=[]
-	for ii in range (len(bins)-1):
-		x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
-
-
-
-	
-	gp.gp_histogram = copy.deepcopy(n)
-
-	gp.gp_xbins = copy.deepcopy(x_bins)
+	for key in thisdict.keys():
+		gp.main.boxplot(thisdict[key])
+		
 
 
 	
@@ -327,17 +321,18 @@ def Plot_gp():
 		
 
 	gp.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-	gp.main.set_ylabel('Counts')
-	gp.main.set_xlabel('GP')
+	
+	
 	
 
 	
 
 def Which_tab():
 
+
 	try:
 		if tabs.index(tabs.select()) == 0:
-			Plot_main()
+			#Plot_main()
 
 			ffp.canvas3.draw()
 
@@ -375,6 +370,10 @@ def Diffusion_fun():
 
 		tk.messagebox.showerror(title='Error', message=Message_generator())
 
+
+def Restruct_fun():
+
+	print ("restructured")
 
 
 class Left_frame :
@@ -736,17 +735,21 @@ class Left_frame :
 		self.frame023 = tk.Frame(self.frame02)
 		self.frame023.pack(side="top", fill="x")
 
+
+		self.Restruct_button = tk.Button(self.frame023, text="Restructure data", command=Restruct_fun)
+		self.Restruct_button.grid(row = 0, column = 0, sticky="W")
+
 		self.Threshold_button = tk.Button(self.frame023, text="Peak analysis", command=Threshold_fun)
-		self.Threshold_button.grid(row = 0, column = 0, sticky="W")
+		self.Threshold_button.grid(row = 1, column = 0, sticky="W")
 
 		self.Diffusion_button = tk.Button(self.frame023, text="Diffusion analysis", command=Diffusion_fun)
-		self.Diffusion_button.grid(row = 1, column = 0, sticky="W")
+		self.Diffusion_button.grid(row = 2, column = 0, sticky="W")
 
 		self.Add_to_plot_button = tk.Button(self.frame023, text="Plot", command=Which_tab)
-		self.Add_to_plot_button.grid(row = 2, column = 0, sticky="W")
+		self.Add_to_plot_button.grid(row = 3, column = 0, sticky="W")
 
 		self.Output_button = tk.Button(self.frame023, text="Output", command=Which_tab)
-		self.Output_button.grid(row = 3, column = 0, sticky="W")
+		self.Output_button.grid(row = 4, column = 0, sticky="W")
 
 
 
@@ -1627,9 +1630,16 @@ class Threshold_window:
 
 	def Apply_to_all(self):
 
-		global Output_dictionary
+		global rep_index
 
-		this_dictionary = {}
+		self.fit_all_flag = True
+
+		for rep_index_i in range (data_list_current[file_index].repetitions): 
+			rep_index = rep_index_i
+			self.Peaks()
+			self.Fit_gaus()
+
+		self.fit_all_flag = False
 
 
 	def resid (self, params, x, ydata ):
@@ -1693,6 +1703,8 @@ class Threshold_window:
 		#lmfit.report_fit(o1)
 
 
+		output_dict = {}
+
 		params = o1.params
 		print ("Chi_Sqr = ", o1.chisqr)
 		print ("Reduced Chi_Sqr = ", o1.redchi)
@@ -1702,6 +1714,12 @@ class Threshold_window:
 			self.full_dict[param]["Init"].delete(0,"end")
 			self.full_dict[param]["Init"].insert(0,str(round(params[param].value,3)))
 			popt.append(np.float64(params[param].value))
+			output_dict[param] = np.float64(params[param].value)
+
+
+		data_list_raw[file_index].gp_fitting[rep_index] = output_dict
+
+		print(data_list_raw[file_index].gp_fitting)
 
 
 			
@@ -1711,44 +1729,41 @@ class Threshold_window:
 
 
 			
-
-		self.gp_hist.cla()
-									
-									
-		self.gp_hist.set_title("GP histogram")
-		self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.gp_hist.set_ylabel('Counts')
-		self.gp_hist.set_xlabel('GP')
-		self.gp_hist.bar(x, y, width=0.2, bottom=None, align='center', label = 'raw')
-		
-
-		if self.Components.get() == '1 component':
-			self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
-
-		if self.Components.get() == '2 components':
-			self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
-			popt1 = popt[:3]
-			popt2 = popt[3:6]
-			self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
-			self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
-
-		if self.Components.get() == '3 components':
-			self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
-			popt1 = popt[:3]
-			popt2 = popt[3:6]
-			popt3 = popt[6:9]
-			self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
-			self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
-			self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
-
-
-
-		self.canvas5.draw()
-
-		self.figure5.tight_layout()
-
-
+		if self.fit_all_flag == False:
+			self.gp_hist.cla()
+										
+										
+			self.gp_hist.set_title("GP histogram")
+			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.gp_hist.set_ylabel('Counts')
+			self.gp_hist.set_xlabel('GP')
+			self.gp_hist.bar(x, y, width=0.2, bottom=None, align='center', label = 'raw')
 			
+
+			if self.Components.get() == '1 component':
+				self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+
+			if self.Components.get() == '2 components':
+				self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
+				popt1 = popt[:3]
+				popt2 = popt[3:6]
+				self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
+				self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+
+			if self.Components.get() == '3 components':
+				self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
+				popt1 = popt[:3]
+				popt2 = popt[3:6]
+				popt3 = popt[6:9]
+				self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
+				self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+				self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
+
+
+
+			self.canvas5.draw()
+
+			self.figure5.tight_layout()
 
 	
 	def Update_thresholds (self):
@@ -1886,67 +1901,68 @@ class Threshold_window:
 			yp2_raw.append(y2_raw[p])
 			yp1_2_raw.append(y1_raw[p])
 		
-
-
-		self.peaks.cla()
-		self.hist1.cla()
-		self.gp_hist.cla()
-
-		self.peaks.set_title("Intensity traces")
 		
-		self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.peaks.set_ylabel('Intensity (a.u.)')
-		self.peaks.set_xlabel('Time (s)')
 
-		self.hist1.set_title("Intensity histograms")
+		if self.fit_all_flag == False:
+			self.peaks.cla()
+			self.hist1.cla()
+			self.gp_hist.cla()
 
-		self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.hist1.set_ylabel('Counts')
-		self.hist1.set_xlabel('Intensity (a.u.)')
-
-
-		if which_channel == "both":
-
+			self.peaks.set_title("Intensity traces")
 			
+			self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.peaks.set_ylabel('Intensity (a.u.)')
+			self.peaks.set_xlabel('Time (s)')
 
-			self.peaks.plot(x1, y1, zorder=1)
-			self.peaks.plot(x2, y2, zorder=2)
+			self.hist1.set_title("Intensity histograms")
 
-			self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=3)
-			self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=4)
-
-			
-			if (self.var.get() == 1):
-				self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 5)
-				self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 6)
+			self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.hist1.set_ylabel('Counts')
+			self.hist1.set_xlabel('Intensity (a.u.)')
 
 
-			
+			if which_channel == "both":
 
-			self.hist1.hist(yh1)
-			self.hist1.hist(yh2)
+				
 
-		if which_channel == "channel 1":
-			self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
-			self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
-			
-			if (self.var.get() == 1):
-				self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
-			self.hist1.hist(yh1)
-			
+				self.peaks.plot(x1, y1, zorder=1)
+				self.peaks.plot(x2, y2, zorder=2)
 
-		if which_channel == "channel 2":
-			
-			self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
-			self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=2)
+				self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=3)
+				self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=4)
 
-			if (self.var.get() == 1):
-				self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
-			self.hist1.hist(yh2)
+				
+				if (self.var.get() == 1):
+					self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 5)
+					self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 6)
 
-		if change_normal == False:
-			self.peaks.set_xlim(main_xlim)
-			self.peaks.set_ylim(main_ylim)
+
+				
+
+				self.hist1.hist(yh1)
+				self.hist1.hist(yh2)
+
+			if which_channel == "channel 1":
+				self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
+				self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
+				
+				if (self.var.get() == 1):
+					self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
+				self.hist1.hist(yh1)
+				
+
+			if which_channel == "channel 2":
+				
+				self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
+				self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=2)
+
+				if (self.var.get() == 1):
+					self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
+				self.hist1.hist(yh2)
+
+			if change_normal == False:
+				self.peaks.set_xlim(main_xlim)
+				self.peaks.set_ylim(main_ylim)
 
 		
 
@@ -1969,15 +1985,9 @@ class Threshold_window:
 				gp_list_temp.append(gp_1)
 
 
-		
-		self.gp_hist.set_title("GP histogram")
-		self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.gp_hist.set_ylabel('Counts')
-		self.gp_hist.set_xlabel('GP')
-
 		self.n, bins, patches = self.gp_hist.hist(gp_list_temp)
 
-		
+			
 
 
 		self.x_bins=[]
@@ -1985,15 +1995,19 @@ class Threshold_window:
 			self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
 
 
+		if self.fit_all_flag == False:
+			self.gp_hist.set_title("GP histogram")
+			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.gp_hist.set_ylabel('Counts')
+			self.gp_hist.set_xlabel('GP')
 
-		
 
 
-		
 
-		self.canvas5.draw()
 
-		self.figure5.tight_layout()
+			self.canvas5.draw()
+
+			self.figure5.tight_layout()
 
 	def Fitting_frame(self):
 
@@ -2269,7 +2283,7 @@ class Threshold_window:
 	def __init__(self, win_width, win_height, dpi_all):
 
 
-
+		self.fit_all_flag = False
 		self.normalization_index = "z-score"
 
 		self.normalization_index_for_plot = "raw"
@@ -2538,9 +2552,12 @@ class Threshold_window:
 		self.Fit_button = tk.Button(self.frame007, text="Fit", command=self.Fit_gaus)
 		self.Fit_button.grid(row = 0, column = 0, sticky='w')
 
+		self.Fit_all_button = tk.Button(self.frame007, text="Fit all", command=self.Apply_to_all)
+		self.Fit_all_button.grid(row = 0, column = 2, sticky='w')
+
 		self.Components = ttk.Combobox(self.frame007,values = ["1 component", "2 components", "3 components"], width = 13 )
 		self.Components.config(state = "readonly")
-		self.Components.grid(row = 0, column = 1)
+		self.Components.grid(row = 0, column = 1, sticky='w')
 		self.Components.set("1 component")
 
 		self.Components.bind("<<ComboboxSelected>>", self.Choose_components)

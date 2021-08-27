@@ -55,6 +55,8 @@ class Full_dataset_fcs:
         self.threshold_ch1 = 0
         self.threshold_ch2 = 0
         self.binning = 1
+        self.gp_fitting = [None] * repetitions_arg
+        self.diff_fitting = [None] * repetitions_arg
         
     
         
