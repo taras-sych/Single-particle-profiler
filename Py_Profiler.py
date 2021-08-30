@@ -337,12 +337,7 @@ def Plot_gp():
 	gp.main.set_xticklabels(keys)
 	#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 
-	
 
-		
-
-
-	
 	
 	
 def Plot_diff():
@@ -443,8 +438,94 @@ def Plot_diff():
 	#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		
 
-	
-	
+def Plot_gp_diff():
+
+	gp_diff.main.cla()
+
+	global tree_list_name
+	global output_file_name
+
+	list1 = data_frame.tree.get_checked()
+
+	#print (data_frame.tree.selection())
+
+	thisdict_gp = {}
+	thisdict_diff = {}
+
+	for index in list1:
+
+		num1, num = index.split('I')
+		
+
+		num = int(num, 16)
+
+		
+
+		sum1 = num 
+		file = 0
+		rep = 0
+		for i in range (len(data_list_raw)):
+			rep = 0
+			sum1-=1
+			file+=1
+			if sum1 == 0:
+				file1 = file
+				rep1 = rep
+
+			
+			for j in range (repetitions_list[i]):
+				sum1-=1
+				rep+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+
+
+		if rep1 == 0:
+			rep1+=1
+
+
+		
+
+
+		output_file_name = tree_list_name[file1-1][:-4]
+		#print(output_file_name)
+
+
+
+		file1 = file1-1
+		rep1 = rep1-1
+
+
+		"""if output_file_name in thisdict.keys():
+									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+								else:
+									thisdict[output_file_name] = []
+									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])"""
+
+		if output_file_name in thisdict_diff.keys():
+			thisdict_diff[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+		else:
+			thisdict_diff[output_file_name] = []
+			thisdict_diff[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+
+
+		if output_file_name in thisdict_gp.keys():
+			thisdict_gp[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+		else:
+			thisdict_gp[output_file_name] = []
+			thisdict_gp[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+
+		
+	for key in thisdict_diff.keys():
+		gp_diff.main.scatter(thisdict_gp[key], thisdict_diff[key], label = key )
+		gp_diff.main.legend(loc='upper right')
+
+
+
+
+
 
 def Which_tab():
 
@@ -465,8 +546,15 @@ def Which_tab():
 
 		gp.figure3.tight_layout()
 
+	if tabs.index(tabs.select()) == 2:
+		Plot_gp_diff()
+
+		gp_diff.canvas3.draw()
+
+		gp_diff.figure3.tight_layout()
+
 	
-	#tk.messagebox.showerror(title='Error', message=Message_generator())
+		#tk.messagebox.showerror(title='Error', message=Message_generator())
 
 
 
@@ -1280,6 +1368,41 @@ class GP_frame :
 		self.frame13.pack(side="top", fill="x")
 
 		self.ffp_export_btn = tk.Button(self.frame13, text="Export", command=self.Export_plot)
+		self.ffp_export_btn.grid(column = 0, row =0, sticky = "w")
+
+		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
+		self.ffp_btn.grid(column = 0, row =1, sticky = "w")
+
+class GP_Diff_frame:
+
+	def __init__ (self, frame1, win_width, win_height, dpi_all):
+
+		self.frame12 = tk.Frame(frame1)
+		self.frame12.pack(side="top", fill="x")
+
+
+		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi=100)
+		self.main = self.figure3.add_subplot(1, 1, 1)
+
+		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.main.set_ylabel('Counts')
+		self.main.set_xlabel('GP')
+
+
+		self.canvas3 = FigureCanvasTkAgg(self.figure3, self.frame12)
+		self.canvas3.get_tk_widget().pack()
+
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas3, self.frame12)
+		self.toolbar.update()
+		self.canvas3.get_tk_widget().pack()
+
+		self.figure3.tight_layout()
+
+		self.frame13 = tk.Frame(frame1)
+		self.frame13.pack(side="top", fill="x")
+
+		self.ffp_export_btn = tk.Button(self.frame13, text="Export", command=Norm)
 		self.ffp_export_btn.grid(column = 0, row =0, sticky = "w")
 
 		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
@@ -2862,5 +2985,6 @@ data_frame = Left_frame(frame0, win_width, win_height, dpi_all )
 
 diff = Diff_frame(frame1, win_width, win_height, dpi_all)
 gp = GP_frame(frame4, win_width, win_height, dpi_all)
+gp_diff = GP_Diff_frame(frame5, win_width, win_height, dpi_all)
 
 root.mainloop()
