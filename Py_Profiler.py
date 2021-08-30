@@ -315,10 +315,7 @@ def Plot_gp():
 		
 		
 		
-	print()
-	print()
-	print()
-	print(thisdict)
+
 
 	keys = []
 	vals = []
@@ -349,7 +346,7 @@ def Plot_diff():
 
 	list1 = data_frame.tree.get_checked()
 
-	#print (data_frame.tree.selection())
+
 
 	thisdict = {}
 
@@ -391,7 +388,7 @@ def Plot_diff():
 
 
 		output_file_name = tree_list_name[file1-1][:-4]
-		#print(output_file_name)
+
 
 
 
@@ -415,10 +412,7 @@ def Plot_diff():
 
 		
 
-	print()
-	print()
-	print()
-	print(thisdict)
+
 
 	keys = []
 	vals = []
@@ -447,7 +441,7 @@ def Plot_gp_diff():
 
 	list1 = data_frame.tree.get_checked()
 
-	#print (data_frame.tree.selection())
+
 
 	thisdict_gp = {}
 	thisdict_diff = {}
@@ -490,7 +484,7 @@ def Plot_gp_diff():
 
 
 		output_file_name = tree_list_name[file1-1][:-4]
-		#print(output_file_name)
+
 
 
 
@@ -530,31 +524,31 @@ def Plot_gp_diff():
 def Which_tab():
 
 
-	
-	if tabs.index(tabs.select()) == 0:
-		Plot_diff()
+	try:
+		if tabs.index(tabs.select()) == 0:
+			Plot_diff()
 
-		diff.canvas3.draw()
+			diff.canvas3.draw()
 
-		diff.figure3.tight_layout()
-		
+			diff.figure3.tight_layout()
+			
 
-	if tabs.index(tabs.select()) == 1:
-		Plot_gp()
+		if tabs.index(tabs.select()) == 1:
+			Plot_gp()
 
-		gp.canvas3.draw()
+			gp.canvas3.draw()
 
-		gp.figure3.tight_layout()
+			gp.figure3.tight_layout()
 
-	if tabs.index(tabs.select()) == 2:
-		Plot_gp_diff()
+		if tabs.index(tabs.select()) == 2:
+			Plot_gp_diff()
 
-		gp_diff.canvas3.draw()
+			gp_diff.canvas3.draw()
 
-		gp_diff.figure3.tight_layout()
+			gp_diff.figure3.tight_layout()
 
-	
-		#tk.messagebox.showerror(title='Error', message=Message_generator())
+	except:
+		tk.messagebox.showerror(title='Error', message=Message_generator())
 
 
 
@@ -580,7 +574,238 @@ def Diffusion_fun():
 
 def Restruct_fun():
 
-	print ("restructured")
+
+	th_win = Restruct_window(win_width, win_height, dpi_all)
+
+class Restruct_window:
+
+
+
+	def Plot_curve(self):
+
+
+		global file_index
+		global rep_index
+
+		
+		self.curves.cla()
+		self.traces.cla()
+
+
+
+
+
+		x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x
+		y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.y
+
+		self.x_fit = x1
+		self.y_fit = y1
+
+		
+		self.curves.plot(x1, y1, label = "auto corr ch 1")
+
+
+		
+
+
+		x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.x
+		y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.y
+
+		
+		self.curves.plot(x2, y2, label = "auto corr ch 2")
+
+
+
+
+		x3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.x
+		y3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.y
+
+		
+		self.curves.plot(x3, y3, label = "cross-corr")
+
+		
+		
+		self.curves.set_title("Correlation curves")
+		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.curves.set_ylabel('G(tau)')
+		self.curves.set_xlabel('Delay time')
+		self.curves.set_xscale ('log')
+
+
+		y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
+		y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
+
+		x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
+		x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
+
+
+		self.traces.set_title("Intensity traces")
+		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.traces.set_ylabel('Intensity')
+		self.traces.set_xlabel('Time (s)')
+
+		self.traces.plot(x1, y1, label = "channel 1")
+		self.traces.plot(x2, y2, label = "channel 2")
+
+		self.traces.legend(loc='upper right')
+
+		
+
+		self.curves.legend(loc='upper right')
+
+		self.canvas5.draw()
+
+		self.figure5.tight_layout()
+
+
+
+	def Choose_curve(self, event):
+
+		global file_index
+		global rep_index
+
+		index = self.tree.selection()
+		num1, num = index[0].split('I')
+
+
+		
+
+		num = int(num, 16)
+
+		sum1 = num 
+		file = 0
+
+		rep = 0
+		
+
+
+		for i in range (len(data_list_raw)):
+			#print ("I am here")
+			rep = 0
+			sum1-=1
+			file+=1
+			if sum1 == 0:
+				file1 = file
+				rep1 = rep
+
+			
+			for j in range (repetitions_list[i]):
+				sum1-=1
+				rep+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+
+
+		if rep1 == 0:
+			rep1+=1
+
+
+
+
+		
+
+		file_index = file1-1
+		rep_index = rep1-1
+
+
+
+		self.Plot_curve()
+
+
+
+
+	def __init__(self, win_width, win_height, dpi_all):
+
+
+		global file_index
+		global rep_index
+
+		self.win_diff = tk.Toplevel()
+
+		self.th_width = round(0.7*self.win_diff.winfo_screenwidth())
+		self.th_height = round(0.4*self.win_diff.winfo_screenwidth())
+
+		self.line1 = str(self.th_width) + "x" + str(self.th_height)
+
+
+		self.win_diff.geometry(self.line1)
+
+		self.frame002 = tk.Frame(self.win_diff)
+		self.frame002.pack(side = "left", anchor = "nw")
+
+		
+
+
+
+		self.scrollbar = tk.Scrollbar(self.frame002)
+		self.scrollbar.pack(side = "left", fill = "y")
+
+
+		self.Datalist = tk.Listbox(self.frame002, width = 100, height = 10)
+		self.Datalist.pack(side = "top", anchor = "nw")
+		
+		
+		
+		self.tree = CheckboxTreeview(self.Datalist)
+		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
+		self.tree.pack()
+
+
+		self.tree.config(yscrollcommand = self.scrollbar.set)
+		self.scrollbar.config(command = self.tree.yview)
+
+		self.tree.bind('<<TreeviewSelect>>', self.Choose_curve)
+
+
+
+		self.Datalist.config(width = 100, height = 10)
+
+
+		self.frame000 = tk.Frame(self.win_diff)
+		self.frame000.pack(side = "left", anchor = "nw")
+
+
+		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi=100)
+						
+		gs = self.figure5.add_gridspec(2, 1)
+
+
+		self.traces = self.figure5.add_subplot(gs[:1, 0])
+
+		self.traces.set_title("Correlation curves")
+
+		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.traces.set_ylabel('G(tau)')
+		self.traces.set_xlabel('Delay time (s)')
+
+		self.curves = self.figure5.add_subplot(gs[1, 0])
+
+		#self.hist1.set_title("Intensity histogram")
+
+		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.curves.set_ylabel('Counts')
+		self.curves.set_xlabel('Residuals')
+
+
+
+
+		self.canvas5 = FigureCanvasTkAgg(self.figure5, self.frame000)
+		self.canvas5.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas5, self.frame000)
+		self.toolbar.update()
+		self.canvas5.get_tk_widget().pack()
+
+		self.figure5.tight_layout()
+
+		for i in range(0, len(tree_list_name)):
+			name = tree_list_name[i]
+			Data_tree (self.tree, name, data_list_current[i].repetitions)
+
+
+
 
 
 class Left_frame :
@@ -1476,7 +1701,7 @@ class Diffusion_window :
 
 		data_list_raw[file_index].diff_fitting[rep_index] = output_dict
 
-		print(data_list_raw[file_index].diff_fitting)
+		#print(data_list_raw[file_index].diff_fitting)
 			
 
 
@@ -1545,8 +1770,8 @@ class Diffusion_window :
 		if self.ch_01_var.get() == 1:
 
 
-			x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x
-			y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.y
+			x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x
+			y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.y
 
 			self.x_fit = x1
 			self.y_fit = y1
@@ -1558,8 +1783,8 @@ class Diffusion_window :
 		
 		if self.ch_02_var.get() == 1:
 
-			x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.x
-			y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.y
+			x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.x
+			y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.y
 
 			if self.fit_all_flag == False:
 				self.curves.scatter(x2, y2, label = "auto corr ch 2")
@@ -1567,8 +1792,8 @@ class Diffusion_window :
 
 		if self.ch_12_var.get() == 1:
 
-			x3 = data_list_current[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.x
-			y3 = data_list_current[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.y
+			x3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.x
+			y3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.y
 
 			if self.fit_all_flag == False:
 				self.curves.scatter(x3, y3, label = "cross-corr")
@@ -1986,7 +2211,7 @@ class Threshold_window:
 
 		data_list_raw[file_index].gp_fitting[rep_index] = output_dict
 
-		print(data_list_raw[file_index].gp_fitting)
+		#print(data_list_raw[file_index].gp_fitting)
 
 
 			
@@ -2069,7 +2294,7 @@ class Threshold_window:
 
 			if int(rep_index_i/data_list_current[file_index].binning) == int_div:
 
-				print ("adding repetition ", rep_index_i)
+				#print ("adding repetition ", rep_index_i)
 
 
 				if len(x1) == 0:
@@ -2543,7 +2768,7 @@ class Threshold_window:
 
 		data_list_current[file_index].binning = int(self.Binning_choice.get())
 
-		print(data_list_current[file_index].binning)
+		
 
 		self.Peaks()
 
