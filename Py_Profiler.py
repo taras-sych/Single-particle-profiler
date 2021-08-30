@@ -35,6 +35,8 @@ from scipy.signal import find_peaks
 from scipy.optimize import curve_fit
 import random
 
+import seaborn as sns
+
 
 
 global binning_list
@@ -295,7 +297,7 @@ def Plot_gp():
 		
 
 
-		#output_file_name = tree_list_name[file1-1][:-4]
+		output_file_name = tree_list_name[file1-1][:-4]
 		#print(output_file_name)
 
 
@@ -304,31 +306,42 @@ def Plot_gp():
 		rep1 = rep1-1
 
 
-		if file1 in thisdict.keys():
-			thisdict[file1].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+		if output_file_name in thisdict.keys():
+			thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
 		else:
-			thisdict[file1] = []
-			thisdict[file1].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+			thisdict[output_file_name] = []
+			thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
 		
 		
 		
+	print()
+	print()
+	print()
+	print(thisdict)
 
-
-
-	
+	keys = []
+	vals = []
 	for key in thisdict.keys():
-		gp.main.boxplot(thisdict[key])
-		
+		keys.append(key)
+		vals.append(thisdict[key])
 
+
+
+	sns.set(context='notebook', style='whitegrid')
+	#sns.axlabel( ylabel="Diffusion time", fontsize=16)
+	sns.boxplot(data=vals, width=.18, ax = gp.main)
+	sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = gp.main)
+
+	# category labels
+	gp.main.set_xticklabels(keys)
+	#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 
 	
 
-	
-
 		
 
-	gp.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+
 	
 	
 	
@@ -382,7 +395,7 @@ def Plot_diff():
 		
 
 
-		#output_file_name = tree_list_name[file1-1][:-4]
+		output_file_name = tree_list_name[file1-1][:-4]
 		#print(output_file_name)
 
 
@@ -391,54 +404,69 @@ def Plot_diff():
 		rep1 = rep1-1
 
 
-		if file1 in thisdict.keys():
-			thisdict[file1].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+		"""if output_file_name in thisdict.keys():
+									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+								else:
+									thisdict[output_file_name] = []
+									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])"""
+
+		if output_file_name in thisdict.keys():
+			thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
 		else:
-			thisdict[file1] = []
-			thisdict[file1].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+			thisdict[output_file_name] = []
+			thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
 
 		
+
 		
-		
 
+	print()
+	print()
+	print()
+	print(thisdict)
 
-
-	
+	keys = []
+	vals = []
 	for key in thisdict.keys():
-		diff.main.boxplot(thisdict[key])
+		keys.append(key)
+		vals.append(thisdict[key])
+
+
+
+	sns.set(context='notebook', style='whitegrid')
+	#sns.axlabel( ylabel="Diffusion time", fontsize=16)
+	sns.boxplot(data=vals, width=.18, ax = diff.main)
+	sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = diff.main)
+
+	# category labels
+	diff.main.set_xticklabels(keys)
+	#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		
 
-
 	
-
-	
-
-		
-
-	diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 	
 
 def Which_tab():
 
 
-	try:
-		if tabs.index(tabs.select()) == 0:
-			Plot_diff()
+	
+	if tabs.index(tabs.select()) == 0:
+		Plot_diff()
 
-			diff.canvas3.draw()
+		diff.canvas3.draw()
 
-			diff.figure3.tight_layout()
-			
+		diff.figure3.tight_layout()
+		
 
-		if tabs.index(tabs.select()) == 1:
-			Plot_gp()
+	if tabs.index(tabs.select()) == 1:
+		Plot_gp()
 
-			gp.canvas3.draw()
+		gp.canvas3.draw()
 
-			gp.figure3.tight_layout()
+		gp.figure3.tight_layout()
 
-	except:
-		tk.messagebox.showerror(title='Error', message=Message_generator())
+	
+	#tk.messagebox.showerror(title='Error', message=Message_generator())
 
 
 
