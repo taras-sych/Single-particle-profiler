@@ -73,7 +73,15 @@ def Message_generator():
 
 def Corr_curve(tc, offset, GN0, A1, txy1, alpha1, AR1, B1, tauT1 ):
 
-	return offset + GN0 * (A1*(((1+((tc/txy1)**alpha1))**-1)*(((1+(tc/((AR1**2)*txy1)))**-0.5)))) * (1 + (B1*np.exp(-tc/tauT1)))
+	txy1 = txy1 / 1000
+
+	tauT1 = tauT1 / 1000
+
+	G_Diff =  (A1*(((1+((tc/txy1)**alpha1))**-1)*(((1+(tc/((AR1**2)*txy1)))**-0.5))))
+
+	G_T = 1 + (B1*np.exp(-tc/tauT1))
+
+	return offset + GN0 * G_Diff * G_T
 
 
 def Gauss(x, a, x0, sigma):
@@ -324,7 +332,90 @@ def Plot_gp():
 	
 	
 	
+def Plot_diff():
+	diff_list = []
+	diff.main.cla()
 
+	global tree_list_name
+	global output_file_name
+
+	list1 = data_frame.tree.get_checked()
+
+	#print (data_frame.tree.selection())
+
+	thisdict = {}
+
+	for index in list1:
+
+		num1, num = index.split('I')
+		
+
+		num = int(num, 16)
+
+		
+
+		sum1 = num 
+		file = 0
+		rep = 0
+		for i in range (len(data_list_raw)):
+			rep = 0
+			sum1-=1
+			file+=1
+			if sum1 == 0:
+				file1 = file
+				rep1 = rep
+
+			
+			for j in range (repetitions_list[i]):
+				sum1-=1
+				rep+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+
+
+		if rep1 == 0:
+			rep1+=1
+
+
+		
+
+
+		#output_file_name = tree_list_name[file1-1][:-4]
+		#print(output_file_name)
+
+
+
+		file1 = file1-1
+		rep1 = rep1-1
+
+
+		if file1 in thisdict.keys():
+			thisdict[file1].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+		else:
+			thisdict[file1] = []
+			thisdict[file1].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+
+		
+		
+		
+
+
+
+	
+	for key in thisdict.keys():
+		diff.main.boxplot(thisdict[key])
+		
+
+
+	
+
+	
+
+		
+
+	diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 	
 
 def Which_tab():
@@ -332,11 +423,11 @@ def Which_tab():
 
 	try:
 		if tabs.index(tabs.select()) == 0:
-			#Plot_main()
+			Plot_diff()
 
-			ffp.canvas3.draw()
+			diff.canvas3.draw()
 
-			ffp.figure3.tight_layout()
+			diff.figure3.tight_layout()
 			
 
 		if tabs.index(tabs.select()) == 1:
@@ -899,7 +990,40 @@ class FFP_frame :
 
 
 	
+class Diff_frame :
 
+	def __init__ (self, frame1, win_width, win_height, dpi_all):
+
+		self.frame12 = tk.Frame(frame1)
+		self.frame12.pack(side="top", fill="x")
+
+
+		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi=100)
+		self.main = self.figure3.add_subplot(1, 1, 1)
+
+		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.main.set_ylabel('Counts')
+		self.main.set_xlabel('GP')
+
+
+		self.canvas3 = FigureCanvasTkAgg(self.figure3, self.frame12)
+		self.canvas3.get_tk_widget().pack()
+
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas3, self.frame12)
+		self.toolbar.update()
+		self.canvas3.get_tk_widget().pack()
+
+		self.figure3.tight_layout()
+
+		self.frame13 = tk.Frame(frame1)
+		self.frame13.pack(side="top", fill="x")
+
+		self.ffp_export_btn = tk.Button(self.frame13, text="Export", command=Norm)
+		self.ffp_export_btn.grid(column = 0, row =0, sticky = "w")
+
+		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
+		self.ffp_btn.grid(column = 0, row =1, sticky = "w")
 		
 class GP_frame :
 
@@ -965,180 +1089,141 @@ class GP_frame :
 		file_export.close()
 
 
-	def Fit_gaus(self):
+	"""def Fit_gaus(self):
+			
+					
+					try:
+					
+						global fit_list_x
+						global fit_list_y
+						global Fit_params
+			
+						x = self.gp_xbins
+						y = self.gp_histogram
+			
+						x1 = np.linspace(min(x), max(x), num=500)
+			
+						if (self.gaus_number == 1):
+			
+							#m1 = float(self.gaus_mean_1.get())
+			
+							#popt,pcov = curve_fit(Gauss, x, y, bounds=((-np.inf,-0.8 ,-np.inf), (np.inf, 0.6 ,np.inf)))
+							popt,pcov = curve_fit(Gauss, x, y)
+			
+							#print(popt)
+			
+			
+							Plot_gp()
+							fit_list_x = x1
+							fit_list_y = Gauss(x1, *popt)
+							Fit_params = popt
+			
+							gp.main.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+			
+							gp.canvas3.draw()
+			
+							gp.figure3.tight_layout()
+			
+							self.fit_parampampams.delete(0,'end')
+			
+							self.fit_parampampams.insert(0, "Fitting parameters:") 
+							self.fit_parampampams.insert(1, "A:\t" + str(round (popt[0],3)))
+							self.fit_parampampams.insert(1, "Mean:\t" + str(round(popt[1],3)))
+							self.fit_parampampams.insert(1, "Sigma:\t" + str(round(popt[2],3)))
+							
+			
+						if (self.gaus_number == 2):
+			
+							popt,pcov = curve_fit(Gauss2, x, y)
+			
+							Fit_params = popt
+			
+							popt1 = popt[0:3]
+			
+							popt2 = popt[3:6]
+			
+							#print(popt1)
+							#print(popt2)
+			
+							Plot_gp()
+							fit_list_x = x1
+							fit_list_y = Gauss2(x1, *popt)
+			
+							gp.main.plot(x1, Gauss(x1, *popt1), color = 'orange', label='fit')
+			
+							gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
+			
+							gp.main.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
+			
+							gp.canvas3.draw()
+			
+							gp.figure3.tight_layout()
+			
+							self.fit_parampampams.delete(0,'end')
+			
+							self.fit_parampampams.insert('end', "Fitting parameters:")
+							self.fit_parampampams.insert('end', "Peak 1:")
+							self.fit_parampampams.insert('end', "A:\t" + str(round (popt[0],3)))
+							self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[1],3)))
+							self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[2],3)))
+							self.fit_parampampams.insert('end', "Peak 2:")
+							self.fit_parampampams.insert('end', "A:\t" + str(round (popt[3],3)))
+							self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[4],3)))
+							self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[5],3)))
+			
+					except:
+						tk.messagebox.showerror(title='Error', message=Message_generator())
+			
+			
+			
+			
+			
+					if (self.gaus_number == 3):
+			
+						popt,pcov = curve_fit(Gauss3, x, y)
+			
+						popt1 = popt[0:3]
+			
+						popt2 = popt[3:6]
+			
+						popt3 = popt[6:9]
+			
+						#print(popt1)
+						#print(popt2)
+						#print(popt3)
+			
+			
+						Plot_gp()
+			
+						gp.main.plot(x1, Gauss(x1, *popt1), color = 'orange', label='fit')
+			
+						gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
+			
+						gp.main.plot(x1, Gauss(x1, *popt3), color = 'orange', label='fit')
+			
+						gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
+			
+						gp.main.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
+			
+						gp.canvas3.draw()
+			
+						gp.figure3.tight_layout()
+			
+						self.fit_parampampams.delete(0,'end')"""
 
-		
-		try:
-		
-			global fit_list_x
-			global fit_list_y
-			global Fit_params
-
-			x = self.gp_xbins
-			y = self.gp_histogram
-
-			x1 = np.linspace(min(x), max(x), num=500)
-
-			if (self.gaus_number == 1):
-
-				#m1 = float(self.gaus_mean_1.get())
-
-				#popt,pcov = curve_fit(Gauss, x, y, bounds=((-np.inf,-0.8 ,-np.inf), (np.inf, 0.6 ,np.inf)))
-				popt,pcov = curve_fit(Gauss, x, y)
-
-				#print(popt)
 
 
-				Plot_gp()
-				fit_list_x = x1
-				fit_list_y = Gauss(x1, *popt)
-				Fit_params = popt
-
-				gp.main.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
-
-				gp.canvas3.draw()
-
-				gp.figure3.tight_layout()
-
-				self.fit_parampampams.delete(0,'end')
-
-				self.fit_parampampams.insert(0, "Fitting parameters:") 
-				self.fit_parampampams.insert(1, "A:\t" + str(round (popt[0],3)))
-				self.fit_parampampams.insert(1, "Mean:\t" + str(round(popt[1],3)))
-				self.fit_parampampams.insert(1, "Sigma:\t" + str(round(popt[2],3)))
-				
-
-			if (self.gaus_number == 2):
-
-				popt,pcov = curve_fit(Gauss2, x, y)
-
-				Fit_params = popt
-
-				popt1 = popt[0:3]
-
-				popt2 = popt[3:6]
-
-				#print(popt1)
-				#print(popt2)
-
-				Plot_gp()
-				fit_list_x = x1
-				fit_list_y = Gauss2(x1, *popt)
-
-				gp.main.plot(x1, Gauss(x1, *popt1), color = 'orange', label='fit')
-
-				gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
-
-				gp.main.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
-
-				gp.canvas3.draw()
-
-				gp.figure3.tight_layout()
-
-				self.fit_parampampams.delete(0,'end')
-
-				self.fit_parampampams.insert('end', "Fitting parameters:")
-				self.fit_parampampams.insert('end', "Peak 1:")
-				self.fit_parampampams.insert('end', "A:\t" + str(round (popt[0],3)))
-				self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[1],3)))
-				self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[2],3)))
-				self.fit_parampampams.insert('end', "Peak 2:")
-				self.fit_parampampams.insert('end', "A:\t" + str(round (popt[3],3)))
-				self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[4],3)))
-				self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[5],3)))
-
-		except:
-			tk.messagebox.showerror(title='Error', message=Message_generator())
-
-
-
-
-
-		if (self.gaus_number == 3):
-
-			popt,pcov = curve_fit(Gauss3, x, y)
-
-			popt1 = popt[0:3]
-
-			popt2 = popt[3:6]
-
-			popt3 = popt[6:9]
-
-			#print(popt1)
-			#print(popt2)
-			#print(popt3)
-
-
-			Plot_gp()
-
-			gp.main.plot(x1, Gauss(x1, *popt1), color = 'orange', label='fit')
-
-			gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
-
-			gp.main.plot(x1, Gauss(x1, *popt3), color = 'orange', label='fit')
-
-			gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
-
-			gp.main.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
-
-			gp.canvas3.draw()
-
-			gp.figure3.tight_layout()
-
-			self.fit_parampampams.delete(0,'end')
-
-
-
-	def How_many_gaus(self, event):
-		self.gaus_number = int(self.Gauss_Fit.get())
+	"""def How_many_gaus(self, event):
+			
+					self.gaus_number = int(self.Gauss_Fit.get())"""
 
 	def __init__(self, frame1, win_width, win_height, dpi_all):
 
 		
 
-		self.gp_histogram = []
-
-		self.gp_xbins = []
 		
-		self.frame3 = tk.Frame(frame1)
-		self.frame3.pack(side="top", fill="x")
+		
 
-		self.Label1 = tk.Label(self.frame3, text="Gauss Fit: ")
-		self.Label1.grid(row = 0, column = 0)
-
-		self.Gauss_Fit = ttk.Combobox(self.frame3,values = ["1", "2", "3"], width = 9)
-		self.Gauss_Fit.config(state = "readonly")
-		self.Gauss_Fit.grid(row = 0, column = 1, sticky = "w")
-
-		self.Gauss_Fit.set("1")
-
-		self.gaus_number = 1
-
-		self.Gauss_Fit.bind("<<ComboboxSelected>>", self.How_many_gaus)
-
-		self.Fit_button = tk.Button(self.frame3, text="Fit", command=self.Fit_gaus, width = 9)
-		self.Fit_button.grid(row = 0, column = 2, sticky = "w")
-
-		self.Label2 = tk.Label(self.frame3, text="mean 1: ")
-		self.Label2.grid(row = 1, column = 0, sticky = "w")
-
-		self.gaus_mean_1 = tk.Entry(self.frame3, width = 9)
-		self.gaus_mean_1.grid(row = 1, column = 1, sticky = "w")
-
-		self.Label3 = tk.Label(self.frame3, text="mean 2: ")
-		self.Label3.grid(row = 2, column = 0, sticky = "w")
-
-		self.gaus_mean_2 = tk.Entry(self.frame3, width = 9)
-		self.gaus_mean_2.grid(row = 2, column = 1, sticky = "w")
-
-		self.Label4 = tk.Label(self.frame3, text="mean 3: ")
-		self.Label4.grid(row = 3, column = 0, sticky = "w")
-
-		self.gaus_mean_3 = tk.Entry(self.frame3, width = 9)
-		self.gaus_mean_3.grid(row = 3, column = 1, sticky = "w")
-
-		self.fit_parampampams = tk.Listbox(self.frame3, width = 18, height = 6)
-		self.fit_parampampams.grid (row = 1, column = 2, rowspan = 3, sticky = "w")
 
 
 		self.frame12 = tk.Frame(frame1)
@@ -1175,6 +1260,19 @@ class GP_frame :
 
 class Diffusion_window :
 
+	def Apply_to_all(self):
+	
+		global rep_index
+
+		self.fit_all_flag = True
+
+		for rep_index_i in range (data_list_current[file_index].repetitions): 
+			rep_index = rep_index_i
+			self.Plot_curve()
+			self.Fit_corr_curve()
+
+		self.fit_all_flag = False
+
 
 	def Fit_corr_curve(self):
 
@@ -1203,12 +1301,14 @@ class Diffusion_window :
 		x1 = np.linspace(min(x), max(x), num=500)
 
 
-		method = 'L-BFGS-B'
+		method = 'least_squares'
 
 		o1 = lmfit.minimize(self.resid, params, args=(x, y), method=method)
 		#print("# Fit using sum of squares:\n")
 		#lmfit.report_fit(o1)
 
+
+		output_dict = {}
 
 		params = o1.params
 		print ("Chi_Sqr = ", o1.chisqr)
@@ -1219,35 +1319,42 @@ class Diffusion_window :
 			self.full_dict[param]["Init"].delete(0,"end")
 			self.full_dict[param]["Init"].insert(0,str(round(params[param].value,3)))
 			popt.append(np.float64(params[param].value))
+			output_dict[param] = np.float64(params[param].value)
 
 
+
+		data_list_raw[file_index].diff_fitting[rep_index] = output_dict
+
+		print(data_list_raw[file_index].diff_fitting)
 			
 
 
 
 
 
+		if self.fit_all_flag == False:	
+
+			self.curves.cla()
+										
+										
+			self.curves.set_title("Correlation curves")
+			self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.curves.set_ylabel('G(tau)')
+			self.curves.set_xlabel('Delay time')
+			self.curves.set_xscale ('log')
+			self.curves.scatter(x, y, label = 'raw')
 			
 
-		self.curves.cla()
-									
-									
-		self.curves.set_title("Correlation curves")
-		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.curves.set_ylabel('G(tau)')
-		self.curves.set_xlabel('Delay time')
-		self.curves.set_xscale ('log')
-		self.curves.scatter(x, y, label = 'raw')
-		
-
-		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
-			self.curves.plot(x1, Corr_curve(x1, *popt), 'r-', label='fit')
+			if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
+				self.curves.plot(x, Corr_curve(x, *popt), 'r-', label='fit')
+				self.residuals.plot(x, o1.residual, 'b-')
+				#self.curves.scatter(x, Corr_curve(x, *popt))
 
 
 
-		self.canvas5.draw()
+			self.canvas5.draw()
 
-		self.figure5.tight_layout()
+			self.figure5.tight_layout()
 
 
 	def resid (self, params, x, ydata ):
@@ -1280,7 +1387,8 @@ class Diffusion_window :
 		global file_index
 		global rep_index
 
-		self.curves.cla()
+		if self.fit_all_flag == False:
+			self.curves.cla()
 
 
 		if self.ch_01_var.get() == 1:
@@ -1292,7 +1400,8 @@ class Diffusion_window :
 			self.x_fit = x1
 			self.y_fit = y1
 
-			self.curves.scatter(x1, y1, label = "auto corr ch 1")
+			if self.fit_all_flag == False:
+				self.curves.scatter(x1, y1, label = "auto corr ch 1")
 
 
 		
@@ -1301,7 +1410,8 @@ class Diffusion_window :
 			x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.x
 			y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.y
 
-			self.curves.scatter(x2, y2, label = "auto corr ch 2")
+			if self.fit_all_flag == False:
+				self.curves.scatter(x2, y2, label = "auto corr ch 2")
 
 
 		if self.ch_12_var.get() == 1:
@@ -1309,21 +1419,24 @@ class Diffusion_window :
 			x3 = data_list_current[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.x
 			y3 = data_list_current[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.y
 
-			self.curves.scatter(x3, y3, label = "cross-corr")
-
-		self.curves.set_title("Correlation curves")
-		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.curves.set_ylabel('G(tau)')
-		self.curves.set_xlabel('Delay time')
-		self.curves.set_xscale ('log')
+			if self.fit_all_flag == False:
+				self.curves.scatter(x3, y3, label = "cross-corr")
 
 		
+		if self.fit_all_flag == False:
+			self.curves.set_title("Correlation curves")
+			self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.curves.set_ylabel('G(tau)')
+			self.curves.set_xlabel('Delay time')
+			self.curves.set_xscale ('log')
 
-		self.curves.legend(loc='upper right')
+			
 
-		self.canvas5.draw()
+			self.curves.legend(loc='upper right')
 
-		self.figure5.tight_layout()
+			self.canvas5.draw()
+
+			self.figure5.tight_layout()
 
 
 	def Choose_curve(self, event):
@@ -1392,9 +1505,9 @@ class Diffusion_window :
 		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
 
 			self.list_of_params = ['offset', 'GN0', 'A', 'txy', 'alpha', 'AR', 'B', 'T_tri' ]
-			self.list_of_inits = ['1', '1', '1', '0', '1', '5', '1', '0.005']
+			self.list_of_inits = ['1', '1', '1', '0.02', '1', '5', '1', '0.005']
 			self.list_of_min = ['0', '0', '0', '0', '0', '0', '0', '0']
-			self.list_of_max = ['10', '5', '1', '100000', '20', '1', '1', '100']
+			self.list_of_max = ['10', '5', '1', '100000', '20', '20', '1', '100']
 
 			
 
@@ -1453,6 +1566,9 @@ class Diffusion_window :
 
 	def __init__(self, win_width, win_height, dpi_all):
 
+
+		
+		self.fit_all_flag = False
 
 		global file_index
 		global rep_index
@@ -2714,8 +2830,9 @@ tabs.pack(side = "left", anchor = "nw")
 
 data_frame = Left_frame(frame0, win_width, win_height, dpi_all )
 
-ffp = FFP_frame(frame1, win_width, win_height, dpi_all)
+#ffp = FFP_frame(frame1, win_width, win_height, dpi_all)
 
+diff = Diff_frame(frame1, win_width, win_height, dpi_all)
 gp = GP_frame(frame4, win_width, win_height, dpi_all)
 
 root.mainloop()
