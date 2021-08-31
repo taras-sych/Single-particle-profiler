@@ -14,6 +14,18 @@ import math
     # Falk Schneider 20/04/2020
 
 
+def correlate_full (timestep, a, b):
+
+    corr = correlate_linear(a,b)#correlate linear
+
+    #Calculates smoothed version of curve using logarithmic bins.
+    bins = logbins(a.size//2, 64)
+    scorr = smooth(corr_py.binaver(corr,bins))
+
+    time = bins*timestep
+
+    return time, corr
+
 
 def correlate_linear(a, b):
     """Return linear correlation of two vectors using DFT."""

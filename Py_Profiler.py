@@ -20,6 +20,8 @@ from ttkwidgets import CheckboxTreeview
 
 import fcs_importer
 
+import Correlation as corr_py
+
 import codecs
 
 import os
