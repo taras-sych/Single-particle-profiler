@@ -2267,6 +2267,8 @@ class Threshold_window:
 
 
 	def Peaks (self):
+
+		
 		
 		global change_normal
 
@@ -2291,9 +2293,12 @@ class Threshold_window:
 		y2_raw = []
 
 
+		
+
+
 
 		for rep_index_i in range (data_list_current[file_index].repetitions):
-
+						
 			if int(rep_index_i/data_list_current[file_index].binning) == int_div:
 
 				#print ("adding repetition ", rep_index_i)
@@ -2319,15 +2324,15 @@ class Threshold_window:
 
 
 
-		if th1 == 0:
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(round(np.mean(y1),2)))
-			data_list_current[file_index].threshold_ch1 = round(np.mean(y1),2)
-
-		if th2 == 0:
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(round(np.mean(y2),2)))
-			data_list_current[file_index].threshold_ch2 = round(np.mean(y2),2)
+		"""if th1 == 0:
+									self.ch1_th.delete(0,"end")
+									self.ch1_th.insert(0,str(round(np.mean(y1),2)))
+									data_list_current[file_index].threshold_ch1 = round(np.mean(y1),2)
+						
+								if th2 == 0:
+									self.ch2_th.delete(0,"end")
+									self.ch2_th.insert(0,str(round(np.mean(y2),2)))
+									data_list_current[file_index].threshold_ch2 = round(np.mean(y2),2)"""
 
 
 
@@ -2482,7 +2487,7 @@ class Threshold_window:
 		self.n, bins, patches = self.gp_hist.hist(gp_list_temp)
 
 			
-
+		
 
 		self.x_bins=[]
 		for ii in range (len(bins)-1):
@@ -2594,11 +2599,11 @@ class Threshold_window:
 
 		if self.normalization_index == "z-score":
 			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(1))
+			self.ch1_th.insert(0,str(3))
 
 			
 			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(1))
+			self.ch2_th.insert(0,str(3))
 
 		if self.normalization_index == "manual":
 
@@ -2620,6 +2625,7 @@ class Threshold_window:
 
 
 	def Normalize(self):
+		print("Normalize")
 		global change_normal
 		global file_index
 		global rep_index
@@ -2637,8 +2643,8 @@ class Threshold_window:
 				y1z = stats.zscore(y1)
 				y2z = stats.zscore(y2)
 
-				data_list_current[file_index].threshold_ch1 = 1
-				data_list_current[file_index].threshold_ch2 = 1
+				data_list_current[file_index].threshold_ch1 = 3
+				data_list_current[file_index].threshold_ch2 = 3
 
 				data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1z
 				data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2z
@@ -2649,7 +2655,7 @@ class Threshold_window:
 				self.ch2_th.delete(0,"end")
 				self.ch2_th.insert(0,str(1))
 
-				self.Peaks()
+		
 
 
 			if self.normalization_index == "manual":
@@ -2662,7 +2668,7 @@ class Threshold_window:
 				data_list_current[file_index].threshold_ch1 = 0
 				data_list_current[file_index].threshold_ch2 = 0
 
-				self.Peaks()
+		self.Peaks()
 
 		#self.Update_thresholds_button.invoke()
 
@@ -2671,14 +2677,10 @@ class Threshold_window:
 
 		self.normalization_index = self.Normalization.get()
 		
-		if self.normalization_index == "z-score":
-			
-			self.Normalize()
+		self.Normalize()
 
 
-		if self.normalization_index == "manual":
-			
-			self.Normalize()
+	
 
 	def Normalize_for_plot_index(self, event):
 		
@@ -2691,7 +2693,7 @@ class Threshold_window:
 
 	def Plot_trace(self, event):
 
-		
+		print("Plot trace")
 
 		global file_index
 		global rep_index
@@ -2756,7 +2758,9 @@ class Threshold_window:
 
 		rep = rep1-1
 
-		self.Peaks()
+		self.Normalize()
+
+
 
 	
 	def Binning(self, event):
@@ -2804,14 +2808,15 @@ class Threshold_window:
 		self.frame002.pack(side = "left", anchor = "nw")
 
 		
+		self.frame003 = tk.Frame(self.frame002)
+		self.frame003.pack(side = "top", anchor = "nw")
 
 
-
-		self.scrollbar_t = tk.Scrollbar(self.frame002)
+		self.scrollbar_t = tk.Scrollbar(self.frame003)
 		self.scrollbar_t.pack(side = "left", fill = "y")
 
 
-		self.Datalist_t = tk.Listbox(self.frame002, width = 100, height = 10)
+		self.Datalist_t = tk.Listbox(self.frame003, width = 100, height = 10)
 		self.Datalist_t.pack(side = "top", anchor = "nw")
 		
 		
@@ -2914,8 +2919,7 @@ class Threshold_window:
 		self.Peaks_button=tk.Checkbutton(self.frame001, text="Display peaks", variable=self.var, command=self.Update_thresholds)
 		self.Peaks_button.grid(row = 1, column = 3, sticky='w')
 
-		self.Apply_button = tk.Button(self.frame001, text="Apply and Fit", command=self.Temp)
-		self.Apply_button.grid(row = 2, column = 3)
+
 
 		
 
@@ -3073,42 +3077,7 @@ class Threshold_window:
 		print(1)
 
 
-class Fitting_window:
 
-	def __init__(self, win_width, win_height, dpi_all):
-
-
-		self.th_width = round(0.7*self.win_threshold.winfo_screenwidth())
-		self.th_height = round(0.4*self.win_threshold.winfo_screenwidth())
-
-		self.line1 = str(self.th_width) + "x" + str(self.th_height)
-
-
-		self.win_threshold.geometry(self.line1)
-
-		self.scrollbar = tk.Scrollbar(self.frame02)
-		self.scrollbar.pack(side = "left", fill = "y")
-
-
-		self.Datalist = tk.Listbox(self.frame02, width = 100, height = 10)
-		self.Datalist.pack(side = "left", anchor = "nw")
-		
-		
-		
-		self.tree=CheckboxTreeview(self.Datalist)
-		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
-		self.tree.pack()
-
-
-		self.tree.config(yscrollcommand = self.scrollbar.set)
-		self.scrollbar.config(command = self.tree.yview)
-
-		self.tree.bind('<<TreeviewSelect>>', self.Plot_data)
-
-		self.Datalist.config(width = 100, height = 10)
-
-		self.frame02 = tk.Frame(frame0)
-		self.frame02.pack(side="top", fill="x")
 
 
 
@@ -3136,12 +3105,12 @@ class Data_tree:
 
 
 
-class Found_peaks:
+"""class Found_peaks:
 	def __init__(self, x1, y1, t1):
 		self.x = x1
 		self.y = y1
 		self.t = t1
-		self.active = True
+		self.active = True"""
 			
 		
 	
