@@ -39,7 +39,7 @@ import random
 
 import seaborn as sns
 
-
+sns.set(context='notebook', style='whitegrid')
 
 global binning_list
 binning_list = []
@@ -327,7 +327,7 @@ def Plot_gp():
 
 
 
-	sns.set(context='notebook', style='whitegrid')
+	
 	#sns.axlabel( ylabel="Diffusion time", fontsize=16)
 	sns.boxplot(data=vals, width=.18, ax = gp.main)
 	sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = gp.main)
