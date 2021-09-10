@@ -2501,6 +2501,38 @@ class Threshold_window:
 			self.gp_hist.set_xlabel('GP')
 
 
+			if data_list_raw[file_index].gp_fitting[rep_index] != None:
+
+				x1 = self.x_bins
+
+				for param in data_list_raw[file_index].gp_fitting[rep_index].keys():
+			
+
+					popt.append(np.float64(data_list_raw[file_index].gp_fitting[param]))
+					
+
+
+
+				if self.Components.get() == '1 component':
+					self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+
+				if self.Components.get() == '2 components':
+					self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
+					popt1 = popt[:3]
+					popt2 = popt[3:6]
+					self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
+					self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+
+				if self.Components.get() == '3 components':
+					self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
+					popt1 = popt[:3]
+					popt2 = popt[3:6]
+					popt3 = popt[6:9]
+					self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
+					self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+					self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
+
+
 
 
 
