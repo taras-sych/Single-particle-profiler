@@ -884,6 +884,8 @@ class Left_frame :
 
 
 		self.traces.cla()
+
+		self.traces.set_title("Intensity traces")
 		
 		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.traces.set_ylabel('Intensity (a.u.)')
@@ -894,10 +896,10 @@ class Left_frame :
 
 		self.traces.legend(loc='upper right')
 
-		self.canvas1.draw()
 
-		self.figure1.tight_layout()
 
+
+		self.corr.set_title("Correlation curves")
 
 
 		self.corr.cla()
@@ -922,9 +924,9 @@ class Left_frame :
 
 		self.corr.legend(loc='upper right')
 
-		self.canvas2.draw()
+		self.canvas1.draw()
 
-		self.figure2.tight_layout()
+		self.figure1.tight_layout()
 
 
 
@@ -1093,9 +1095,9 @@ class Left_frame :
 		self.traces.clear()
 		self.corr.clear()
 		self.canvas1.draw()
-		self.canvas2.draw()
+	
 		self.figure1.tight_layout()
-		self.figure2.tight_layout()
+	
 
 		data_list_raw = []
 		data_list_current = []
@@ -1192,12 +1194,35 @@ class Left_frame :
 		self.frame04.pack(side="top", fill="x")
 
 
-		self.figure1 = Figure(figsize=(win_width/(2*dpi_all),win_height/(4*dpi_all)), dpi=100)
-		self.traces = self.figure1.add_subplot(1, 1, 1)
+
+		fig_height = (win_height/1.89 - self.Datalist.winfo_height() - self.Import_Button.winfo_height())/dpi_all
+		self.figure1 = Figure(figsize=(win_width/(2*dpi_all),fig_height), dpi=100)
+
+
+
+
+		gs = self.figure1.add_gridspec(2, 1)
+
+
+		self.traces = self.figure1.add_subplot(gs[:1, 0])
+
+		self.traces.set_title("Intensity traces")
 
 		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.traces.set_ylabel('Intensity (a.u.)')
+		self.traces.set_ylabel('intensity (a.u.)')
 		self.traces.set_xlabel('Time (s)')
+
+		self.corr = self.figure1.add_subplot(gs[1, 0])
+
+
+
+		self.corr.set_title("Correlation curves")
+
+		self.corr.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.corr.set_ylabel('G (tau)')
+		self.corr.set_xlabel('Delay time')
+
+
 
 
 		self.canvas1 = FigureCanvasTkAgg(self.figure1, self.frame04)
@@ -1209,30 +1234,13 @@ class Left_frame :
 
 		self.figure1.tight_layout()
 
-
-		self.frame06 = tk.Frame(frame0)
-		self.frame06.pack(side="top", fill="x")
-
-
-		self.figure2 = Figure(figsize=(win_width/(2*dpi_all),win_height/(4*dpi_all)), dpi=100)
-		self.corr = self.figure2.add_subplot(1, 1, 1)
-
-		self.corr.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.corr.set_ylabel('G(tau)')
-		self.corr.set_xlabel('Delay time')
-
-
-		self.canvas2 = FigureCanvasTkAgg(self.figure2, self.frame06)
-		self.canvas2.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
-
-		self.toolbar = NavigationToolbar2Tk(self.canvas2, self.frame06)
-		self.toolbar.update()
-		self.canvas2.get_tk_widget().pack()
-
-		self.figure2.tight_layout()
-
 		self.framepb = tk.Frame(frame0)
 		self.framepb.pack(side="top", fill="x")
+
+
+
+
+		
 
 	
 
@@ -2467,21 +2475,25 @@ class Threshold_window:
 
 		gp_list_temp = []
 
-		for k in range (len(yp1)):
-			gp_1 = (yp2_1_raw[k] - yp1_raw[k])/(yp2_1_raw[k] + yp1_raw[k])
+		
+
+		if which_channel == "channel 1" or which_channel == "both":
+			for k in range (len(yp1)):
+				gp_1 = (yp1_raw[k] - yp2_1_raw[k])/(yp2_1_raw[k] + yp1_raw[k])
 
 
 
-			if abs(gp_1) < 1:
-				gp_list_temp.append(gp_1)
+				if abs(gp_1) < 1:
+					gp_list_temp.append(gp_1)
 
-		for k in range (len(yp2)):
-			gp_1 = (yp1_2_raw[k] - yp2_raw[k])/(yp1_2_raw[k] + yp2_raw[k])
+		if which_channel == "channel 2" or which_channel == "both":
+			for k in range (len(yp2)):
+				gp_1 = (yp1_2_raw[k] - yp2_raw[k])/(yp1_2_raw[k] + yp2_raw[k])
 
 
 
-			if abs(gp_1) < 1:
-				gp_list_temp.append(gp_1)
+				if abs(gp_1) < 1:
+					gp_list_temp.append(gp_1)
 
 
 		self.n, bins, patches = self.gp_hist.hist(gp_list_temp)
@@ -2503,12 +2515,15 @@ class Threshold_window:
 
 			if data_list_raw[file_index].gp_fitting[rep_index] != None:
 
-				x1 = self.x_bins
+
+				x1 = np.linspace(min(self.x_bins), max(self.x_bins), num=500)
+				popt = []
 
 				for param in data_list_raw[file_index].gp_fitting[rep_index].keys():
 			
 
-					popt.append(np.float64(data_list_raw[file_index].gp_fitting[param]))
+					popt.append(np.float64(data_list_raw[file_index].gp_fitting[rep_index][param]))
+
 					
 
 
@@ -2657,7 +2672,7 @@ class Threshold_window:
 
 
 	def Normalize(self):
-		print("Normalize")
+		
 		global change_normal
 		global file_index
 		global rep_index
@@ -2725,7 +2740,7 @@ class Threshold_window:
 
 	def Plot_trace(self, event):
 
-		print("Plot trace")
+		
 
 		global file_index
 		global rep_index
