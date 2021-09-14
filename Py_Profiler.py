@@ -518,6 +518,9 @@ def Plot_gp_diff():
 		gp_diff.main.scatter(thisdict_gp[key], thisdict_diff[key], label = key )
 		gp_diff.main.legend(loc='upper right')
 
+	gp_diff.main.set_ylabel('Diffusion time (ms)')
+	gp_diff.main.set_xlabel('GP')
+
 
 
 
@@ -1610,6 +1613,7 @@ class GP_frame :
 
 class GP_Diff_frame:
 
+
 	def __init__ (self, frame1, win_width, win_height, dpi_all):
 
 		self.frame12 = tk.Frame(frame1)
@@ -1620,7 +1624,7 @@ class GP_Diff_frame:
 		self.main = self.figure3.add_subplot(1, 1, 1)
 
 		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.main.set_ylabel('Counts')
+		self.main.set_ylabel('Diffusion time (ms)')
 		self.main.set_xlabel('GP')
 
 
@@ -2271,7 +2275,12 @@ class Threshold_window:
 	def Update_thresholds (self):
 		global change_normal
 		change_normal = False
+		if data_list_raw[file_index].gp_fitting[rep_index] != None:
+			data_list_raw[file_index].gp_fitting[rep_index] = None
+
 		self.Peaks()
+
+
 
 
 	def Peaks (self):
@@ -2529,12 +2538,14 @@ class Threshold_window:
 
 
 				if self.Components.get() == '1 component':
+					print("1 comp")
 					self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
 
 				if self.Components.get() == '2 components':
 					self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
 					popt1 = popt[:3]
 					popt2 = popt[3:6]
+					print("2 comp")
 					self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
 					self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
 
@@ -2543,6 +2554,7 @@ class Threshold_window:
 					popt1 = popt[:3]
 					popt2 = popt[3:6]
 					popt3 = popt[6:9]
+					print("3 comp")
 					self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
 					self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
 					self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
@@ -2679,6 +2691,8 @@ class Threshold_window:
 
 		change_normal = True
 
+
+
 			
 		for rep in range (repetitions_list[file_index]):
 
@@ -2702,7 +2716,7 @@ class Threshold_window:
 				self.ch2_th.delete(0,"end")
 				self.ch2_th.insert(0,str(1))
 
-		
+			
 
 
 			if self.normalization_index == "manual":
@@ -2723,6 +2737,9 @@ class Threshold_window:
 	def Normalize_index(self, event):
 
 		self.normalization_index = self.Normalization.get()
+
+		if data_list_raw[file_index].gp_fitting[rep_index] != None:
+			data_list_raw[file_index].gp_fitting[rep_index] = None
 		
 		self.Normalize()
 
@@ -2740,10 +2757,19 @@ class Threshold_window:
 
 	def Plot_trace(self, event):
 
-		
-
 		global file_index
 		global rep_index
+
+
+
+
+
+
+
+
+		
+
+
 
 		index = self.tree_t.selection()
 		num1, num = index[0].split('I')
@@ -2804,6 +2830,21 @@ class Threshold_window:
 
 
 		rep = rep1-1
+
+
+		if data_list_raw[file_index].gp_fitting[rep_index] != None:
+			print("Keys: ", len(data_list_raw[file_index].gp_fitting[rep_index].keys()))
+			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 3:
+
+				self.Normalization.set("1 component")
+
+			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 6:
+
+				self.Normalization.set("2 components")
+
+			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 9:
+
+				self.Normalization.set("3 components")
 
 		self.Normalize()
 
