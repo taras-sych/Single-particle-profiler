@@ -2243,7 +2243,7 @@ class Threshold_window:
 			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 			self.gp_hist.set_ylabel('Counts')
 			self.gp_hist.set_xlabel('GP')
-			self.gp_hist.bar(x, y, width=0.2, bottom=None, align='center', label = 'raw')
+			self.gp_hist.bar(x, y, width = x[1] - x[0], bottom=None, align='center', label = 'raw')
 			
 
 			if self.Components.get() == '1 component':
@@ -2455,8 +2455,8 @@ class Threshold_window:
 
 				
 
-				self.hist1.hist(yh1)
-				self.hist1.hist(yh2)
+				self.hist1.hist(yh1, bins = int(np.sqrt(len(yh1))))
+				self.hist1.hist(yh2, bins = int(np.sqrt(len(yh2))))
 
 			if which_channel == "channel 1":
 				self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
@@ -2464,7 +2464,7 @@ class Threshold_window:
 				
 				if (self.var.get() == 1):
 					self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
-				self.hist1.hist(yh1)
+				self.hist1.hist(yh1, bins = int(np.sqrt(len(yh1))))
 				
 
 			if which_channel == "channel 2":
@@ -2474,7 +2474,7 @@ class Threshold_window:
 
 				if (self.var.get() == 1):
 					self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
-				self.hist1.hist(yh2)
+				self.hist1.hist(yh2, bins = int(np.sqrt(len(yh2))))
 
 			if change_normal == False:
 				self.peaks.set_xlim(main_xlim)
@@ -2504,8 +2504,8 @@ class Threshold_window:
 				if abs(gp_1) < 1:
 					gp_list_temp.append(gp_1)
 
-
-		self.n, bins, patches = self.gp_hist.hist(gp_list_temp)
+		
+		self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
 
 			
 		
@@ -2542,19 +2542,21 @@ class Threshold_window:
 					self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
 
 				if self.Components.get() == '2 components':
+					print("2 comp")
 					self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
 					popt1 = popt[:3]
 					popt2 = popt[3:6]
-					print("2 comp")
+					
 					self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
 					self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
 
 				if self.Components.get() == '3 components':
 					self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
+					print("3 comp")
 					popt1 = popt[:3]
 					popt2 = popt[3:6]
 					popt3 = popt[6:9]
-					print("3 comp")
+					
 					self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
 					self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
 					self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
@@ -2833,18 +2835,23 @@ class Threshold_window:
 
 
 		if data_list_raw[file_index].gp_fitting[rep_index] != None:
-			print("Keys: ", len(data_list_raw[file_index].gp_fitting[rep_index].keys()))
+
+
 			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 3:
 
-				self.Normalization.set("1 component")
+				
+
+				self.Components.set("1 component")
 
 			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 6:
 
-				self.Normalization.set("2 components")
+				
+
+				self.Components.set("2 components")
 
 			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 9:
 
-				self.Normalization.set("3 components")
+				self.Components.set("3 components")
 
 		self.Normalize()
 
