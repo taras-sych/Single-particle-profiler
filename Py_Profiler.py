@@ -2287,7 +2287,7 @@ class Threshold_window:
 
 		
 		
-		global change_normal
+
 
 		
 		main_xlim = self.peaks.get_xlim()
@@ -2360,6 +2360,8 @@ class Threshold_window:
 
 		th1 = data_list_current[file_index].threshold_ch1
 		th2 = data_list_current[file_index].threshold_ch2
+
+		print ("Thresholds: ", th1, th2)
 
 		yh1 = []
 		yh2 = []
@@ -2476,9 +2478,9 @@ class Threshold_window:
 					self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
 				self.hist1.hist(yh2, bins = int(np.sqrt(len(yh2))))
 
-			if change_normal == False:
-				self.peaks.set_xlim(main_xlim)
-				self.peaks.set_ylim(main_ylim)
+			"""if change_normal == False:
+													self.peaks.set_xlim(main_xlim)
+													self.peaks.set_ylim(main_ylim)"""
 
 		
 
@@ -2687,58 +2689,92 @@ class Threshold_window:
 
 	def Normalize(self):
 		
-		global change_normal
+
 		global file_index
 		global rep_index
 
-		change_normal = True
+		
 
+
+		data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
 
 
 			
 		for rep in range (repetitions_list[file_index]):
 
-			y1 = data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y
-			y2 = data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y
+
+
+			y1 = data_list_raw[file_index].datasets_list[rep].channels_list[0].fluct_arr.y
+			y2 = data_list_raw[file_index].datasets_list[rep].channels_list[1].fluct_arr.y
 			
 				
 			if self.normalization_index == "z-score":
 				y1z = stats.zscore(y1)
 				y2z = stats.zscore(y2)
 
-				data_list_current[file_index].threshold_ch1 = 3
-				data_list_current[file_index].threshold_ch2 = 3
+
+				data_list_current[file_index].threshold_ch1 = float(self.ch1_th.get())
+				data_list_current[file_index].threshold_ch2 = float(self.ch2_th.get())
 
 				data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1z
 				data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2z
 
-				self.ch1_th.delete(0,"end")
-				self.ch1_th.insert(0,str(1))
-		
-				self.ch2_th.delete(0,"end")
-				self.ch2_th.insert(0,str(1))
+
 
 			
 
 
 			if self.normalization_index == "manual":
 
-				y1 = y1/np.mean(y1)
-				y2 = y2/np.mean(y2)
 
-				data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
 
-				data_list_current[file_index].threshold_ch1 = 0
-				data_list_current[file_index].threshold_ch2 = 0
+				y1m = y1/np.mean(y1)
+				y2m = y2/np.mean(y2)
+
+				
+
+				data_list_current[file_index].threshold_ch1 = float(self.ch1_th.get())
+				data_list_current[file_index].threshold_ch2 = float(self.ch2_th.get())
+				
+
+				data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1m
+				data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2m
+
+
+
+
 
 		self.Peaks()
 
-		#self.Update_thresholds_button.invoke()
+
+
+
 
 
 	def Normalize_index(self, event):
 
 		self.normalization_index = self.Normalization.get()
+
+
+		if self.normalization_index == "z-score":
+			
+
+			self.ch1_th.delete(0,"end")
+			self.ch1_th.insert(0,str(3))
+			
+			self.ch2_th.delete(0,"end")
+			self.ch2_th.insert(0,str(3))
+
+
+
+		if self.normalization_index == "manual":
+
+
+			self.ch1_th.delete(0,"end")
+			self.ch1_th.insert(0,str(1))
+			
+			self.ch2_th.delete(0,"end")
+			self.ch2_th.insert(0,str(1))
 
 		if data_list_raw[file_index].gp_fitting[rep_index] != None:
 			data_list_raw[file_index].gp_fitting[rep_index] = None
@@ -3062,7 +3098,7 @@ class Threshold_window:
 		self.ch1_th = tk.Entry(self.frame001, width = 9)
 		self.ch1_th.grid(row = 4, column = 1, sticky='w')
 
-		self.ch1_th.insert("end", str(data_list_current[file_index].threshold_ch1))
+		self.ch1_th.insert("end", str(3))
 
 		self.ch2_label = tk.Label(self.frame001, text="channel 2: ")
 		self.ch2_label.grid(row = 5, column = 0, sticky='w')
@@ -3072,7 +3108,7 @@ class Threshold_window:
 		self.ch2_th = tk.Entry(self.frame001, width = 9)
 		self.ch2_th.grid(row = 5, column = 1, sticky='w')
 
-		self.ch2_th.insert("end", str(data_list_current[file_index].threshold_ch2))
+		self.ch2_th.insert("end", str(3))
 
 
 		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
@@ -3115,8 +3151,7 @@ class Threshold_window:
 		#ttk.Separator(self.frame001, orient="vertical").grid(column=2, row=2, rowspan=5, sticky='ns')
 
 
-		global change_normal
-		change_normal = True
+
 		
 
 
@@ -3128,9 +3163,7 @@ class Threshold_window:
 		
 		
 
-		for i in range(0, len(tree_list_name)):
-			name = tree_list_name[i]
-			Data_tree (self.tree_t, name, data_list_current[i].repetitions)
+
 
 
 
@@ -3163,6 +3196,11 @@ class Threshold_window:
 		self.frame004.pack(side = "top", anchor = "nw")
 
 		self.Fitting_frame()
+
+
+		for i in range(0, len(tree_list_name)):
+			name = tree_list_name[i]
+			Data_tree (self.tree_t, name, data_list_current[i].repetitions)
 
 		
 
@@ -3199,13 +3237,6 @@ class Data_tree:
 		tree.selection_set(child_id)
 
 
-
-"""class Found_peaks:
-	def __init__(self, x1, y1, t1):
-		self.x = x1
-		self.y = y1
-		self.t = t1
-		self.active = True"""
 			
 		
 	
