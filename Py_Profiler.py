@@ -2456,9 +2456,17 @@ class Threshold_window:
 
 
 				
+				
+				bins_1 = int(np.sqrt(len(yh1)))
+				bins_2 = int(np.sqrt(len(yh2)))
 
-				self.hist1.hist(yh1, bins = int(np.sqrt(len(yh1))))
-				self.hist1.hist(yh2, bins = int(np.sqrt(len(yh2))))
+				if bins_1 == 0:
+					bins_1 = 1
+
+				if bins_2 == 0:
+					bins_2 = 1
+				self.hist1.hist(yh1, bins = bins_1)
+				self.hist1.hist(yh2, bins = bins_2)
 
 			if which_channel == "channel 1":
 				self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
@@ -2573,7 +2581,10 @@ class Threshold_window:
 
 	def Fitting_frame(self):
 
+
 		self.frame004.destroy()
+
+
 
 		self.frame004 = tk.Frame(self.frame002)
 		self.frame004.pack(side = "top", anchor = "nw")
@@ -2604,7 +2615,11 @@ class Threshold_window:
 			self.list_of_min = ['0', '-1', '-1', '0', '-1', '-1', '0', '-1', '-1']
 			self.list_of_max = ['10000', '1', '1', '10000', '1', '1', '10000', '1', '1']
 
-			
+
+
+
+
+
 
 		Label_1 = tk.Label(self.frame004, text="Param")
 		Label_1.grid(row = 0, column = 0, sticky = 'w')
@@ -2650,6 +2665,17 @@ class Threshold_window:
 			thisdict["Max"].grid(row = row_index, column = 4, sticky = 'w')
 			thisdict["Max"].delete(0,"end")
 			thisdict["Max"].insert(0,self.list_of_max[row_index-1])
+
+			if data_list_raw[file_index].gp_fitting[rep_index] != None and len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == len(self.list_of_params) :
+
+				thisdict["Init"].delete(0,"end")
+				thisdict["Init"].insert(0,data_list_raw[file_index].gp_fitting[rep_index][param])
+
+
+
+			
+
+
 
 			row_index+=1
 
@@ -2782,6 +2808,10 @@ class Threshold_window:
 		self.Normalize()
 
 
+
+		self.Fitting_frame()
+
+
 	
 
 	def Normalize_for_plot_index(self, event):
@@ -2890,6 +2920,10 @@ class Threshold_window:
 				self.Components.set("3 components")
 
 		self.Normalize()
+
+
+
+		self.Fitting_frame()
 
 
 
