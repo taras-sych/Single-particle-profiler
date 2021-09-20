@@ -584,6 +584,9 @@ def Restruct_fun():
 
 class Restruct_window:
 
+	def Temp(self):
+		print(1)
+
 
 
 	def Plot_curve(self):
@@ -740,15 +743,17 @@ class Restruct_window:
 		self.frame002 = tk.Frame(self.win_diff)
 		self.frame002.pack(side = "left", anchor = "nw")
 
-		
+
+		self.frame003 = tk.Frame(self.frame002)
+		self.frame003.pack(side = "top", anchor = "nw")		
 
 
 
-		self.scrollbar = tk.Scrollbar(self.frame002)
+		self.scrollbar = tk.Scrollbar(self.frame003)
 		self.scrollbar.pack(side = "left", fill = "y")
 
 
-		self.Datalist = tk.Listbox(self.frame002, width = 100, height = 10)
+		self.Datalist = tk.Listbox(self.frame003, width = 100, height = 10)
 		self.Datalist.pack(side = "top", anchor = "nw")
 		
 		
@@ -766,6 +771,22 @@ class Restruct_window:
 
 
 		self.Datalist.config(width = 100, height = 10)
+
+
+		self.frame004 = tk.Frame(self.frame002)
+		self.frame004.pack(side = "top", anchor = "nw")
+
+		Label_1 = tk.Label(self.frame004, text="Repetitions: ")
+		Label_1.grid(row = 0, column = 0, sticky = 'w')
+
+		self.num_rep = tk.Entry(self.frame004, width = 9)
+		self.num_rep.grid(row = 0, column = 1, sticky='w')
+
+		self.num_rep.delete(0,"end")
+		self.num_rep.insert(0,data_list_current[rep_index].repetitions)
+
+		self.Rep_button = tk.Button(self.frame004, text="Apply reps", command=self.Temp)
+		self.Rep_button.grid(row = 0, column = 2, sticky='w')
 
 
 		self.frame000 = tk.Frame(self.win_diff)
@@ -1670,8 +1691,8 @@ class Diffusion_window :
 		
 
 
-		x = self.x_fit
-		y = self.y_fit
+		x = self.x_ch1
+		y = self.y_ch1
 
 		params = lmfit.Parameters()
 
@@ -1688,7 +1709,7 @@ class Diffusion_window :
 
  
 
-		x1 = np.linspace(min(x), max(x), num=500)
+		
 
 
 		method = 'least_squares'
@@ -1725,6 +1746,7 @@ class Diffusion_window :
 		if self.fit_all_flag == False:	
 
 			self.curves.cla()
+			self.residuals.cla()
 										
 										
 			self.curves.set_title("Correlation curves")
@@ -1734,6 +1756,8 @@ class Diffusion_window :
 			self.curves.set_xscale ('log')
 			self.curves.scatter(x, y, label = 'raw')
 			
+			x1 = np.linspace(min(x), max(x), num=50000)
+
 
 			if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
 				self.curves.plot(x, Corr_curve(x, *popt), 'r-', label='fit')
@@ -1787,8 +1811,8 @@ class Diffusion_window :
 			x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x
 			y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.y
 
-			self.x_fit = x1
-			self.y_fit = y1
+			self.x_ch1 = x1
+			self.y_ch1 = y1
 
 			if self.fit_all_flag == False:
 				self.curves.scatter(x1, y1, label = "auto corr ch 1")
@@ -1800,11 +1824,17 @@ class Diffusion_window :
 			x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.x
 			y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.y
 
+			self.x_ch2 = x1
+			self.y_ch2 = y1
+
 			if self.fit_all_flag == False:
 				self.curves.scatter(x2, y2, label = "auto corr ch 2")
 
 
 		if self.ch_12_var.get() == 1:
+
+			self.x_ch12 = x1
+			self.y_ch12 = y1
 
 			x3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.x
 			y3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.y
@@ -2384,40 +2414,53 @@ class Threshold_window:
 		
 		peaks1, _ = find_peaks(y1, height=th1)
 
+		peaks2, _ = find_peaks(y2, height=th2)
+
+		print (peaks1)
+		print (peaks2)
+
+		if which_channel == "channel 1":
+
+			peaks = peaks1
+
+		if which_channel == "channel 2":
+
+			peaks = peaks2
+
+		if which_channel == "both and":
+
+			peaks = list(set(peaks1).intersection(set(peaks2)))
+
+		if which_channel == "both or":
+
+			peaks = list(set(peaks1).union(set(peaks2)))
+
 		xp1 = []
+		xp2 = []
 		yp1 = []
-		yp2_1 = []
 
 		yp1_raw = []
-		yp2_1_raw = []
-
-
-
-		for p in peaks1:
-			xp1.append(x1[p])
-			yp1.append(y1[p])
-			yp2_1.append(y2[p])
-
-			yp1_raw.append(y1_raw[p])
-			yp2_1_raw.append(y2_raw[p])
-
-
-		peaks1, _ = find_peaks(y2, height=th2)
-
-		xp2 = []
 		yp2 = []
-		yp1_2 = []
 
 		yp2_raw = []
-		yp1_2_raw = []
 
-		for p in peaks1:
-			xp2.append(x2[p])
+
+
+
+
+
+
+		for p in peaks:
+			xp1.append(x1[p])
+			xp2.append(x1[p])
+			yp1.append(y1[p])
 			yp2.append(y2[p])
-			yp1_2.append(y1[p])
 
+			yp1_raw.append(y1_raw[p])
 			yp2_raw.append(y2_raw[p])
-			yp1_2_raw.append(y1_raw[p])
+
+
+
 		
 		
 
@@ -2439,52 +2482,32 @@ class Threshold_window:
 			self.hist1.set_xlabel('Intensity (a.u.)')
 
 
-			if which_channel == "both":
 
-				
-
-				self.peaks.plot(x1, y1, zorder=1)
-				self.peaks.plot(x2, y2, zorder=2)
-
-				self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=3)
-				self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=4)
-
-				
-				if (self.var.get() == 1):
-					self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 5)
-					self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 6)
-
-
-				
-				
-				bins_1 = int(np.sqrt(len(yh1)))
-				bins_2 = int(np.sqrt(len(yh2)))
-
-				if bins_1 == 0:
-					bins_1 = 1
-
-				if bins_2 == 0:
-					bins_2 = 1
-				self.hist1.hist(yh1, bins = bins_1)
-				self.hist1.hist(yh2, bins = bins_2)
-
-			if which_channel == "channel 1":
+			if which_channel == "channel 1" or which_channel == "both or" or which_channel == "both and":
 				self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
 				self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
 				
 				if (self.var.get() == 1):
 					self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
-				self.hist1.hist(yh1, bins = int(np.sqrt(len(yh1))))
+
+				bins_1 = int(np.sqrt(len(yh1)))
+				if bins_1 == 0:
+					bins_1 = 1
+				self.hist1.hist(yh1, bins = bins_1)
 				
 
-			if which_channel == "channel 2":
+			if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
 				
 				self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
 				self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=2)
 
 				if (self.var.get() == 1):
 					self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
-				self.hist1.hist(yh2, bins = int(np.sqrt(len(yh2))))
+
+				bins_2 = int(np.sqrt(len(yh2)))
+				if bins_2 == 0:
+					bins_2 = 1
+				self.hist1.hist(yh2, bins = bins_2)
 
 			"""if change_normal == False:
 													self.peaks.set_xlim(main_xlim)
@@ -2496,23 +2519,16 @@ class Threshold_window:
 
 		
 
-		if which_channel == "channel 1" or which_channel == "both":
-			for k in range (len(yp1)):
-				gp_1 = (yp1_raw[k] - yp2_1_raw[k])/(yp2_1_raw[k] + yp1_raw[k])
+		
+		for k in range (len(yp1_raw)):
+			gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
 
 
 
-				if abs(gp_1) < 1:
-					gp_list_temp.append(gp_1)
-
-		if which_channel == "channel 2" or which_channel == "both":
-			for k in range (len(yp2)):
-				gp_1 = (yp1_2_raw[k] - yp2_raw[k])/(yp1_2_raw[k] + yp2_raw[k])
+			if abs(gp_1) < 1:
+				gp_list_temp.append(gp_1)
 
 
-
-				if abs(gp_1) < 1:
-					gp_list_temp.append(gp_1)
 
 		
 		self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
@@ -3096,11 +3112,11 @@ class Threshold_window:
 
 	
 
-		self.Threshold = ttk.Combobox(self.frame001,values = ["both", "channel 1", "channel 2"], width = 9 )
+		self.Threshold = ttk.Combobox(self.frame001,values = ["both and", "both or", "channel 1", "channel 2"], width = 9 )
 		self.Threshold.config(state = "readonly")
 		self.Threshold.grid(row = 2, column = 1)
 
-		self.Threshold.set("both")
+		self.Threshold.set("both and")
 
 		self.Threshold.bind("<<ComboboxSelected>>", self.Threshold_callback)
 
