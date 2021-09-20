@@ -2416,8 +2416,7 @@ class Threshold_window:
 
 		peaks2, _ = find_peaks(y2, height=th2)
 
-		print (peaks1)
-		print (peaks2)
+
 
 		if which_channel == "channel 1":
 
