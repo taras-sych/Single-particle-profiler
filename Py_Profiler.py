@@ -788,6 +788,8 @@ class Restruct_window:
 		self.Rep_button = tk.Button(self.frame004, text="Apply reps", command=self.Temp)
 		self.Rep_button.grid(row = 0, column = 2, sticky='w')
 
+		self.Remove_button = tk.Button(self.frame004, text="Remove dataset", command=self.Temp)
+		self.Remove_button.grid(row = 1, column = 0, columnspan = 3, sticky = 'ew')
 
 		self.frame000 = tk.Frame(self.win_diff)
 		self.frame000.pack(side = "left", anchor = "nw")
@@ -1677,8 +1679,20 @@ class Diffusion_window :
 
 		self.fit_all_flag = True
 
+		self.list_of_inits_for_fit_all = {}
+
+		for param in self.list_of_params:
+			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
+
+
+
 		for rep_index_i in range (data_list_current[file_index].repetitions): 
 			rep_index = rep_index_i
+			for param in self.list_of_params:
+				self.full_dict[param]["Init"].delete(0,"end")
+				self.full_dict[param]["Init"].insert(0,str(round(self.list_of_inits_for_fit_all[param],3)))
+
+
 			self.Plot_curve()
 			self.Fit_corr_curve()
 
@@ -2106,7 +2120,7 @@ class Diffusion_window :
 		
 
 		self.Norm_label = tk.Label(self.frame001, text="FCS curve fitting: ")
-		self.Norm_label.grid(row = 0, column = 0, sticky = 'w')
+		self.Norm_label.grid(row = 0, column = 0, columnspan = 2, sticky = 'w')
 
 		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet", "no triplet"], width = 9 )
 		self.Triplet.config(state = "readonly")
@@ -2129,15 +2143,15 @@ class Diffusion_window :
 
 
 		self.Fit_button = tk.Button(self.frame001, text="Fit", command=self.Fit_corr_curve)
-		self.Fit_button.grid(row = 2, column = 0, sticky='w')
+		self.Fit_button.grid(row = 2, column = 0, sticky='ew')
 
 
 
 		self.Fit_all_button = tk.Button(self.frame001, text="Fit all", command=self.Apply_to_all)
-		self.Fit_all_button.grid(row = 2, column = 1, sticky='w')
+		self.Fit_all_button.grid(row = 2, column = 1, sticky='ew')
 
 		self.Table_label = tk.Label(self.frame001, text="Fitting parampampams: ")
-		self.Table_label.grid(row = 3, column = 0, sticky = 'w')
+		self.Table_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w')
 
 
 
@@ -2170,7 +2184,16 @@ class Threshold_window:
 
 		self.fit_all_flag = True
 
-		for rep_index_i in range (data_list_current[file_index].repetitions): 
+		self.list_of_inits_for_fit_all = {}
+
+		for param in self.list_of_params:
+			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
+
+		for rep_index_i in range (data_list_current[file_index].repetitions):
+			for param in self.list_of_params:
+				self.full_dict[param]["Init"].delete(0,"end")
+				self.full_dict[param]["Init"].insert(0,str(round(self.list_of_inits_for_fit_all[param],3)))
+				
 			rep_index = rep_index_i
 			self.Peaks()
 			self.Fit_gaus()
@@ -3210,13 +3233,6 @@ class Threshold_window:
 		global tree_list_name
 		global repetitions_list
 		
-		
-
-
-
-
-
-
 
 
 		self.frame007 = tk.Frame(self.frame002)
@@ -3225,14 +3241,14 @@ class Threshold_window:
 
 
 		self.Fit_button = tk.Button(self.frame007, text="Fit", command=self.Fit_gaus)
-		self.Fit_button.grid(row = 0, column = 0, sticky='w')
+		self.Fit_button.grid(row = 0, column = 0, sticky='ew')
 
 		self.Fit_all_button = tk.Button(self.frame007, text="Fit all", command=self.Apply_to_all)
-		self.Fit_all_button.grid(row = 0, column = 2, sticky='w')
+		self.Fit_all_button.grid(row = 0, column = 1, sticky='ew')
 
 		self.Components = ttk.Combobox(self.frame007,values = ["1 component", "2 components", "3 components"], width = 13 )
 		self.Components.config(state = "readonly")
-		self.Components.grid(row = 0, column = 1, sticky='w')
+		self.Components.grid(row = 0, column = 0, columnspan = 2, sticky='w')
 		self.Components.set("1 component")
 
 		self.Components.bind("<<ComboboxSelected>>", self.Choose_components)
