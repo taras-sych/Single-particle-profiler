@@ -1,0 +1,6 @@
+tk
+matplotlib
+lmfit
+ttkwidgets
+scipy
+seaborn

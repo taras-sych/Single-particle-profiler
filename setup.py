@@ -1,22 +1,27 @@
-from setuptools import setup, find_packages, Extension
-import numpy
-setup(name='focuspoint',
-	version='0.1',
-	author='Dominic Waithe',
-	install_requires=['lmfit','matplotlib','cython'],
-	include_package_data=True,
-	include_dirs=[numpy.get_include()],
-	ext_modules=[Extension('focuspoint.fib4', ['focuspoint/fib4.c'])],
-	packages = ['focuspoint', 'focuspoint.import_methods', 'focuspoint.correlation_methods', 'focuspoint.fitting_methods'],
-	
-	package_data={
-        'focuspoint': ['fib4.pyx'],
-    },
-	entry_points={
-        'console_scripts': [
-            'sample=sample:main',
-        ],
-    },
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 12 12:41:15 2019
+@author: aurelien
+"""
+
+from setuptools import setup, find_packages
 
 
-	)
+def readme():
+    with open('README.md') as f:
+        return f.read()
+    
+setup(name='fluct_prof',
+      version='1.0',
+      description='Fluctuometry profiler',
+      install_requires=['tk','matplotlib','lmfit', 'ttkwidgets', 'scipy', 'seaborn'],
+      long_description = readme(),
+      url='',
+      packages = find_packages(),
+      author='Taras Sych',
+      author_email='taras.sych@ki.se',
+      package_data = {},
+      include_package_data = False,
+      license='MIT',
+      zip_safe=False)

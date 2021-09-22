@@ -6,9 +6,6 @@ import matplotlib.pyplot as plt
 import lmfit
 
 
-from pandastable import Table
-from pandas import DataFrame
-
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 #from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2TkAgg)
 # Implement the default Matplotlib key bindings.
@@ -18,9 +15,9 @@ from matplotlib import cm as mplcm
 
 from ttkwidgets import CheckboxTreeview
 
-import fcs_importer
+from fluct_prof import fcs_importer
 
-import Correlation as corr_py
+from fluct_prof import Correlation as corr_py
 
 import codecs
 
