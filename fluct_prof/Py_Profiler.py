@@ -1687,7 +1687,7 @@ class Diffusion_window :
 			rep_index = rep_index_i
 			for param in self.list_of_params:
 				self.full_dict[param]["Init"].delete(0,"end")
-				self.full_dict[param]["Init"].insert(0,str(round(self.list_of_inits_for_fit_all[param],3)))
+				self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 
 
 			self.Plot_curve()
@@ -2189,7 +2189,7 @@ class Threshold_window:
 		for rep_index_i in range (data_list_current[file_index].repetitions):
 			for param in self.list_of_params:
 				self.full_dict[param]["Init"].delete(0,"end")
-				self.full_dict[param]["Init"].insert(0,str(round(self.list_of_inits_for_fit_all[param],3)))
+				self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 				
 			rep_index = rep_index_i
 			self.Peaks()
