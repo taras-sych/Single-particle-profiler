@@ -1,4 +1,4 @@
-# Fluctyometry profiler
+# Fluctuometry profiler
 # Current main version
 
 Reads files (.fcs, .SIN)
