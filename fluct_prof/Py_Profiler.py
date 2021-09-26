@@ -2117,19 +2117,19 @@ class Diffusion_window :
 		self.Norm_label = tk.Label(self.frame001, text="FCS curve fitting: ")
 		self.Norm_label.grid(row = 0, column = 0, columnspan = 2, sticky = 'w')
 
-		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet", "no triplet"], width = 9 )
+		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet", "no triplet"], width = 20 )
 		self.Triplet.config(state = "readonly")
 		
-		self.Triplet.grid(row = 1, column = 0, sticky='w')
+		self.Triplet.grid(row = 1, column = 0, sticky='ew')
 
 		self.Triplet.set("triplet")
 
 		self.Triplet.bind("<<ComboboxSelected>>", self.Temp)
 
-		self.Components = ttk.Combobox(self.frame001,values = ["1 component", "2 components", "3 components"], width = 9 )
+		self.Components = ttk.Combobox(self.frame001,values = ["1 component", "2 components", "3 components"], width = 20)
 		self.Components.config(state = "readonly")
 		
-		self.Components.grid(row = 1, column = 1, sticky='w')
+		self.Components.grid(row = 1, column = 1, sticky='ew')
 
 		self.Components.set("1 component")
 
@@ -2149,16 +2149,7 @@ class Diffusion_window :
 		self.Table_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w')
 
 
-		self.active_cahnnels = []
 
-		self.Select_channel = ttk.Combobox(self.frame001,values = ["1 component", "2 components", "3 components"], width = 9 )
-		self.Select_channel.config(state = "readonly")
-		
-		self.Select_channel.grid(row = 1, column = 1, sticky='w')
-
-		self.Select_channel.set("1 component")
-
-		self.Select_channel.bind("<<ComboboxSelected>>", self.Temp)
 
 
 
@@ -2171,6 +2162,26 @@ class Diffusion_window :
 		for i in range(0, len(tree_list_name)):
 			name = tree_list_name[i]
 			Data_tree (self.tree, name, data_list_current[i].repetitions)
+
+		self.active_cahnnels = []
+
+		for item in data_list_raw[file_index].datasets_list[rep_index].channels_list:
+			self.active_cahnnels.append(item.name)
+
+		for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
+			self.active_cahnnels.append(item.description)
+
+
+		print (data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x)
+
+		self.Select_channel = ttk.Combobox(self.frame001,values = self.active_cahnnels, width = 40)
+		self.Select_channel.config(state = "readonly")
+		
+		self.Select_channel.grid(row = 4, column = 0, columnspan = 2, sticky='w')
+
+		self.Select_channel.set(self.active_cahnnels[0])
+
+		self.Select_channel.bind("<<ComboboxSelected>>", self.Temp)
 
 
 		self.frame004 = tk.Frame(self.frame002)
