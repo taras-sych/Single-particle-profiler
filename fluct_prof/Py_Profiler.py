@@ -1263,8 +1263,6 @@ class Left_frame :
 
 
 
-		
-
 	
 
 class FFP_frame :
@@ -2151,12 +2149,18 @@ class Diffusion_window :
 		self.Table_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w')
 
 
+		self.active_cahnnels = []
 
-		self.frame004 = tk.Frame(self.frame002)
-		self.frame004.pack(side = "top", anchor = "nw")
-
-		self.Fitting_frame()
+		self.Select_channel = ttk.Combobox(self.frame001,values = ["1 component", "2 components", "3 components"], width = 9 )
+		self.Select_channel.config(state = "readonly")
 		
+		self.Select_channel.grid(row = 1, column = 1, sticky='w')
+
+		self.Select_channel.set("1 component")
+
+		self.Select_channel.bind("<<ComboboxSelected>>", self.Temp)
+
+
 
 		global tree_list
 		global tree_list_name
@@ -2167,6 +2171,15 @@ class Diffusion_window :
 		for i in range(0, len(tree_list_name)):
 			name = tree_list_name[i]
 			Data_tree (self.tree, name, data_list_current[i].repetitions)
+
+
+		self.frame004 = tk.Frame(self.frame002)
+		self.frame004.pack(side = "top", anchor = "nw")
+
+		self.Fitting_frame()
+		
+
+
 
 
 		#self.Plot_curve()
