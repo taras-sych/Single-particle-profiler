@@ -2172,7 +2172,7 @@ class Diffusion_window :
 			self.active_cahnnels.append(item.description)
 
 
-		print (data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x)
+		
 
 		self.Select_channel = ttk.Combobox(self.frame001,values = self.active_cahnnels, width = 40)
 		self.Select_channel.config(state = "readonly")
