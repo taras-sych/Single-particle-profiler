@@ -899,14 +899,19 @@ class Left_frame :
 
 
 	def Plot_this_data(self, datasets_pos, rep):
-		x1 = datasets_pos.datasets_list[rep].channels_list[0].fluct_arr.x
-		y1 = datasets_pos.datasets_list[rep].channels_list[0].fluct_arr.y
-
-		x2 = datasets_pos.datasets_list[rep].channels_list[1].fluct_arr.x
-		y2 = datasets_pos.datasets_list[rep].channels_list[1].fluct_arr.y
-
 
 		self.traces.cla()
+
+		for item in datasets_pos.datasets_list[rep].channels_list:
+			x = item.fluct_arr.x
+			y = item.fluct_arr.y
+
+			self.traces.plot(x, y, label = item.short_name)
+
+
+
+
+		
 
 		self.traces.set_title("Intensity traces")
 		
@@ -914,8 +919,7 @@ class Left_frame :
 		self.traces.set_ylabel('Intensity (a.u.)')
 		self.traces.set_xlabel('Time (s)')
 
-		self.traces.plot(x1, y1, label = "channel 1")
-		self.traces.plot(x2, y2, label = "channel 2")
+
 
 		self.traces.legend(loc='upper right')
 
@@ -927,23 +931,24 @@ class Left_frame :
 
 		self.corr.cla()
 
-		x1 = datasets_pos.datasets_list[rep].channels_list[0].auto_corr_arr.x
-		y1 = datasets_pos.datasets_list[rep].channels_list[0].auto_corr_arr.y
 
-		x2 = datasets_pos.datasets_list[rep].channels_list[1].auto_corr_arr.x
-		y2 = datasets_pos.datasets_list[rep].channels_list[1].auto_corr_arr.y
-
-		x3 = datasets_pos.datasets_list[rep].cross_list[0].cross_corr_arr.x
-		y3 = datasets_pos.datasets_list[rep].cross_list[0].cross_corr_arr.y
 
 		self.corr.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.corr.set_ylabel('G(tau)')
 		self.corr.set_xlabel('Delay time')
 		self.corr.set_xscale ('log')
 
-		self.corr.plot(x1, y1, label = "auto corr ch 1")
-		self.corr.plot(x2, y2, label = "auto corr ch 2")
-		self.corr.plot(x3, y3, label = "cross-corr")
+		for item in datasets_pos.datasets_list[rep].channels_list:
+			x = item.auto_corr_arr.x
+			y = item.auto_corr_arr.y
+
+			self.corr.plot(x, y, label = item.short_name)
+
+		for item in datasets_pos.datasets_list[rep].cross_list:
+			x = item.cross_corr_arr.x
+			y = item.cross_corr_arr.y
+
+			self.corr.plot(x, y, label = item.short_name)
 
 		self.corr.legend(loc='upper right')
 
@@ -1005,7 +1010,7 @@ class Left_frame :
 				lines = file.readlines()
 
 				if filename.endswith('.fcs'):
-					dataset = fcs_importer.Fill_datasets_fcs(lines, fcs_importer.Find_repetitions (lines))
+					dataset = fcs_importer.Fill_datasets_fcs(lines)
 
 				if filename.endswith('.SIN'): 
 					dataset = fcs_importer.Fill_datasets_sin(lines)
@@ -1096,6 +1101,8 @@ class Left_frame :
 		
 
 		rep = rep1-1
+
+
 
 		self.Plot_this_data(data_list_raw[file_index], rep)
 
@@ -2367,8 +2374,8 @@ class Threshold_window:
 		main_xlim = self.peaks.get_xlim()
 		main_ylim = self.peaks.get_ylim()
 
-		th1 = data_list_current[file_index].threshold_ch1
-		th2 = data_list_current[file_index].threshold_ch2
+		th1 = data_list_current[file_index].threshold_list[0]
+		th2 = data_list_current[file_index].threshold_list[1]
 
 
 		int_div = int(rep_index/data_list_current[file_index].binning)
@@ -2427,13 +2434,13 @@ class Threshold_window:
 
 
 
-		data_list_current[file_index].threshold_ch1 = float(self.ch1_th.get())
+		data_list_current[file_index].threshold_list[0] = float(self.ch1_th.get())
 
-		data_list_current[file_index].threshold_ch2 = float(self.ch2_th.get())
+		data_list_current[file_index].threshold_list[1] = float(self.ch2_th.get())
 
 
-		th1 = data_list_current[file_index].threshold_ch1
-		th2 = data_list_current[file_index].threshold_ch2
+		th1 = data_list_current[file_index].threshold_list[0]
+		th2 = data_list_current[file_index].threshold_list[1]
 
 		print ("Thresholds: ", th1, th2)
 
@@ -2798,8 +2805,8 @@ class Threshold_window:
 				y2z = stats.zscore(y2)
 
 
-				data_list_current[file_index].threshold_ch1 = float(self.ch1_th.get())
-				data_list_current[file_index].threshold_ch2 = float(self.ch2_th.get())
+				data_list_current[file_index].threshold_list[0] = float(self.ch1_th.get())
+				data_list_current[file_index].threshold_list[1] = float(self.ch2_th.get())
 
 				data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1z
 				data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2z
@@ -2818,8 +2825,8 @@ class Threshold_window:
 
 				
 
-				data_list_current[file_index].threshold_ch1 = float(self.ch1_th.get())
-				data_list_current[file_index].threshold_ch2 = float(self.ch2_th.get())
+				data_list_current[file_index].threshold_list[0] = float(self.ch1_th.get())
+				data_list_current[file_index].threshold_list[1] = float(self.ch2_th.get())
 				
 
 				data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1m
