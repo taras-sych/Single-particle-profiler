@@ -3,7 +3,11 @@ from tkinter import ttk
 from tkinter import font as tkFont
 import matplotlib.pyplot as plt
 
+
+
 import lmfit
+
+import time
 
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
@@ -900,61 +904,57 @@ class Left_frame :
 
 	def Plot_this_data(self, datasets_pos, rep):
 
+		
+
+		
+
 		self.traces.cla()
 
-		for item in datasets_pos.datasets_list[rep].channels_list:
-			x = item.fluct_arr.x
-			y = item.fluct_arr.y
+		self.corr.cla()
 
-			self.traces.plot(x, y, label = item.short_name)
+		for i in range (datasets_pos.datasets_list[rep].channels_number): 
+
+			self.traces.plot(datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.x, datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.y, label = datasets_pos.datasets_list[rep].channels_list[i].short_name)
+
+			self.corr.plot(datasets_pos.datasets_list[rep].channels_list[i].auto_corr_arr.x, datasets_pos.datasets_list[rep].channels_list[i].auto_corr_arr.y, label = datasets_pos.datasets_list[rep].channels_list[i].short_name)
+
+		for i in range (datasets_pos.datasets_list[rep].cross_number):
+
+			self.corr.plot(datasets_pos.datasets_list[rep].cross_list[i].cross_corr_arr.x, datasets_pos.datasets_list[rep].cross_list[i].cross_corr_arr.y, label = datasets_pos.datasets_list[rep].cross_list[i].short_name)
 
 
+		
 
 
+		
 		
 
 		self.traces.set_title("Intensity traces")
-		
 		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.traces.set_ylabel('Intensity (a.u.)')
+		self.traces.set_ylabel('Counts (Hz)')
 		self.traces.set_xlabel('Time (s)')
-
-
-
 		self.traces.legend(loc='upper right')
 
 
 
 
 		self.corr.set_title("Correlation curves")
-
-
-		self.corr.cla()
-
-
-
 		self.corr.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.corr.set_ylabel('G(tau)')
 		self.corr.set_xlabel('Delay time')
 		self.corr.set_xscale ('log')
-
-		for item in datasets_pos.datasets_list[rep].channels_list:
-			x = item.auto_corr_arr.x
-			y = item.auto_corr_arr.y
-
-			self.corr.plot(x, y, label = item.short_name)
-
-		for item in datasets_pos.datasets_list[rep].cross_list:
-			x = item.cross_corr_arr.x
-			y = item.cross_corr_arr.y
-
-			self.corr.plot(x, y, label = item.short_name)
-
 		self.corr.legend(loc='upper right')
 
-		self.canvas1.draw()
+
+		self.canvas1.draw_idle()
+
+		
 
 		self.figure1.tight_layout()
+
+		
+		
+		
 
 
 
@@ -1045,7 +1045,7 @@ class Left_frame :
 
 	def Plot_data(self, event):
 
-		
+		start = time.time()
 
 		global file_index
 		global rep_index
@@ -1102,9 +1102,11 @@ class Left_frame :
 
 		rep = rep1-1
 
-
+		
 
 		self.Plot_this_data(data_list_raw[file_index], rep)
+
+		root.update()
 
 	def Delete_dataset(self):
 		global file_index
@@ -1124,7 +1126,7 @@ class Left_frame :
 			self.tree.delete(dataset)
 		self.traces.clear()
 		self.corr.clear()
-		self.canvas1.draw()
+		self.canvas1.draw_idle()
 	
 		self.figure1.tight_layout()
 	
@@ -1289,7 +1291,7 @@ class FFP_frame :
 		ffp.main.set_xlim(main_xlim)
 		ffp.main.set_ylim(main_ylim)
 
-		self.canvas3.draw()
+		self.canvas3.draw_idle()
 
 		self.figure3.tight_layout()
 
@@ -1782,7 +1784,7 @@ class Diffusion_window :
 
 
 
-			self.canvas5.draw()
+			self.canvas5.draw_idle()
 
 			self.figure5.tight_layout()
 
@@ -1870,7 +1872,7 @@ class Diffusion_window :
 
 			self.curves.legend(loc='upper right')
 
-			self.canvas5.draw()
+			self.canvas5.draw_idle()
 
 			self.figure5.tight_layout()
 
@@ -2124,7 +2126,7 @@ class Diffusion_window :
 		self.Norm_label = tk.Label(self.frame001, text="FCS curve fitting: ")
 		self.Norm_label.grid(row = 0, column = 0, columnspan = 2, sticky = 'w')
 
-		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet", "no triplet"], width = 20 )
+		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet", "no triplet"], width = 9 )
 		self.Triplet.config(state = "readonly")
 		
 		self.Triplet.grid(row = 1, column = 0, sticky='ew')
@@ -2133,7 +2135,7 @@ class Diffusion_window :
 
 		self.Triplet.bind("<<ComboboxSelected>>", self.Temp)
 
-		self.Components = ttk.Combobox(self.frame001,values = ["1 component", "2 components", "3 components"], width = 20)
+		self.Components = ttk.Combobox(self.frame001,values = ["1 component", "2 components", "3 components"], width = 9)
 		self.Components.config(state = "readonly")
 		
 		self.Components.grid(row = 1, column = 1, sticky='ew')
@@ -2176,15 +2178,15 @@ class Diffusion_window :
 			self.active_cahnnels.append(item.name)
 
 		for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
-			self.active_cahnnels.append(item.description)
+			self.active_cahnnels.append(item.short_name)
 
 
 		
 
-		self.Select_channel = ttk.Combobox(self.frame001,values = self.active_cahnnels, width = 40)
+		self.Select_channel = ttk.Combobox(self.frame001,values = self.active_cahnnels, width = 10)
 		self.Select_channel.config(state = "readonly")
 		
-		self.Select_channel.grid(row = 4, column = 0, columnspan = 2, sticky='w')
+		self.Select_channel.grid(row = 4, column = 0, columnspan = 2, sticky='ew')
 
 		self.Select_channel.set(self.active_cahnnels[0])
 
@@ -2223,6 +2225,7 @@ class Threshold_window:
 				self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 				
 			rep_index = rep_index_i
+			#self.Normalize()
 			self.Peaks()
 			self.Fit_gaus()
 
@@ -2348,7 +2351,7 @@ class Threshold_window:
 
 
 
-			self.canvas5.draw()
+			self.canvas5.draw_idle()
 
 			self.figure5.tight_layout()
 
@@ -2365,6 +2368,12 @@ class Threshold_window:
 
 
 	def Peaks (self):
+
+		print ("peaks called")
+
+		start_time = time.time()
+
+		
 
 		
 		
@@ -2442,7 +2451,7 @@ class Threshold_window:
 		th1 = data_list_current[file_index].threshold_list[0]
 		th2 = data_list_current[file_index].threshold_list[1]
 
-		print ("Thresholds: ", th1, th2)
+		
 
 		yh1 = []
 		yh2 = []
@@ -2641,9 +2650,11 @@ class Threshold_window:
 
 
 
-			self.canvas5.draw()
+			self.canvas5.draw_idle()
 
 			self.figure5.tight_layout()
+
+			print("--- %s seconds ---" % (time.time() - start_time))
 
 	def Fitting_frame(self):
 
@@ -2780,20 +2791,25 @@ class Threshold_window:
 
 
 	def Normalize(self):
+
+		print ("normalize called")
+
 		
 
 		global file_index
 		global rep_index
 
 		
-
+		start_time = time.time()
 
 		data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
 
+		print("--- %s seconds ---" % (time.time() - start_time))
 
-			
-		for rep in range (repetitions_list[file_index]):
 
+		
+
+		for rep in range(repetitions_list[file_index]):
 
 
 			y1 = data_list_raw[file_index].datasets_list[rep].channels_list[0].fluct_arr.y
@@ -2834,7 +2850,7 @@ class Threshold_window:
 
 
 
-
+		
 
 		self.Peaks()
 
@@ -3326,8 +3342,8 @@ class Data_tree:
 			text1 = "repetition " + str (i+1)
 			tree.insert(self.folder1, "end", text=text1)
 
-		tree.focus(child_id)
-		tree.selection_set(child_id)
+		#tree.focus(child_id)
+		#tree.selection_set(child_id)
 
 
 			
