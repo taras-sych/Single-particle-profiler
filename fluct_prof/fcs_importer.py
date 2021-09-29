@@ -5,7 +5,7 @@ from tkinter import ttk
 
 import copy
 
-from numba import jit, cuda
+
 
 
 
@@ -56,7 +56,6 @@ class Full_dataset_fcs:
         
 #---------------------------------------------------
 
-@jit(target ="cuda")
 def Fill_datasets_fcs(list_file):
 
     #print ("Begin")

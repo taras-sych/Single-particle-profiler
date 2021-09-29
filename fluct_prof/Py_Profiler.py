@@ -76,7 +76,7 @@ def Message_generator():
 	index = random.randint(0, len(messages)-1)
 	return messages[index]
 
-def Corr_curve(tc, offset, GN0, A1, txy1, alpha1, AR1, B1, tauT1 ):
+def Corr_curve_3d(tc, offset, GN0, A1, txy1, alpha1, AR1, B1, tauT1 ):
 
 	txy1 = txy1 / 1000
 
@@ -84,14 +84,27 @@ def Corr_curve(tc, offset, GN0, A1, txy1, alpha1, AR1, B1, tauT1 ):
 
 	G_Diff =  (A1*(((1+((tc/txy1)**alpha1))**-1)*(((1+(tc/((AR1**2)*txy1)))**-0.5))))
 
-	G_T = 1 + (B1*np.exp(-tc/tauT1))
+	G_T = 1 + (B1*np.exp(tc/(-tauT1)))
+
+	return offset + GN0 * G_Diff * G_T
+
+def Corr_curve_2d(tc, offset, GN0, A1, txy1, alpha1, B1, tauT1):
+
+	txy1 = txy1 / 1000
+
+	tauT1 = tauT1 / 1000
+
+	G_Diff =  A1*(((1+((tc/txy1)**alpha1))**-1))
+
+	G_T = 1 + (B1*np.exp(tc/(-tauT1)))
 
 	return offset + GN0 * G_Diff * G_T
 
 
 def Gauss(x, a, x0, sigma):
 
-    return a * np.exp(-(x - x0)**2 / (2 * sigma**2))
+
+	return a * np.exp(-(x - x0)**2 / (2 * sigma**2))
 
 
 def Gauss2(x, a1, x01, sigma1, a2, x02, sigma2):
@@ -641,11 +654,11 @@ class Restruct_window:
 		self.curves.set_xscale ('log')
 
 
-		y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
-		y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
+		y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
+		y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
 
-		x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
-		x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
+		x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
+		x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
 
 
 		self.traces.set_title("Intensity traces")
@@ -784,7 +797,7 @@ class Restruct_window:
 		self.num_rep.grid(row = 0, column = 1, sticky='w')
 
 		self.num_rep.delete(0,"end")
-		self.num_rep.insert(0,data_list_current[rep_index].repetitions)
+		self.num_rep.insert(0,data_list_raw[rep_index].repetitions)
 
 		self.Rep_button = tk.Button(self.frame004, text="Apply reps", command=self.Temp)
 		self.Rep_button.grid(row = 0, column = 2, sticky='w')
@@ -831,7 +844,10 @@ class Restruct_window:
 
 		for i in range(0, len(tree_list_name)):
 			name = tree_list_name[i]
-			Data_tree (self.tree, name, data_list_current[i].repetitions)
+			treetree = Data_tree (self.tree, name, data_list_raw[i].repetitions)
+
+		self.tree.selection_set(treetree.child_id)
+		
 
 
 
@@ -840,66 +856,9 @@ class Restruct_window:
 class Left_frame :
 
 
-	def Normalize(self):
-		global file_index
-		global rep_index
-
-
-		for rep in range (repetitions_list[file_index]):
-			y1 = data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y
-			y2 = data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y
-		
-			if self.normalization_index == "z-score":
-
-				y1z = stats.zscore(y1)
-				y2z = stats.zscore(y2)
-
-				data_list_current[file_index].threshold_ch1 = 1
-				data_list_current[file_index].threshold_ch2 = 1
-
-				self.Plot_this_data(data_list_current[file_index], rep_index)
-
-
-			if self.normalization_index == "mean":
-
-				y1 = y1/np.mean(y1)
-				y2 = y2/np.mean(y2)
-
-				data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
-
-				data_list_current[file_index].threshold_ch1 = 0
-				data_list_current[file_index].threshold_ch2 = 0
-
-				self.Plot_this_data(data_list_current[file_index], rep_index)
 
 
 
-
-
-
-		#data_list_current[file_index].threshold_ch1 = 0
-		#data_list_current[file_index].threshold_ch2 = 0
-
-
-
-
-
-		#dataset = data_list[file_index]
-
-		self.Plot_this_data(data_list_current[file_index], rep_index)
-
-	def Restore(self):
-		global file_index
-		global rep_index
-
-		#print(1)
-
-		data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
-
-		data_list_current[file_index].threshold_ch1 = 0
-		data_list_current[file_index].threshold_ch2 = 0
-
-		self.Plot_this_data(data_list_current[file_index], rep_index)
 
 
 	def Plot_this_data(self, datasets_pos, rep):
@@ -1015,10 +974,11 @@ class Left_frame :
 				if filename.endswith('.SIN'): 
 					dataset = fcs_importer.Fill_datasets_sin(lines)
 
-				dataset1 = copy.deepcopy(dataset)
+				#dataset1 = copy.deepcopy(dataset)
 
 
 				treetree = Data_tree (self.tree, name, dataset.repetitions)
+				self.tree.selection_set(treetree.child_id)
 				tree_list.append(treetree)
 
 				tree_list_name.append(name)
@@ -1029,7 +989,7 @@ class Left_frame :
 				data_list_raw.append(dataset)
 
 
-				data_list_current.append(dataset1)
+				#data_list_current.append(dataset1)
 
 
 
@@ -1690,7 +1650,7 @@ class Diffusion_window :
 
 
 
-		for rep_index_i in range (data_list_current[file_index].repetitions): 
+		for rep_index_i in range (data_list_raw[file_index].repetitions): 
 			rep_index = rep_index_i
 			for param in self.list_of_params:
 				self.full_dict[param]["Init"].delete(0,"end")
@@ -1732,7 +1692,11 @@ class Diffusion_window :
 
 		method = 'least_squares'
 
+
+
 		o1 = lmfit.minimize(self.resid, params, args=(x, y), method=method)
+
+
 		#print("# Fit using sum of squares:\n")
 		#lmfit.report_fit(o1)
 
@@ -1777,10 +1741,14 @@ class Diffusion_window :
 			x1 = np.linspace(min(x), max(x), num=50000)
 
 
-			if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
-				self.curves.plot(x, Corr_curve(x, *popt), 'r-', label='fit')
+			if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D":
+				self.curves.plot(x, Corr_curve_3d(x, *popt), 'r-', label='fit')
 				self.residuals.plot(x, o1.residual, 'b-')
 				#self.curves.scatter(x, Corr_curve(x, *popt))
+
+			if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D":
+				self.curves.plot(x, Corr_curve_2d(x, *popt), 'r-', label='fit')
+				self.residuals.plot(x, o1.residual, 'b-')
 
 
 
@@ -1796,12 +1764,18 @@ class Diffusion_window :
 		for param in self.list_of_params:
 
 			param_list.append( np.float64(params[param].value))
+
+
 		
 
 		
 		
-		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
-			y_model = Corr_curve(x, *param_list)
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D":
+
+			y_model = Corr_curve_3d(x, *param_list)
+
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D":
+			y_model = Corr_curve_2d(x, *param_list)
 
 
 		return y_model - ydata
@@ -1933,6 +1907,10 @@ class Diffusion_window :
 
 		self.Plot_curve()
 
+	def Update_fitting (self, event):
+
+		self.Fitting_frame()
+
 	def Fitting_frame(self):
 
 		self.frame004.destroy()
@@ -1940,12 +1918,19 @@ class Diffusion_window :
 		self.frame004 = tk.Frame(self.frame002)
 		self.frame004.pack(side = "top", anchor = "nw")
 
-		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component':
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D" :
 
 			self.list_of_params = ['offset', 'GN0', 'A', 'txy', 'alpha', 'AR', 'B', 'T_tri' ]
 			self.list_of_inits = ['1', '1', '1', '0.02', '1', '5', '1', '0.005']
 			self.list_of_min = ['0', '0', '0', '0', '0', '0', '0', '0']
 			self.list_of_max = ['10', '5', '1', '100000', '20', '20', '1', '100']
+
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D" :
+
+			self.list_of_params = ['offset', 'GN0', 'A', 'txy', 'alpha', 'B', 'T_tri' ]
+			self.list_of_inits = ['1', '1', '1', '0.02', '1', '1', '0.005']
+			self.list_of_min = ['0', '0', '0', '0', '0',  '0', '0']
+			self.list_of_max = ['10', '5', '1', '100000', '20', '1', '100']
 
 			
 
@@ -2126,23 +2111,32 @@ class Diffusion_window :
 		self.Norm_label = tk.Label(self.frame001, text="FCS curve fitting: ")
 		self.Norm_label.grid(row = 0, column = 0, columnspan = 2, sticky = 'w')
 
-		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet", "no triplet"], width = 9 )
+		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet"], width = 9 )
 		self.Triplet.config(state = "readonly")
 		
 		self.Triplet.grid(row = 1, column = 0, sticky='ew')
 
 		self.Triplet.set("triplet")
 
-		self.Triplet.bind("<<ComboboxSelected>>", self.Temp)
+		self.Triplet.bind("<<ComboboxSelected>>", self.Update_fitting)
 
-		self.Components = ttk.Combobox(self.frame001,values = ["1 component", "2 components", "3 components"], width = 9)
+		self.Components = ttk.Combobox(self.frame001,values = ["1 component"], width = 9)
 		self.Components.config(state = "readonly")
 		
 		self.Components.grid(row = 1, column = 1, sticky='ew')
 
 		self.Components.set("1 component")
 
-		self.Components.bind("<<ComboboxSelected>>", self.Temp)
+		self.Components.bind("<<ComboboxSelected>>", self.Update_fitting)
+
+		self.Dimension = ttk.Combobox(self.frame001,values = ["2D", "3D"], width = 9)
+		self.Dimension.config(state = "readonly")
+		
+		self.Dimension.grid(row = 1, column = 2, sticky='ew')
+
+		self.Dimension.set("3D")
+
+		self.Dimension.bind("<<ComboboxSelected>>", self.Update_fitting)
 
 
 
@@ -2170,7 +2164,10 @@ class Diffusion_window :
 
 		for i in range(0, len(tree_list_name)):
 			name = tree_list_name[i]
-			Data_tree (self.tree, name, data_list_current[i].repetitions)
+			treetree = Data_tree (self.tree, name, data_list_raw[i].repetitions)
+
+		
+		self.tree.selection_set(treetree.child_id)
 
 		self.active_cahnnels = []
 
@@ -2219,7 +2216,7 @@ class Threshold_window:
 		for param in self.list_of_params:
 			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
 
-		for rep_index_i in range (data_list_current[file_index].repetitions):
+		for rep_index_i in range (data_list_raw[file_index].repetitions):
 			for param in self.list_of_params:
 				self.full_dict[param]["Init"].delete(0,"end")
 				self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
@@ -2383,11 +2380,11 @@ class Threshold_window:
 		main_xlim = self.peaks.get_xlim()
 		main_ylim = self.peaks.get_ylim()
 
-		th1 = data_list_current[file_index].threshold_list[0]
-		th2 = data_list_current[file_index].threshold_list[1]
+		th1 = data_list_raw[file_index].threshold_list[0]
+		th2 = data_list_raw[file_index].threshold_list[1]
 
 
-		int_div = int(rep_index/data_list_current[file_index].binning)
+		int_div = int(rep_index/data_list_raw[file_index].binning)
 
 		
 
@@ -2404,9 +2401,9 @@ class Threshold_window:
 
 
 
-		for rep_index_i in range (data_list_current[file_index].repetitions):
+		for rep_index_i in range (data_list_raw[file_index].repetitions):
 						
-			if int(rep_index_i/data_list_current[file_index].binning) == int_div:
+			if int(rep_index_i/data_list_raw[file_index].binning) == int_div:
 
 				#print ("adding repetition ", rep_index_i)
 
@@ -2416,16 +2413,16 @@ class Threshold_window:
 				else:
 					x_min = max(x1) + x1[1] - x1[0]
 
-				x_temp_1 = [elem + x_min for elem in data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.x]
-				x_temp_2 = [elem + x_min for elem in data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.x]
+				x_temp_1 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.x]
+				x_temp_2 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.x]
 
 
 				x1.extend(x_temp_1)
-				y1.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+				#y1.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
 				y1_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
 
 				x2.extend(x_temp_2)
-				y2.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
+				#y2.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
 				y2_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
 
 
@@ -2443,18 +2440,38 @@ class Threshold_window:
 
 
 
-		data_list_current[file_index].threshold_list[0] = float(self.ch1_th.get())
+		data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
 
-		data_list_current[file_index].threshold_list[1] = float(self.ch2_th.get())
+		data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
 
 
-		th1 = data_list_current[file_index].threshold_list[0]
-		th2 = data_list_current[file_index].threshold_list[1]
+		th1 = data_list_raw[file_index].threshold_list[0]
+		th2 = data_list_raw[file_index].threshold_list[1]
 
 		
 
 		yh1 = []
 		yh2 = []
+
+		if self.normalization_index == "z-score":
+				y1 = stats.zscore(y1_raw)
+				y2 = stats.zscore(y2_raw)
+
+
+				data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
+				data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
+
+
+
+			
+
+
+		if self.normalization_index == "manual":
+
+
+
+			y1 = y1_raw/np.mean(y1_raw)
+			y2 = y2_raw/np.mean(y2_raw)
 
 		
 		
@@ -2773,11 +2790,11 @@ class Threshold_window:
 
 		if self.normalization_index == "manual":
 
-			x1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
-			y1 = data_list_current[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
+			x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
+			y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
 
-			x2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
-			y2 = data_list_current[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
+			x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
+			y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
 
 
 			self.ch1_th.delete(0,"end")
@@ -2800,11 +2817,11 @@ class Threshold_window:
 		global rep_index
 
 		
-		start_time = time.time()
+		
 
-		data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
+		#data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
 
-		print("--- %s seconds ---" % (time.time() - start_time))
+		
 
 
 		
@@ -2821,11 +2838,11 @@ class Threshold_window:
 				y2z = stats.zscore(y2)
 
 
-				data_list_current[file_index].threshold_list[0] = float(self.ch1_th.get())
-				data_list_current[file_index].threshold_list[1] = float(self.ch2_th.get())
+				data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
+				data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
 
-				data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1z
-				data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2z
+				#data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1z
+				#data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2z
 
 
 
@@ -2841,12 +2858,12 @@ class Threshold_window:
 
 				
 
-				data_list_current[file_index].threshold_list[0] = float(self.ch1_th.get())
-				data_list_current[file_index].threshold_list[1] = float(self.ch2_th.get())
+				data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
+				data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
 				
 
-				data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1m
-				data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2m
+				#data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1m
+				#data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2m
 
 
 
@@ -2887,7 +2904,7 @@ class Threshold_window:
 		if data_list_raw[file_index].gp_fitting[rep_index] != None:
 			data_list_raw[file_index].gp_fitting[rep_index] = None
 		
-		self.Normalize()
+		self.Peaks()
 
 
 
@@ -2966,7 +2983,7 @@ class Threshold_window:
 		file_index = file1-1
 		rep_index = rep1-1
 
-		current_repetitions_number = data_list_current[file_index].repetitions
+		current_repetitions_number = data_list_raw[file_index].repetitions
 
 		#print(current_repetitions_number)
 
@@ -2976,7 +2993,7 @@ class Threshold_window:
 				divisors.append(divdiv)
 
 		self.Binning_choice.config(values = divisors)
-		self.Binning_choice.set(data_list_current[file_index].binning)
+		self.Binning_choice.set(data_list_raw[file_index].binning)
 
 
 		rep = rep1-1
@@ -3001,9 +3018,9 @@ class Threshold_window:
 
 				self.Components.set("3 components")
 
-		self.Normalize()
+		#self.Normalize()
 
-
+		self.Peaks()
 
 		self.Fitting_frame()
 
@@ -3019,7 +3036,7 @@ class Threshold_window:
 		change_normal = True
 
 
-		data_list_current[file_index].binning = int(self.Binning_choice.get())
+		data_list_raw[file_index].binning = int(self.Binning_choice.get())
 
 		
 
@@ -3309,7 +3326,12 @@ class Threshold_window:
 
 		for i in range(0, len(tree_list_name)):
 			name = tree_list_name[i]
-			Data_tree (self.tree_t, name, data_list_current[i].repetitions)
+			treetree = Data_tree (self.tree_t, name, data_list_raw[i].repetitions)
+
+		#self.Normalize()
+
+		
+		self.tree_t.selection_set(treetree.child_id)
 
 		
 
@@ -3327,7 +3349,6 @@ class Threshold_window:
 
 
 class Data_tree:
-
 	
 
 	def __init__(self, tree, name, repetitions):
@@ -3335,9 +3356,9 @@ class Data_tree:
 
 		
 		
-
+		
 		self.folder1=tree.insert( "", "end", text=name)
-		child_id = tree.get_children()[-1]
+		self.child_id = tree.get_children()[-1]
 		for i in range(0, repetitions):
 			text1 = "repetition " + str (i+1)
 			tree.insert(self.folder1, "end", text=text1)
@@ -3346,7 +3367,7 @@ class Data_tree:
 		#tree.selection_set(child_id)
 
 
-			
+
 		
 	
 			
