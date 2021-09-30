@@ -1638,25 +1638,56 @@ class Diffusion_window :
 
 		for rep_index_i in range (data_list_raw[file_index].repetitions): 
 			rep_index = rep_index_i
-			for param in self.list_of_params:
-				self.full_dict[param]["Init"].delete(0,"end")
-				self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+			for channel_index_i in range(data_list_raw[file_index].datasets_list[rep_index].channels_number + data_list_raw[file_index].datasets_list[rep_index].cross_number):
 
 
-			self.Plot_curve()
-			self.Fit_corr_curve()
+				if channel_index_i < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+					
+					if self.channels_flags[channel_index_i].get() == 1:
+
+						self.channel_index = channel_index_i
+						for param in self.list_of_params:
+							self.full_dict[param]["Init"].delete(0,"end")
+							self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+
+							self.Fit_corr_curve()
+
+
+				else:
+
+					if self.cross_flags[channel_index_i - data_list_raw[file_index].datasets_list[rep_index].channels_number].get() == 1:
+
+						self.channel_index = channel_index_i
+						for param in self.list_of_params:
+							self.full_dict[param]["Init"].delete(0,"end")
+							self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+
+							self.Fit_corr_curve()
+
+
+					#self.Plot_curve()
+					
+
+		
 
 		self.fit_all_flag = False
+
+		self.Plot_curve()
 
 
 	def Fit_corr_curve(self):
 
 		
-		
+		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+			x = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].auto_corr_arr.x
+			y = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].auto_corr_arr.y
+
+		else:
+			num = data_list_raw[file_index].datasets_list[rep_index].channels_number
+			x = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index - num].auto_corr_arr.x
+			y = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index - num].auto_corr_arr.y
 
 
-		x = self.x_ch1
-		y = self.y_ch1
 
 		params = lmfit.Parameters()
 
@@ -1702,7 +1733,8 @@ class Diffusion_window :
 
 
 
-		data_list_raw[file_index].diff_fitting[rep_index] = output_dict
+		data_list_raw[file_index].diff_fitting[rep_index, self.channel_index] = output_dict
+		#print(data_list_raw[file_index].diff_fitting)
 
 		#print(data_list_raw[file_index].diff_fitting)
 			
@@ -1711,36 +1743,13 @@ class Diffusion_window :
 
 
 
-		if self.fit_all_flag == False:	
+		if self.fit_all_flag == False:
 
-			self.curves.cla()
-			self.residuals.cla()
-										
-										
-			self.curves.set_title("Correlation curves")
-			self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-			self.curves.set_ylabel('G(tau)')
-			self.curves.set_xlabel('Delay time')
-			self.curves.set_xscale ('log')
-			self.curves.scatter(x, y, label = 'raw')
-			
-			x1 = np.linspace(min(x), max(x), num=50000)
-
-
-			if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D":
-				self.curves.plot(x, Corr_curve_3d(x, *popt), 'r-', label='fit')
-				self.residuals.plot(x, o1.residual, 'b-')
-				#self.curves.scatter(x, Corr_curve(x, *popt))
-
-			if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D":
-				self.curves.plot(x, Corr_curve_2d(x, *popt), 'r-', label='fit')
-				self.residuals.plot(x, o1.residual, 'b-')
+			self.Plot_curve()
 
 
 
-			self.canvas5.draw_idle()
 
-			self.figure5.tight_layout()
 
 
 	def resid (self, params, x, ydata ):
@@ -1770,6 +1779,7 @@ class Diffusion_window :
 		print(1)
 
 	def Update_plot(self, event):
+
 		self.Plot_curve()
 
 
@@ -1783,7 +1793,7 @@ class Diffusion_window :
 			self.curves.cla()
 
 
-		
+		num = len(data_list_raw[file_index].datasets_list[rep_index].channels_list)
 		for i in range (len(data_list_raw[file_index].datasets_list[rep_index].channels_list)):
 
 			if self.channels_flags[i].get() == 1:
@@ -1793,6 +1803,23 @@ class Diffusion_window :
 
 				if self.fit_all_flag == False:
 					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name)
+
+				if 	data_list_raw[file_index].diff_fitting[rep_index, i] != None:
+
+					popt = []
+
+					for key in data_list_raw[file_index].diff_fitting[rep_index, i].keys():
+
+						popt.append(np.float64(data_list_raw[file_index].diff_fitting[rep_index, i][key]))
+
+
+					if len(popt) == 7:
+						
+						self.curves.plot(x1, Corr_curve_2d(x1, *popt), label = "Fit")
+
+					if len(popt) == 8:
+						
+						self.curves.plot(x1, Corr_curve_3d(x1, *popt), label = "Fit")
 
 
 
@@ -1806,24 +1833,35 @@ class Diffusion_window :
 				if self.fit_all_flag == False:
 					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name)
 
+				k = i + len(data_list_raw[file_index].datasets_list[rep_index].channels_list)
+
+				if 	data_list_raw[file_index].diff_fitting[rep_index, k] != None:
+					if len(data_list_raw[file_index].diff_fitting[rep_index, k]) == 7:
+						popt = data_list_raw[file_index].diff_fitting[rep_index, k]
+						self.curves.plot(x1, Corr_curve_2d(x1, *popt), label = "Fit")
+
+					if len(data_list_raw[file_index].diff_fitting[rep_index, k]) == 8:
+						popt = data_list_raw[file_index].diff_fitting[rep_index, k]
+						self.curves.plot(x1, Corr_curve_3d(x1, *popt), label = "Fit")
+
 
 
 
 		
-		if self.fit_all_flag == False:
-			self.curves.set_title("Correlation curves")
-			self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-			self.curves.set_ylabel('G(tau)')
-			self.curves.set_xlabel('Delay time')
-			self.curves.set_xscale ('log')
+		
+		self.curves.set_title("Correlation curves")
+		self.curves.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.curves.set_ylabel('G(tau)')
+		self.curves.set_xlabel('Delay time')
+		self.curves.set_xscale ('log')
 
-			
+		
 
-			self.curves.legend(loc='upper right')
+		self.curves.legend(loc='upper right')
 
-			self.canvas5.draw_idle()
+		self.canvas5.draw_idle()
 
-			self.figure5.tight_layout()
+		self.figure5.tight_layout()
 
 
 	def Choose_curve(self, event):
@@ -1949,7 +1987,12 @@ class Diffusion_window :
 
 
 
-			
+		if 	data_list_raw[file_index].diff_fitting[rep_index, self.channel_index] != None:
+			for i in range (len(self.list_of_params)):
+				if self.list_of_params[i] in data_list_raw[file_index].diff_fitting[rep_index, self.channel_index].keys():
+					self.list_of_inits[i] = data_list_raw[file_index].diff_fitting[rep_index, self.channel_index][self.list_of_params[i]]
+
+		#print (self.list_of_inits)
 
 		Label_1 = tk.Label(self.frame004, text="Param")
 		Label_1.grid(row = 1, column = 0, sticky = 'w')
@@ -2672,11 +2715,11 @@ class Threshold_window:
 
 
 				if self.Components.get() == '1 component':
-					print("1 comp")
+					#print("1 comp")
 					self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
 
 				if self.Components.get() == '2 components':
-					print("2 comp")
+					#print("2 comp")
 					self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
 					popt1 = popt[:3]
 					popt2 = popt[3:6]
@@ -2686,7 +2729,7 @@ class Threshold_window:
 
 				if self.Components.get() == '3 components':
 					self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
-					print("3 comp")
+					#print("3 comp")
 					popt1 = popt[:3]
 					popt2 = popt[3:6]
 					popt3 = popt[6:9]
@@ -2841,7 +2884,7 @@ class Threshold_window:
 
 	def Normalize(self):
 
-		print ("normalize called")
+		#print ("normalize called")
 
 		
 
