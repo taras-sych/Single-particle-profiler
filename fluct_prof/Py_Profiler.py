@@ -12,6 +12,9 @@ import time
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 #from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2TkAgg)
+#from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvasTkAgg
+#from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar2Tk
+
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
 from matplotlib.figure import Figure
@@ -809,7 +812,7 @@ class Restruct_window:
 		self.frame000.pack(side = "left", anchor = "nw")
 
 
-		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi=100)
+		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
 						
 		gs = self.figure5.add_gridspec(2, 1)
 
@@ -992,7 +995,7 @@ class Left_frame :
 				#data_list_current.append(dataset1)
 
 
-
+				total_channels_list.append(dataset.datasets_list[0].channels_number + dataset.datasets_list[0].cross_number)
 				repetitions_list.append(dataset.repetitions)
 
 				peaks_list.append([None] * dataset.repetitions)
@@ -1188,7 +1191,7 @@ class Left_frame :
 
 
 		fig_height = (win_height/1.89 - self.Datalist.winfo_height() - self.Import_Button.winfo_height())/dpi_all
-		self.figure1 = Figure(figsize=(win_width/(2*dpi_all),fig_height), dpi=100)
+		self.figure1 = Figure(figsize=(win_width/(2*dpi_all),fig_height), dpi = dpi_all)
 
 
 
@@ -1302,7 +1305,7 @@ class FFP_frame :
 		self.frame12.pack(side="top", fill="x")
 
 
-		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi=100)
+		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi = dpi_all)
 		self.main = self.figure3.add_subplot(1, 1, 1)
 
 		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
@@ -1323,11 +1326,7 @@ class FFP_frame :
 		self.frame13 = tk.Frame(frame1)
 		self.frame13.pack(side="top", fill="x")
 
-		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
-		self.ffp_btn.grid(column = 0, row =0)
 
-		self.ffp_export_btn = tk.Button(self.frame13, text="Export", command=Norm)
-		self.ffp_export_btn.grid(column = 0, row =1)
 
 
 	
@@ -1339,7 +1338,7 @@ class Diff_frame :
 		self.frame12.pack(side="top", fill="x")
 
 
-		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi=100)
+		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi = dpi_all)
 		self.main = self.figure3.add_subplot(1, 1, 1)
 
 		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
@@ -1360,11 +1359,7 @@ class Diff_frame :
 		self.frame13 = tk.Frame(frame1)
 		self.frame13.pack(side="top", fill="x")
 
-		self.ffp_export_btn = tk.Button(self.frame13, text="Export", command=Norm)
-		self.ffp_export_btn.grid(column = 0, row =0, sticky = "w")
 
-		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
-		self.ffp_btn.grid(column = 0, row =1, sticky = "w")
 		
 class GP_frame :
 
@@ -1571,7 +1566,7 @@ class GP_frame :
 		self.frame12.pack(side="top", fill="x")
 
 
-		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi=100)
+		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi = dpi_all)
 		self.main = self.figure3.add_subplot(1, 1, 1)
 
 		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
@@ -1592,11 +1587,7 @@ class GP_frame :
 		self.frame13 = tk.Frame(frame1)
 		self.frame13.pack(side="top", fill="x")
 
-		self.ffp_export_btn = tk.Button(self.frame13, text="Export", command=self.Export_plot)
-		self.ffp_export_btn.grid(column = 0, row =0, sticky = "w")
 
-		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
-		self.ffp_btn.grid(column = 0, row =1, sticky = "w")
 
 class GP_Diff_frame:
 
@@ -1607,7 +1598,7 @@ class GP_Diff_frame:
 		self.frame12.pack(side="top", fill="x")
 
 
-		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi=100)
+		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi = dpi_all)
 		self.main = self.figure3.add_subplot(1, 1, 1)
 
 		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
@@ -1628,11 +1619,6 @@ class GP_Diff_frame:
 		self.frame13 = tk.Frame(frame1)
 		self.frame13.pack(side="top", fill="x")
 
-		self.ffp_export_btn = tk.Button(self.frame13, text="Export", command=Norm)
-		self.ffp_export_btn.grid(column = 0, row =0, sticky = "w")
-
-		self.ffp_btn = tk.Button(self.frame13, text="Configure", command=Norm)
-		self.ffp_btn.grid(column = 0, row =1, sticky = "w")
 
 
 class Diffusion_window :
@@ -1797,42 +1783,31 @@ class Diffusion_window :
 			self.curves.cla()
 
 
-		if self.ch_01_var.get() == 1:
-
-
-			x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x
-			y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.y
-
-			self.x_ch1 = x1
-			self.y_ch1 = y1
-
-			if self.fit_all_flag == False:
-				self.curves.scatter(x1, y1, label = "auto corr ch 1")
-
-
 		
-		if self.ch_02_var.get() == 1:
+		for i in range (len(data_list_raw[file_index].datasets_list[rep_index].channels_list)):
 
-			x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.x
-			y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.y
+			if self.channels_flags[i].get() == 1:
 
-			self.x_ch2 = x1
-			self.y_ch2 = y1
+				x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].auto_corr_arr.x
+				y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].auto_corr_arr.y
 
-			if self.fit_all_flag == False:
-				self.curves.scatter(x2, y2, label = "auto corr ch 2")
+				if self.fit_all_flag == False:
+					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name)
 
 
-		if self.ch_12_var.get() == 1:
 
-			self.x_ch12 = x1
-			self.y_ch12 = y1
+		for i in range (len(data_list_raw[file_index].datasets_list[rep_index].cross_list)):
 
-			x3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.x
-			y3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.y
+			if self.cross_flags[i].get() == 1:
 
-			if self.fit_all_flag == False:
-				self.curves.scatter(x3, y3, label = "cross-corr")
+				x1 = data_list_raw[file_index].datasets_list[rep_index].cross_list[i].cross_corr_arr.x
+				y1 = data_list_raw[file_index].datasets_list[rep_index].cross_list[i].cross_corr_arr.y
+
+				if self.fit_all_flag == False:
+					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name)
+
+
+
 
 		
 		if self.fit_all_flag == False:
@@ -1855,6 +1830,7 @@ class Diffusion_window :
 
 		global file_index
 		global rep_index
+		#self.curve_index = 0
 
 		index = self.tree.selection()
 		num1, num = index[0].split('I')
@@ -1868,44 +1844,72 @@ class Diffusion_window :
 		file = 0
 
 		rep = 0
-		
 
+		ch = 0
+		
+		
 
 		for i in range (len(data_list_raw)):
 			#print ("I am here")
 			rep = 0
+			ch = 0
 			sum1-=1
 			file+=1
 			if sum1 == 0:
 				file1 = file
 				rep1 = rep
-
+				ch1 = ch
+			
 			
 			for j in range (repetitions_list[i]):
+				ch = 0
 				sum1-=1
+				
 				rep+=1
 				if sum1 == 0:
 					file1 = file
 					rep1 = rep
+					ch1 = ch
+
+				for k in range (total_channels_list[i]):
+					sum1-=1
+
+					ch+=1
+					if sum1 == 0:
+						file1 = file
+						rep1 = rep
+						ch1 = ch
+
+
+
 
 
 
 		if rep1 == 0:
 			rep1+=1
 
+		if ch1 == 0:
+			ch1+=1
 
 
 
+
+		if file_index != file1-1:
+
+			file_index = file1-1
+
+			self.Curve_flags()
 		
-
-		file_index = file1-1
 		rep_index = rep1-1
+
+		self.channel_index = ch1-1
 
 
 
 		rep = rep1-1
 
 		self.Plot_curve()
+		self.Fitting_frame()
 
 	def Update_fitting (self, event):
 
@@ -1917,6 +1921,17 @@ class Diffusion_window :
 
 		self.frame004 = tk.Frame(self.frame002)
 		self.frame004.pack(side = "top", anchor = "nw")
+
+		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+
+			text2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].short_name
+		else:
+			imd = self.channel_index - data_list_raw[file_index].datasets_list[rep_index].channels_number
+			text2 = data_list_raw[file_index].datasets_list[rep_index].cross_list[imd].short_name
+
+		text1 = tree_list_name[file_index] + "; repetition: " + str(rep_index) + "; " + text2
+		Label_1 = tk.Label(self.frame004, text=text1)
+		Label_1.grid(row = 0, column = 0, columnspan = 6, sticky = 'w')
 
 		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D" :
 
@@ -1932,25 +1947,27 @@ class Diffusion_window :
 			self.list_of_min = ['0', '0', '0', '0', '0',  '0', '0']
 			self.list_of_max = ['10', '5', '1', '100000', '20', '1', '100']
 
+
+
 			
 
 		Label_1 = tk.Label(self.frame004, text="Param")
-		Label_1.grid(row = 0, column = 0, sticky = 'w')
+		Label_1.grid(row = 1, column = 0, sticky = 'w')
 
 		Label_1 = tk.Label(self.frame004, text="Init")
-		Label_1.grid(row = 0, column = 1, sticky = 'w')
+		Label_1.grid(row = 1, column = 1, sticky = 'w')
 
 		Label_1 = tk.Label(self.frame004, text="Var")
-		Label_1.grid(row = 0, column = 2, sticky = 'w')
+		Label_1.grid(row = 1, column = 2, sticky = 'w')
 
 		Label_1 = tk.Label(self.frame004, text="Min")
-		Label_1.grid(row = 0, column = 3, sticky = 'w')
+		Label_1.grid(row = 1, column = 3, sticky = 'w')
 
 		Label_1 = tk.Label(self.frame004, text="Max")
-		Label_1.grid(row = 0, column = 4, sticky = 'w')
+		Label_1.grid(row = 1, column = 4, sticky = 'w')
 
 		self.full_dict = {}
-		row_index = 1
+		row_index = 2
 
 		self.fixed_list = []
 		for param in self.list_of_params:
@@ -1958,7 +1975,7 @@ class Diffusion_window :
 			thisdict = {
 						"Name": tk.Label(self.frame004, text=param),
 							"Init": tk.Entry(self.frame004, width = 5),
-							"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-1]),
+							"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-2]),
 							"Min": tk.Entry(self.frame004, width = 5),
 							"Max": tk.Entry(self.frame004, width = 5),
 						}
@@ -1968,22 +1985,47 @@ class Diffusion_window :
 			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'w')
 			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'w')
 			thisdict["Init"].delete(0,"end")
-			thisdict["Init"].insert(0,self.list_of_inits[row_index-1])
+			thisdict["Init"].insert(0,self.list_of_inits[row_index-2])
 			thisdict["Var"].grid(row = row_index, column = 2, sticky = 'w')
 			
 			thisdict["Min"].grid(row = row_index, column = 3, sticky = 'w')
 			thisdict["Min"].delete(0,"end")
-			thisdict["Min"].insert(0,self.list_of_min[row_index-1])
+			thisdict["Min"].insert(0,self.list_of_min[row_index-2])
 			thisdict["Max"].grid(row = row_index, column = 4, sticky = 'w')
 			thisdict["Max"].delete(0,"end")
-			thisdict["Max"].insert(0,self.list_of_max[row_index-1])
+			thisdict["Max"].insert(0,self.list_of_max[row_index-2])
 
 			row_index+=1
 
+	def Curve_flags(self):
+
+		self.frame0003.destroy()
+
+		self.frame0003 = tk.Frame(self.frame003)
+		self.frame0003.pack(side = "top", anchor = "nw")
+
+		self.flags_dict = {}
+		self.channels_flags = []
+		self.cross_flags = []
+		column_counter = 0
 
 
+		for item in data_list_raw[file_index].datasets_list[rep_index].channels_list:
+			str1, str2 = item.short_name.split(" ")
+			very_short_name = "ch0" + str2
+			self.channels_flags.append(tk.IntVar(value=1))
+			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame0003, text=very_short_name, variable=self.channels_flags[-1], command=self.Plot_curve)
+			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+			column_counter +=1
 
-
+		for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
+			str1, str2 = item.short_name.split(" vs ")
+			str3, str4 = str1.split(" ")
+			very_short_name = "ch" + str4 + str2
+			self.cross_flags.append(tk.IntVar(value=1))
+			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame0003, text=very_short_name, variable=self.cross_flags[-1], command=self.Plot_curve)
+			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+			column_counter +=1
 
 
 
@@ -1991,10 +2033,15 @@ class Diffusion_window :
 
 
 		
+		self.channel_index = 0
 		self.fit_all_flag = False
 
 		global file_index
 		global rep_index
+
+		global tree_list
+		global tree_list_name
+		global repetitions_list
 
 		self.win_diff = tk.Toplevel()
 
@@ -2036,33 +2083,42 @@ class Diffusion_window :
 
 		self.Datalist.config(width = 100, height = 10)
 
+		for i in range(0, len(tree_list_name)):
+			name = tree_list_name[i]
+			treetree = Data_tree_fcs_fit (self.tree, name, data_list_raw[i])
+
 
 		self.frame003 = tk.Frame(self.frame002)
 		self.frame003.pack(side = "top", anchor = "nw")
 
-		self.ch_01_var = tk.IntVar(value=1)
-		self.ch_02_var = tk.IntVar(value=1)
-		self.ch_12_var = tk.IntVar(value=1)
-		self.ch_21_var = tk.IntVar(value=1)
+		self.frame0003 = tk.Frame(self.frame003)
+		self.frame0003.pack(side = "top", anchor = "nw")
 
-		self.CH_01=tk.Checkbutton(self.frame003, text="CH_01", variable=self.ch_01_var, command=self.Plot_curve)
-		self.CH_01.grid(row = 0, column = 0, sticky='w')
+		self.Curve_flags()
 
-		self.CH_02=tk.Checkbutton(self.frame003, text="CH_02", variable=self.ch_02_var, command=self.Plot_curve)
-		self.CH_02.grid(row = 0, column = 1, sticky='w')
+		"""self.ch_01_var = tk.IntVar(value=1)
+								self.ch_02_var = tk.IntVar(value=1)
+								self.ch_12_var = tk.IntVar(value=1)
+								self.ch_21_var = tk.IntVar(value=1)"""
 
-		self.CH_12=tk.Checkbutton(self.frame003, text="CH_12", variable=self.ch_12_var, command=self.Plot_curve)
-		self.CH_12.grid(row = 0, column = 2, sticky='w')
-
-		self.CH_21=tk.Checkbutton(self.frame003, text="CH_21", variable=self.ch_21_var, command=self.Plot_curve)
-		self.CH_21.grid(row = 0, column = 3, sticky='w')
+		"""self.CH_01=tk.Checkbutton(self.frame003, text="CH_01", variable=self.ch_01_var, command=self.Plot_curve)
+								self.CH_01.grid(row = 0, column = 0, sticky='w')
+						
+								self.CH_02=tk.Checkbutton(self.frame003, text="CH_02", variable=self.ch_02_var, command=self.Plot_curve)
+								self.CH_02.grid(row = 0, column = 1, sticky='w')
+						
+								self.CH_12=tk.Checkbutton(self.frame003, text="CH_12", variable=self.ch_12_var, command=self.Plot_curve)
+								self.CH_12.grid(row = 0, column = 2, sticky='w')
+						
+								self.CH_21=tk.Checkbutton(self.frame003, text="CH_21", variable=self.ch_21_var, command=self.Plot_curve)
+								self.CH_21.grid(row = 0, column = 3, sticky='w')"""
 
 
 		self.frame000 = tk.Frame(self.win_diff)
 		self.frame000.pack(side = "left", anchor = "nw")
 
 
-		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi=100)
+		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
 						
 		gs = self.figure5.add_gridspec(4, 1)
 
@@ -2156,38 +2212,16 @@ class Diffusion_window :
 
 
 
-		global tree_list
-		global tree_list_name
-		global repetitions_list
+		
 		
 		
 
-		for i in range(0, len(tree_list_name)):
-			name = tree_list_name[i]
-			treetree = Data_tree (self.tree, name, data_list_raw[i].repetitions)
+
 
 		
 		self.tree.selection_set(treetree.child_id)
 
-		self.active_cahnnels = []
 
-		for item in data_list_raw[file_index].datasets_list[rep_index].channels_list:
-			self.active_cahnnels.append(item.name)
-
-		for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
-			self.active_cahnnels.append(item.short_name)
-
-
-		
-
-		self.Select_channel = ttk.Combobox(self.frame001,values = self.active_cahnnels, width = 10)
-		self.Select_channel.config(state = "readonly")
-		
-		self.Select_channel.grid(row = 4, column = 0, columnspan = 2, sticky='ew')
-
-		self.Select_channel.set(self.active_cahnnels[0])
-
-		self.Select_channel.bind("<<ComboboxSelected>>", self.Temp)
 
 
 		self.frame004 = tk.Frame(self.frame002)
@@ -3108,7 +3142,7 @@ class Threshold_window:
 		self.frame000.pack(side = "left", anchor = "nw")
 
 
-		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi=100)
+		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
 						
 		gs = self.figure5.add_gridspec(2, 2)
 
@@ -3367,6 +3401,31 @@ class Data_tree:
 		#tree.selection_set(child_id)
 
 
+class Data_tree_fcs_fit:
+
+	def __init__(self, tree, name, dataset):
+		
+
+		
+		
+		
+		self.folder1=tree.insert( "", "end", text=name)
+		self.child_id = tree.get_children()[-1]
+		for i in range(0, dataset.repetitions):
+			text1 = "repetition " + str (i+1)
+			self.folder2=tree.insert(self.folder1, "end", text=text1)
+
+			for j in range(dataset.datasets_list[i].channels_number):
+				text1 = dataset.datasets_list[i].channels_list[j].short_name
+				tree.insert(self.folder2, "end", text = text1)
+
+			for j in range(dataset.datasets_list[i].cross_number):
+				text1 = dataset.datasets_list[i].cross_list[j].short_name
+				tree.insert(self.folder2, "end", text = text1)
+
+
+
+
 
 		
 	
@@ -3383,6 +3442,7 @@ data_list_raw = []
 data_list_current = []
 
 repetitions_list = []
+total_channels_list = []
 
 
 root = tk.Tk()
@@ -3403,8 +3463,7 @@ line = str(win_width) + "x" + str(win_height)
 
 root.geometry(line)
 
-dpi_all = 100
-
+dpi_all = 75
 
 frame0 = tk.LabelFrame(root)
 frame0.pack(side = "left", anchor = "nw", expand =1, fill=tk.BOTH)

@@ -48,7 +48,8 @@ class Full_dataset_fcs:
         
         self.binning = 1
         self.gp_fitting = [None] * repetitions_arg
-        self.diff_fitting = [None] * repetitions_arg
+        self.diff_ch_fitting = [[None] * self.datasets_list[0].channels_number] * repetitions_arg
+        self.diff_cross_fitting = [[None] * self.datasets_list[0].channels_number] * repetitions_arg
         
     
         
