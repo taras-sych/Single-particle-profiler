@@ -2400,9 +2400,7 @@ class Threshold_window:
 
 	def Peaks (self):
 
-		print ("peaks called")
-
-		start_time = time.time()
+		
 
 		
 
@@ -2705,7 +2703,7 @@ class Threshold_window:
 
 			self.figure5.tight_layout()
 
-			print("--- %s seconds ---" % (time.time() - start_time))
+			
 
 	def Fitting_frame(self):
 
