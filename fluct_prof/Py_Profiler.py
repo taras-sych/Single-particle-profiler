@@ -421,11 +421,16 @@ def Plot_diff():
 									thisdict[output_file_name] = []
 									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])"""
 
-		if output_file_name in thisdict.keys():
-			thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
-		else:
-			thisdict[output_file_name] = []
-			thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+		for item in range(len(data_list_raw[file1].datasets_list[rep1].channels_list)):
+			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name].get() == 1:
+
+				output_file_name += " " + data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name 
+
+			if output_file_name in thisdict.keys():
+				thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+			else:
+				thisdict[output_file_name] = []
+				thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
 
 		
 
@@ -546,31 +551,31 @@ def Plot_gp_diff():
 def Which_tab():
 
 
-	try:
-		if tabs.index(tabs.select()) == 0:
-			Plot_diff()
+	#try:
+	if tabs.index(tabs.select()) == 0:
+		Plot_diff()
 
-			diff.canvas3.draw()
+		diff.canvas3.draw()
 
-			diff.figure3.tight_layout()
-			
+		diff.figure3.tight_layout()
+		
 
-		if tabs.index(tabs.select()) == 1:
-			Plot_gp()
+	if tabs.index(tabs.select()) == 1:
+		Plot_gp()
 
-			gp.canvas3.draw()
+		gp.canvas3.draw()
 
-			gp.figure3.tight_layout()
+		gp.figure3.tight_layout()
 
-		if tabs.index(tabs.select()) == 2:
-			Plot_gp_diff()
+	if tabs.index(tabs.select()) == 2:
+		Plot_gp_diff()
 
-			gp_diff.canvas3.draw()
+		gp_diff.canvas3.draw()
 
-			gp_diff.figure3.tight_layout()
+		gp_diff.figure3.tight_layout()
 
-	except:
-		tk.messagebox.showerror(title='Error', message=Message_generator())
+	#except:
+		#tk.messagebox.showerror(title='Error', message=Message_generator())
 
 
 
@@ -1065,6 +1070,9 @@ class Left_frame :
 
 		rep = rep1-1
 
+
+		diff.Curve_flags()
+
 		
 
 		self.Plot_this_data(data_list_raw[file_index], rep)
@@ -1332,7 +1340,54 @@ class FFP_frame :
 	
 class Diff_frame :
 
+
+	def Curve_flags(self):
+
+		self.frame0003.destroy()
+
+		self.frame0003 = tk.Frame(self.frame13)
+		self.frame0003.pack(side = "top", anchor = "nw")
+
+		self.flags_dict = {}
+		self.channels_flags = {}
+		self.cross_flags = []
+		column_counter = 0
+
+		channels_to_display = 0
+
+		for i in range (len(data_list_raw)):
+			if data_list_raw[i].datasets_list[0].channels_number > channels_to_display:
+				channels_to_display = data_list_raw[i].datasets_list[0].channels_number
+				file_index_local = i
+
+
+
+
+		for item in data_list_raw[file_index_local].datasets_list[rep_index].channels_list:
+			str1, str2 = item.short_name.split(" ")
+			very_short_name = "ch0" + str2
+			self.channels_flags[item.short_name] = tk.IntVar(value=1)
+			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame0003, text=very_short_name, variable=self.channels_flags[item.short_name], command=Norm)
+			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+			column_counter +=1
+
+		for item in data_list_raw[file_index_local].datasets_list[rep_index].cross_list:
+			str1, str2 = item.short_name.split(" vs ")
+			str3, str4 = str1.split(" ")
+			very_short_name = "ch" + str4 + str2
+			self.channels_flags[item.short_name] = tk.IntVar(value=1)
+			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame0003, text=very_short_name, variable=self.channels_flags[item.short_name], command=Norm)
+			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+			column_counter +=1
+
 	def __init__ (self, frame1, win_width, win_height, dpi_all):
+
+		
+		self.frame13 = tk.Frame(frame1)
+		self.frame13.pack(side="top", fill="x")
+
+		self.frame0003 = tk.Frame(self.frame13)
+		self.frame0003.pack(side="top", fill="x")
 
 		self.frame12 = tk.Frame(frame1)
 		self.frame12.pack(side="top", fill="x")
@@ -1650,7 +1705,7 @@ class Diffusion_window :
 							self.full_dict[param]["Init"].delete(0,"end")
 							self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 
-							self.Fit_corr_curve()
+						self.Fit_corr_curve()
 
 
 				else:
@@ -1662,7 +1717,7 @@ class Diffusion_window :
 							self.full_dict[param]["Init"].delete(0,"end")
 							self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 
-							self.Fit_corr_curve()
+						self.Fit_corr_curve()
 
 
 					#self.Plot_curve()
@@ -1836,12 +1891,19 @@ class Diffusion_window :
 				k = i + len(data_list_raw[file_index].datasets_list[rep_index].channels_list)
 
 				if 	data_list_raw[file_index].diff_fitting[rep_index, k] != None:
-					if len(data_list_raw[file_index].diff_fitting[rep_index, k]) == 7:
-						popt = data_list_raw[file_index].diff_fitting[rep_index, k]
+
+
+					for key in data_list_raw[file_index].diff_fitting[rep_index, k].keys():
+
+						popt.append(np.float64(data_list_raw[file_index].diff_fitting[rep_index, i][key]))
+
+
+					if len(popt) == 7:
+						
 						self.curves.plot(x1, Corr_curve_2d(x1, *popt), label = "Fit")
 
-					if len(data_list_raw[file_index].diff_fitting[rep_index, k]) == 8:
-						popt = data_list_raw[file_index].diff_fitting[rep_index, k]
+					if len(popt) == 8:
+						
 						self.curves.plot(x1, Corr_curve_3d(x1, *popt), label = "Fit")
 
 
