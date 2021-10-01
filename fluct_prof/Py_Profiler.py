@@ -11,9 +11,7 @@ import time
 
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
-#from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2TkAgg)
-#from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvasTkAgg
-#from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar2Tk
+
 
 # Implement the default Matplotlib key bindings.
 from matplotlib.backend_bases import key_press_handler
@@ -325,11 +323,72 @@ def Plot_gp():
 		rep1 = rep1-1
 
 
-		if output_file_name in thisdict.keys():
-			thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
-		else:
-			thisdict[output_file_name] = []
-			thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+		
+
+		if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 3:
+
+
+			if output_file_name in thisdict.keys():
+
+				thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+			else:
+				thisdict[output_file_name] = []
+				thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+
+		if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 6:
+
+			key = output_file_name + " peak 1"
+
+
+			if key in thisdict.keys():
+
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+			else:
+				thisdict[key] = []
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+
+			key = output_file_name + " peak 2"
+
+
+			if key in thisdict.keys():
+
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+			else:
+				thisdict[key] = []
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+
+
+		if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 9:
+
+			key = output_file_name + " peak 1"
+
+
+			if key in thisdict.keys():
+
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+			else:
+				thisdict[key] = []
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+
+			key = output_file_name + " peak 2"
+
+
+			if key in thisdict.keys():
+
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+			else:
+				thisdict[key] = []
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+
+			key = output_file_name + " peak 3"
+
+
+			if key in thisdict.keys():
+
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean3"])
+			else:
+				thisdict[key] = []
+				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean3"])
 
 		
 		
@@ -341,7 +400,6 @@ def Plot_gp():
 	for key in thisdict.keys():
 		keys.append(key)
 		vals.append(thisdict[key])
-
 
 
 	
@@ -1388,6 +1446,7 @@ class Diff_frame :
 
 		self.frame0003 = tk.Frame(self.frame13)
 		self.frame0003.pack(side="top", fill="x")
+
 
 		self.frame12 = tk.Frame(frame1)
 		self.frame12.pack(side="top", fill="x")
