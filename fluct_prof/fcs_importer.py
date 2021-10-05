@@ -44,7 +44,7 @@ class Full_dataset_fcs:
     def __init__ (self, repetitions_arg, dataset_list_arg):
         self.repetitions = repetitions_arg
         self.datasets_list = dataset_list_arg
-        self.threshold_list = [0] * self.datasets_list[0].channels_number
+        self.threshold_list = [None] * self.datasets_list[0].channels_number
         
         self.binning = 1
         self.gp_fitting = [None] * repetitions_arg

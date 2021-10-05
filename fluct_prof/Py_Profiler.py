@@ -482,13 +482,24 @@ def Plot_diff():
 		for item in range(len(data_list_raw[file1].datasets_list[rep1].channels_list)):
 			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name].get() == 1:
 
-				output_file_name += " " + data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name 
+				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name 
 
-			if output_file_name in thisdict.keys():
-				thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+			if key in thisdict.keys():
+				thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
 			else:
-				thisdict[output_file_name] = []
-				thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+				thisdict[key] = []
+				thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+
+		for item in range(len(data_list_raw[file1].datasets_list[rep1].cross_list)):
+			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[item].short_name].get() == 1:
+
+				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].cross_list[item].short_name 
+
+			if key in thisdict.keys():
+				thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+			else:
+				thisdict[key] = []
+				thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
 
 		
 
@@ -1798,8 +1809,8 @@ class Diffusion_window :
 
 		else:
 			num = data_list_raw[file_index].datasets_list[rep_index].channels_number
-			x = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index - num].auto_corr_arr.x
-			y = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index - num].auto_corr_arr.y
+			x = data_list_raw[file_index].datasets_list[rep_index].cross_list[self.channel_index - num].cross_corr_arr.x
+			y = data_list_raw[file_index].datasets_list[rep_index].cross_list[self.channel_index - num].cross_corr_arr.y
 
 
 
@@ -1945,11 +1956,13 @@ class Diffusion_window :
 				y1 = data_list_raw[file_index].datasets_list[rep_index].cross_list[i].cross_corr_arr.y
 
 				if self.fit_all_flag == False:
-					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name)
+					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].cross_list[i].short_name)
 
 				k = i + len(data_list_raw[file_index].datasets_list[rep_index].channels_list)
 
 				if 	data_list_raw[file_index].diff_fitting[rep_index, k] != None:
+
+					popt = []
 
 
 					for key in data_list_raw[file_index].diff_fitting[rep_index, k].keys():
@@ -2426,6 +2439,114 @@ class Threshold_window:
 
 		self.fit_all_flag = False
 
+		self.Peaks()
+
+
+
+	def Apply_to_all_ticks(self):
+
+		global file_index
+		global rep_index
+
+		self.fit_all_flag = True
+
+		self.list_of_inits_for_fit_all = {}
+
+		for param in self.list_of_params:
+			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
+
+		global tree_list_name
+		global output_file_name
+
+		list1 = self.tree_t.get_checked()
+
+		#print (data_frame.tree.selection())
+
+		thisdict = {}
+
+		for index in list1:
+
+			num1, num = index.split('I')
+			
+
+			num = int(num, 16)
+
+			
+
+			sum1 = num 
+			file = 0
+			rep = 0
+			for i in range (len(data_list_raw)):
+				rep = 0
+				sum1-=1
+				file+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+				
+				for j in range (repetitions_list[i]):
+					sum1-=1
+					rep+=1
+					if sum1 == 0:
+						file1 = file
+						rep1 = rep
+
+
+
+			if rep1 == 0:
+				rep1+=1
+
+
+
+			file_index = file1-1
+			rep_index = rep1-1
+
+
+
+
+			for param in self.list_of_params:
+				self.full_dict[param]["Init"].delete(0,"end")
+				self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+				
+			
+			#self.Normalize()
+			self.Peaks()
+			self.Fit_gaus()
+
+		self.fit_all_flag = False
+
+		self.Peaks()
+
+
+	def Apply_to_all_all(self):
+
+		global rep_index
+		global file_index
+
+		self.fit_all_flag = True
+
+		self.list_of_inits_for_fit_all = {}
+
+		for param in self.list_of_params:
+			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
+
+		for file_index_i in range (len(data_list_raw)):	
+			for rep_index_i in range (data_list_raw[file_index_i].repetitions):
+				for param in self.list_of_params:
+					self.full_dict[param]["Init"].delete(0,"end")
+					self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+					
+				rep_index = rep_index_i
+				file_index = file_index_i
+
+				#self.Normalize()
+				self.Peaks()
+				self.Fit_gaus()
+
+		self.fit_all_flag = False
+
+		self.Peaks()
 
 	def resid (self, params, x, ydata ):
 
@@ -2462,6 +2583,8 @@ class Threshold_window:
 
 		x = self.x_bins
 		y = self.n
+
+
 
 		params = lmfit.Parameters()
 
@@ -2520,7 +2643,7 @@ class Threshold_window:
 										
 			self.gp_hist.set_title("GP histogram")
 			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-			self.gp_hist.set_ylabel('Counts')
+			self.gp_hist.set_ylabel('Counts (Total: ' + str(sum(self.n)) + ')' )
 			self.gp_hist.set_xlabel('GP')
 			self.gp_hist.bar(x, y, width = x[1] - x[0], bottom=None, align='center', label = 'raw')
 			
@@ -2552,10 +2675,28 @@ class Threshold_window:
 
 	
 	def Update_thresholds (self):
+
 		global change_normal
 		change_normal = False
+
+
+
 		if data_list_raw[file_index].gp_fitting[rep_index] != None:
 			data_list_raw[file_index].gp_fitting[rep_index] = None
+
+
+
+
+
+		data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
+		data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
+
+
+
+			
+
+
+
 
 		self.Peaks()
 
@@ -2568,7 +2709,7 @@ class Threshold_window:
 
 		
 
-		
+
 		
 
 
@@ -2576,8 +2717,7 @@ class Threshold_window:
 		main_xlim = self.peaks.get_xlim()
 		main_ylim = self.peaks.get_ylim()
 
-		th1 = data_list_raw[file_index].threshold_list[0]
-		th2 = data_list_raw[file_index].threshold_list[1]
+
 
 
 		int_div = int(rep_index/data_list_raw[file_index].binning)
@@ -2636,38 +2776,59 @@ class Threshold_window:
 
 
 
-		data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
+		#data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
 
-		data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
+		#data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
+
+
+		#th1 = data_list_raw[file_index].threshold_list[0]
+		#th2 = data_list_raw[file_index].threshold_list[1]
+
 
 
 		th1 = data_list_raw[file_index].threshold_list[0]
 		th2 = data_list_raw[file_index].threshold_list[1]
 
+		if th1 == None or th2 == None:
+
+			if self.normalization_index == "z-score":
+
+				th1 = 3
+				th2 = 3
+
+			if self.normalization_index == "manual":
+
+
+				th1 = 2
+				th2 = 2
+
+		self.ch1_th.delete(0,"end")
+		self.ch1_th.insert(0,str(th1))
+
+			
+		self.ch2_th.delete(0,"end")
+		self.ch2_th.insert(0,str(th2))
+
+
+
+
+
+
+		if self.normalization_index == "z-score":
+			y1 = stats.zscore(y1_raw)
+			y2 = stats.zscore(y2_raw)
+
+		if self.normalization_index == "manual":
+
+
+			y1 = y1_raw/np.mean(y1_raw)
+			y2 = y2_raw/np.mean(y2_raw)
 		
 
 		yh1 = []
 		yh2 = []
 
-		if self.normalization_index == "z-score":
-				y1 = stats.zscore(y1_raw)
-				y2 = stats.zscore(y2_raw)
 
-
-				data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
-				data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
-
-
-
-			
-
-
-		if self.normalization_index == "manual":
-
-
-
-			y1 = y1_raw/np.mean(y1_raw)
-			y2 = y2_raw/np.mean(y2_raw)
 
 		
 		
@@ -2816,7 +2977,7 @@ class Threshold_window:
 		if self.fit_all_flag == False:
 			self.gp_hist.set_title("GP histogram")
 			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-			self.gp_hist.set_ylabel('Counts')
+			self.gp_hist.set_ylabel('Counts (Total: ' + str(len(gp_list_temp)) + ')' )
 			self.gp_hist.set_xlabel('GP')
 
 
@@ -2986,11 +3147,6 @@ class Threshold_window:
 
 		if self.normalization_index == "manual":
 
-			x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
-			y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
-
-			x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
-			y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
 
 
 			self.ch1_th.delete(0,"end")
@@ -3497,21 +3653,27 @@ class Threshold_window:
 
 
 
-		self.Fit_button = tk.Button(self.frame007, text="Fit", command=self.Fit_gaus)
+		self.Fit_button = tk.Button(self.frame007, text="Fit this", command=self.Fit_gaus)
 		self.Fit_button.grid(row = 0, column = 0, sticky='ew')
 
-		self.Fit_all_button = tk.Button(self.frame007, text="Fit all", command=self.Apply_to_all)
+		self.Fit_all_button = tk.Button(self.frame007, text="Fit this file", command=self.Apply_to_all)
 		self.Fit_all_button.grid(row = 0, column = 1, sticky='ew')
+
+		self.Fit_ticked_button = tk.Button(self.frame007, text="Fit ticked", command=self.Apply_to_all_ticks)
+		self.Fit_ticked_button.grid(row = 1, column = 0, sticky='ew')
+
+		self.Fit_all_all_button = tk.Button(self.frame007, text="Fit all", command=self.Apply_to_all_all)
+		self.Fit_all_all_button.grid(row = 1, column = 1, sticky='ew')
 
 		self.Components = ttk.Combobox(self.frame007,values = ["1 component", "2 components", "3 components"], width = 13 )
 		self.Components.config(state = "readonly")
-		self.Components.grid(row = 0, column = 0, columnspan = 2, sticky='w')
+		self.Components.grid(row = 2, column = 0, columnspan = 2, sticky='w')
 		self.Components.set("1 component")
 
 		self.Components.bind("<<ComboboxSelected>>", self.Choose_components)
 
-		self.Param_label = tk.Label(self.frame007, text="Fitting parampampams:")
-		self.Components.grid(row = 1, column = 0, sticky='w', columnspan = 2)
+		self.Param_label = tk.Label(self.frame007, text="Fitting parameters:")
+		self.Param_label.grid(row = 3, column = 0, sticky='w', columnspan = 2)
 
 
 		self.frame004 = tk.Frame(self.frame002)
@@ -3526,7 +3688,7 @@ class Threshold_window:
 
 		#self.Normalize()
 
-		
+		self.Put_default()
 		self.tree_t.selection_set(treetree.child_id)
 
 		
