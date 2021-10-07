@@ -1800,15 +1800,150 @@ class Diffusion_window :
 		self.Plot_curve()
 
 
+	def Apply_to_ticked(self):
+
+		print("Apply to ticked")
+
+		global file_index
+		global rep_index
+		#self.curve_index = 0
+
+		list1 = self.tree.get_checked()
+
+
+		print(list1)
+		for index in list1:
+
+			num1, num = index.split('I')
+
+
+			
+
+			num = int(num, 16)
+
+			sum1 = num 
+			file = 0
+
+			rep = 0
+
+			ch = 0
+			
+			
+
+			for i in range (len(data_list_raw)):
+				#print ("I am here")
+				rep = 0
+				ch = 0
+				sum1-=1
+				file+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+					ch1 = ch
+				
+				
+				for j in range (repetitions_list[i]):
+					ch = 0
+					sum1-=1
+					
+					rep+=1
+					if sum1 == 0:
+						file1 = file
+						rep1 = rep
+						ch1 = ch
+
+					for k in range (total_channels_list[i]):
+						sum1-=1
+
+						ch+=1
+						if sum1 == 0:
+							file1 = file
+							rep1 = rep
+							ch1 = ch
+
+
+
+
+
+
+			if rep1 == 0:
+				rep1+=1
+
+			if ch1 == 0:
+				ch1+=1
+
+			file_index = file1-1
+			
+			rep_index = rep1-1
+
+			self.channel_index = ch1-1
+			
+
+			self.fit_all_flag = True
+
+			self.list_of_inits_for_fit_all = {}
+
+			for param in self.list_of_params:
+				self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
+
+
+
+			 
+			
+			channel_index_i = self.channel_index
+
+
+			if channel_index_i < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+				
+				if self.channels_flags[channel_index_i].get() == 1:
+
+					self.channel_index = channel_index_i
+					for param in self.list_of_params:
+						self.full_dict[param]["Init"].delete(0,"end")
+						self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+
+					self.Fit_corr_curve()
+
+
+			else:
+
+				if self.cross_flags[channel_index_i - data_list_raw[file_index].datasets_list[rep_index].channels_number].get() == 1:
+
+					self.channel_index = channel_index_i
+					for param in self.list_of_params:
+						self.full_dict[param]["Init"].delete(0,"end")
+						self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+
+					self.Fit_corr_curve()
+
+
+					#self.Plot_curve()
+					
+
+		
+
+		self.fit_all_flag = False
+
+		self.Plot_curve()
+
+	def Apply_to_all_all(self):
+		print(1)
+
+
 	def Fit_corr_curve(self):
+
+
 
 		
 		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+			#print('Channel to process', self.channel_index)
 			x = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].auto_corr_arr.x
 			y = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].auto_corr_arr.y
 
 		else:
+
 			num = data_list_raw[file_index].datasets_list[rep_index].channels_number
+			#print('Cross to process', num - self.channel_index)
 			x = data_list_raw[file_index].datasets_list[rep_index].cross_list[self.channel_index - num].cross_corr_arr.x
 			y = data_list_raw[file_index].datasets_list[rep_index].cross_list[self.channel_index - num].cross_corr_arr.y
 
@@ -1917,6 +2052,8 @@ class Diffusion_window :
 		if self.fit_all_flag == False:
 			self.curves.cla()
 
+		
+
 
 		num = len(data_list_raw[file_index].datasets_list[rep_index].channels_list)
 		for i in range (len(data_list_raw[file_index].datasets_list[rep_index].channels_list)):
@@ -1967,7 +2104,7 @@ class Diffusion_window :
 
 					for key in data_list_raw[file_index].diff_fitting[rep_index, k].keys():
 
-						popt.append(np.float64(data_list_raw[file_index].diff_fitting[rep_index, i][key]))
+						popt.append(np.float64(data_list_raw[file_index].diff_fitting[rep_index, k][key]))
 
 
 					if len(popt) == 7:
@@ -2233,15 +2370,16 @@ class Diffusion_window :
 		self.frame002 = tk.Frame(self.win_diff)
 		self.frame002.pack(side = "left", anchor = "nw")
 
-		
+		self.frame0002 = tk.Frame(self.frame002)
+		self.frame0002.pack(side = "top", anchor = "nw")
 
 
 
-		self.scrollbar = tk.Scrollbar(self.frame002)
+		self.scrollbar = tk.Scrollbar(self.frame0002)
 		self.scrollbar.pack(side = "left", fill = "y")
 
 
-		self.Datalist = tk.Listbox(self.frame002, width = 100, height = 10)
+		self.Datalist = tk.Listbox(self.frame0002, width = 100, height = 10)
 		self.Datalist.pack(side = "top", anchor = "nw")
 		
 		
@@ -2291,6 +2429,9 @@ class Diffusion_window :
 								self.CH_21.grid(row = 0, column = 3, sticky='w')"""
 
 
+		self.frame001 = tk.Frame(self.frame002)
+		self.frame001.pack(side = "top", anchor = "nw")
+
 		self.frame000 = tk.Frame(self.win_diff)
 		self.frame000.pack(side = "left", anchor = "nw")
 
@@ -2336,8 +2477,7 @@ class Diffusion_window :
 
 
 		
-		self.frame001 = tk.Frame(self.frame002)
-		self.frame001.pack(side = "top", anchor = "nw")
+		
 
 		
 
@@ -2378,11 +2518,19 @@ class Diffusion_window :
 
 
 
-		self.Fit_all_button = tk.Button(self.frame001, text="Fit all", command=self.Apply_to_all)
+		self.Fit_all_button = tk.Button(self.frame001, text="Fit this file", command=self.Apply_to_all)
 		self.Fit_all_button.grid(row = 2, column = 1, sticky='ew')
 
-		self.Table_label = tk.Label(self.frame001, text="Fitting parampampams: ")
-		self.Table_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w')
+		self.Fit_button_ticked = tk.Button(self.frame001, text="Fit ticked", command=self.Apply_to_ticked)
+		self.Fit_button_ticked.grid(row = 3, column = 0, sticky='ew')
+
+
+
+		self.Fit_all_button_all = tk.Button(self.frame001, text="Fit all", command=self.Apply_to_all_all)
+		self.Fit_all_button_all.grid(row = 3, column = 1, sticky='ew')
+
+		self.Table_label = tk.Label(self.frame001, text="Fitting parameters: ")
+		self.Table_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
 
 
 
@@ -3752,7 +3900,7 @@ class Data_tree_fcs_fit:
 
 
 		
-	
+
 			
 
 
@@ -3771,6 +3919,7 @@ total_channels_list = []
 
 root = tk.Tk()
 root.title("PFF analysis")
+
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
