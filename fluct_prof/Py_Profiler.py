@@ -67,6 +67,9 @@ initialdirectory = ''
 global change_normal
 change_normal = False
 
+
+list_of_channel_pairs = []
+
 def Message_generator():
 	messages = [
     'You shall not pass!',  
@@ -1074,6 +1077,8 @@ class Left_frame :
 
 				peaks_list.append([None] * dataset.repetitions)
 
+				list_of_channel_pairs.append([None])
+
 				root.update()   
 
 		self.pb.destroy()
@@ -1927,7 +1932,67 @@ class Diffusion_window :
 		self.Plot_curve()
 
 	def Apply_to_all_all(self):
-		print(1)
+				
+
+		global rep_index
+		global file_index
+
+		self.fit_all_flag = True
+
+		self.list_of_inits_for_fit_all = {}
+
+		for param in self.list_of_params:
+			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
+
+
+		for file_index_i in range(len(data_list_raw)):
+			for rep_index_i in range (data_list_raw[file_index_i].repetitions): 
+				rep_index = rep_index_i
+				for channel_index_i in range(data_list_raw[file_index_i].datasets_list[rep_index].channels_number + data_list_raw[file_index_i].datasets_list[rep_index].cross_number):
+
+					print(file_index_i, rep_index_i, channel_index_i)
+
+
+
+
+					if channel_index_i < data_list_raw[file_index_i].datasets_list[rep_index].channels_number:
+
+
+						if channel_index_i < len(self.channels_flags):
+							if self.channels_flags[channel_index_i].get() == 1:
+
+								self.channel_index = channel_index_i
+								for param in self.list_of_params:
+									self.full_dict[param]["Init"].delete(0,"end")
+									self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+
+								self.Fit_corr_curve()
+
+
+					else:
+
+						if channel_index_i < len(self.channels_flags):
+
+							if self.cross_flags[channel_index_i - data_list_raw[file_index_i].datasets_list[rep_index].channels_number].get() == 1:
+
+								self.channel_index = channel_index_i
+								for param in self.list_of_params:
+									self.full_dict[param]["Init"].delete(0,"end")
+									self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+
+								self.Fit_corr_curve()
+
+
+
+
+					#self.Plot_curve()
+					
+
+		
+
+		self.fit_all_flag = False
+
+		self.Plot_curve()
 
 
 	def Fit_corr_curve(self):
@@ -2321,8 +2386,10 @@ class Diffusion_window :
 		self.flags_dict = {}
 		self.channels_flags = []
 		self.cross_flags = []
+
 		column_counter = 0
 
+		counter = 0
 
 		for item in data_list_raw[file_index].datasets_list[rep_index].channels_list:
 			str1, str2 = item.short_name.split(" ")
@@ -2344,6 +2411,11 @@ class Diffusion_window :
 
 
 	def __init__(self, win_width, win_height, dpi_all):
+
+
+
+
+
 
 
 		
@@ -3649,6 +3721,15 @@ class Threshold_window:
 		self.figure5.tight_layout()
 
 		
+
+		self.Channel_pair_label = tk.Label(self.frame001, text = "Channel pair: ")
+		self.Channel_pair_label.grid(row = 0, column = 0, sticky = 'w')
+
+		self.Channel_pair__choice = ttk.Combobox(self.frame001,values = divisors, width = 4 )
+		self.Channel_pair__choice.config(state = "readonly")
+
+		self.Channel_pair__choice.grid(row = 0, column = 1, sticky = 'w')
+
 
 		self.Binning_label = tk.Label(self.frame001, text="Binning: ")
 		self.Binning_label.grid(row = 0, column = 0, sticky = 'w')
