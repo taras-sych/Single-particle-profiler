@@ -695,35 +695,24 @@ class Restruct_window:
 
 
 
+		for item in data_list_raw[file_index].datasets_list[rep_index].channels_list:
 
-
-		x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.x
-		y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].auto_corr_arr.y
-
-		self.x_fit = x1
-		self.y_fit = y1
+			x1 = item.auto_corr_arr.x
+			y1 = item.auto_corr_arr.y
 
 		
-		self.curves.plot(x1, y1, label = "auto corr ch 1")
+			self.curves.plot(x1, y1, label = item.short_name)
 
 
-		
+		for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
 
-
-		x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.x
-		y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].auto_corr_arr.y
-
-		
-		self.curves.plot(x2, y2, label = "auto corr ch 2")
-
-
-
-
-		x3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.x
-		y3 = data_list_raw[file_index].datasets_list[rep_index].cross_list[0].cross_corr_arr.y
+			x1 = item.cross_corr_arr.x
+			y1 = item.cross_corr_arr.y
 
 		
-		self.curves.plot(x3, y3, label = "cross-corr")
+			self.curves.plot(x1, y1, label = item.short_name)
+
+
 
 		
 		
@@ -734,11 +723,16 @@ class Restruct_window:
 		self.curves.set_xscale ('log')
 
 
-		y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.y
-		y2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.y
+		for item in data_list_raw[file_index].datasets_list[rep_index].channels_list:
 
-		x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x
-		x2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[1].fluct_arr.x
+
+			x1 = item.fluct_arr.x
+			y1 = item.fluct_arr.y
+
+		
+			self.traces.plot(x1, y1, label = item.short_name)
+
+
 
 
 		self.traces.set_title("Intensity traces")
@@ -746,8 +740,7 @@ class Restruct_window:
 		self.traces.set_ylabel('Intensity')
 		self.traces.set_xlabel('Time (s)')
 
-		self.traces.plot(x1, y1, label = "channel 1")
-		self.traces.plot(x2, y2, label = "channel 2")
+
 
 		self.traces.legend(loc='upper right')
 
@@ -2901,6 +2894,12 @@ class Threshold_window:
 
 
 
+
+		self.Channel_pair__choice.config(values = self.channel_pairs)
+		self.Channel_pair__choice.set(self.channel_pairs[0])
+
+
+
 		if data_list_raw[file_index].gp_fitting[rep_index] != None:
 			data_list_raw[file_index].gp_fitting[rep_index] = None
 
@@ -2925,328 +2924,356 @@ class Threshold_window:
 
 	def Peaks (self):
 
-		
-
-		
-
-
-		
-
-
-		
-		main_xlim = self.peaks.get_xlim()
-		main_ylim = self.peaks.get_ylim()
-
-
-
-
-		int_div = int(rep_index/data_list_raw[file_index].binning)
-
-		
-
-
-		x1 = []
-		x2 = []
-		y1 = []
-		y2 = []
-		y1_raw = []
-		y2_raw = []
-
-
-		
-
-
-
-		for rep_index_i in range (data_list_raw[file_index].repetitions):
-						
-			if int(rep_index_i/data_list_raw[file_index].binning) == int_div:
-
-				#print ("adding repetition ", rep_index_i)
-
-
-				if len(x1) == 0:
-					x_min = 0
-				else:
-					x_min = max(x1) + x1[1] - x1[0]
-
-				x_temp_1 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.x]
-				x_temp_2 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.x]
-
-
-				x1.extend(x_temp_1)
-				#y1.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
-				y1_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
-
-				x2.extend(x_temp_2)
-				#y2.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
-				y2_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
-
-
-
-
-		"""if th1 == 0:
-									self.ch1_th.delete(0,"end")
-									self.ch1_th.insert(0,str(round(np.mean(y1),2)))
-									data_list_current[file_index].threshold_ch1 = round(np.mean(y1),2)
-						
-								if th2 == 0:
-									self.ch2_th.delete(0,"end")
-									self.ch2_th.insert(0,str(round(np.mean(y2),2)))
-									data_list_current[file_index].threshold_ch2 = round(np.mean(y2),2)"""
-
-
-
-		#data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
-
-		#data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
-
-
-		#th1 = data_list_raw[file_index].threshold_list[0]
-		#th2 = data_list_raw[file_index].threshold_list[1]
-
-
-
-		th1 = data_list_raw[file_index].threshold_list[0]
-		th2 = data_list_raw[file_index].threshold_list[1]
-
-		if th1 == None or th2 == None:
-
-			if self.normalization_index == "z-score":
-
-				th1 = 3
-				th2 = 3
-
-			if self.normalization_index == "manual":
-
-
-				th1 = 2
-				th2 = 2
-
-		self.ch1_th.delete(0,"end")
-		self.ch1_th.insert(0,str(th1))
-
-			
-		self.ch2_th.delete(0,"end")
-		self.ch2_th.insert(0,str(th2))
-
-
-
-
-
-
-		if self.normalization_index == "z-score":
-			y1 = stats.zscore(y1_raw)
-			y2 = stats.zscore(y2_raw)
-
-		if self.normalization_index == "manual":
-
-
-			y1 = y1_raw/np.mean(y1_raw)
-			y2 = y2_raw/np.mean(y2_raw)
-		
-
-		yh1 = []
-		yh2 = []
-
-
-
-		
-		
-
-		for el in y1:
-			if el >= th1:
-				yh1.append(el)
-
-		for el in y2:
-			if el >= th1:
-				yh2.append(el)
-
-
-
-		which_channel = self.Threshold.get()
-
-		
-		peaks1, _ = find_peaks(y1, height=th1)
-
-		peaks2, _ = find_peaks(y2, height=th2)
-
-
-
-		if which_channel == "channel 1":
-
-			peaks = peaks1
-
-		if which_channel == "channel 2":
-
-			peaks = peaks2
-
-		if which_channel == "both and":
-
-			peaks = list(set(peaks1).intersection(set(peaks2)))
-
-		if which_channel == "both or":
-
-			peaks = list(set(peaks1).union(set(peaks2)))
-
-		xp1 = []
-		xp2 = []
-		yp1 = []
-
-		yp1_raw = []
-		yp2 = []
-
-		yp2_raw = []
-
-
-
-
-
-
-
-		for p in peaks:
-			xp1.append(x1[p])
-			xp2.append(x1[p])
-			yp1.append(y1[p])
-			yp2.append(y2[p])
-
-			yp1_raw.append(y1_raw[p])
-			yp2_raw.append(y2_raw[p])
-
-
-
-		
-		
 
 		if self.fit_all_flag == False:
 			self.peaks.cla()
 			self.hist1.cla()
 			self.gp_hist.cla()
 
-			self.peaks.set_title("Intensity traces")
-			
-			self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-			self.peaks.set_ylabel('Intensity (a.u.)')
-			self.peaks.set_xlabel('Time (s)')
-
-			self.hist1.set_title("Intensity histograms")
-
-			self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-			self.hist1.set_ylabel('Counts')
-			self.hist1.set_xlabel('Intensity (a.u.)')
-
-
-
-			if which_channel == "channel 1" or which_channel == "both or" or which_channel == "both and":
-				self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
-				self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
-				
-				if (self.var.get() == 1):
-					self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
-
-				bins_1 = int(np.sqrt(len(yh1)))
-				if bins_1 == 0:
-					bins_1 = 1
-				self.hist1.hist(yh1, bins = bins_1)
-				
-
-			if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
-				
-				self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
-				self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=2)
-
-				if (self.var.get() == 1):
-					self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
-
-				bins_2 = int(np.sqrt(len(yh2)))
-				if bins_2 == 0:
-					bins_2 = 1
-				self.hist1.hist(yh2, bins = bins_2)
-
-			"""if change_normal == False:
-													self.peaks.set_xlim(main_xlim)
-													self.peaks.set_ylim(main_ylim)"""
-
-		
-
-		gp_list_temp = []
-
-		
-
-		
-		for k in range (len(yp1_raw)):
-			gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
-
-
-
-			if abs(gp_1) < 1:
-				gp_list_temp.append(gp_1)
-
-
-
-		
-		self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
-
-			
-		
-
-		self.x_bins=[]
-		for ii in range (len(bins)-1):
-			self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
-
-
-		if self.fit_all_flag == False:
-			self.gp_hist.set_title("GP histogram")
-			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-			self.gp_hist.set_ylabel('Counts (Total: ' + str(len(gp_list_temp)) + ')' )
-			self.gp_hist.set_xlabel('GP')
-
-
-			if data_list_raw[file_index].gp_fitting[rep_index] != None:
-
-
-				x1 = np.linspace(min(self.x_bins), max(self.x_bins), num=500)
-				popt = []
-
-				for param in data_list_raw[file_index].gp_fitting[rep_index].keys():
-			
-
-					popt.append(np.float64(data_list_raw[file_index].gp_fitting[rep_index][param]))
-
-					
-
-
-
-				if self.Components.get() == '1 component':
-					#print("1 comp")
-					self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
-
-				if self.Components.get() == '2 components':
-					#print("2 comp")
-					self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
-					popt1 = popt[:3]
-					popt2 = popt[3:6]
-					
-					self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
-					self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
-
-				if self.Components.get() == '3 components':
-					self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
-					#print("3 comp")
-					popt1 = popt[:3]
-					popt2 = popt[3:6]
-					popt3 = popt[6:9]
-					
-					self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
-					self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
-					self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
-
-
-
-
-
 			self.canvas5.draw_idle()
 
 			self.figure5.tight_layout()
+
+		
+
+		
+
+
+		
+
+
+		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
+
+
+
+
+			str1 = self.Channel_pair__choice.get()
+
+			str7, str2 = str1.split('/')
+
+			str3, str4 = str7.split(' ')
+
+			str5, str6 = str2.split(' ')
+
+			ch1_ind = int(str4) - 1
+
+			ch2_ind = int(str6) - 1
+
+
+
+			main_xlim = self.peaks.get_xlim()
+			main_ylim = self.peaks.get_ylim()
+
+
+
+
+			int_div = int(rep_index/data_list_raw[file_index].binning)
+
+			
+
+
+			x1 = []
+			x2 = []
+			y1 = []
+			y2 = []
+			y1_raw = []
+			y2_raw = []
+
+
+			
+
+
+
+			for rep_index_i in range (data_list_raw[file_index].repetitions):
+							
+				if int(rep_index_i/data_list_raw[file_index].binning) == int_div:
+
+					#print ("adding repetition ", rep_index_i)
+
+
+					if len(x1) == 0:
+						x_min = 0
+					else:
+						x_min = max(x1) + x1[1] - x1[0]
+
+					x_temp_1 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x]
+					x_temp_2 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.x]
+
+
+					x1.extend(x_temp_1)
+					#y1.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+					y1_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.y)
+
+					x2.extend(x_temp_2)
+					#y2.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
+					y2_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.y)
+
+
+
+
+			"""if th1 == 0:
+										self.ch1_th.delete(0,"end")
+										self.ch1_th.insert(0,str(round(np.mean(y1),2)))
+										data_list_current[file_index].threshold_ch1 = round(np.mean(y1),2)
+							
+									if th2 == 0:
+										self.ch2_th.delete(0,"end")
+										self.ch2_th.insert(0,str(round(np.mean(y2),2)))
+										data_list_current[file_index].threshold_ch2 = round(np.mean(y2),2)"""
+
+
+
+			#data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
+
+			#data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
+
+
+			#th1 = data_list_raw[file_index].threshold_list[0]
+			#th2 = data_list_raw[file_index].threshold_list[1]
+
+
+
+			th1 = data_list_raw[file_index].threshold_list[ch1_ind]
+			th2 = data_list_raw[file_index].threshold_list[ch2_ind]
+
+			if th1 == None or th2 == None:
+
+				if self.normalization_index == "z-score":
+
+					th1 = 3
+					th2 = 3
+
+				if self.normalization_index == "manual":
+
+
+					th1 = 2
+					th2 = 2
+
+			self.ch1_th.delete(0,"end")
+			self.ch1_th.insert(0,str(th1))
+
+				
+			self.ch2_th.delete(0,"end")
+			self.ch2_th.insert(0,str(th2))
+
+
+
+
+
+
+			if self.normalization_index == "z-score":
+				y1 = stats.zscore(y1_raw)
+				y2 = stats.zscore(y2_raw)
+
+			if self.normalization_index == "manual":
+
+
+				y1 = y1_raw/np.mean(y1_raw)
+				y2 = y2_raw/np.mean(y2_raw)
+			
+
+			yh1 = []
+			yh2 = []
+
+
+
+			
+			
+
+			for el in y1:
+				if el >= th1:
+					yh1.append(el)
+
+			for el in y2:
+				if el >= th1:
+					yh2.append(el)
+
+
+
+			which_channel = self.Threshold.get()
+
+			
+			peaks1, _ = find_peaks(y1, height=th1)
+
+			peaks2, _ = find_peaks(y2, height=th2)
+
+
+
+			if which_channel == "channel 1":
+
+				peaks = peaks1
+
+			if which_channel == "channel 2":
+
+				peaks = peaks2
+
+			if which_channel == "both and":
+
+				peaks = list(set(peaks1).intersection(set(peaks2)))
+
+			if which_channel == "both or":
+
+				peaks = list(set(peaks1).union(set(peaks2)))
+
+			xp1 = []
+			xp2 = []
+			yp1 = []
+
+			yp1_raw = []
+			yp2 = []
+
+			yp2_raw = []
+
+
+
+
+
+
+
+			for p in peaks:
+				xp1.append(x1[p])
+				xp2.append(x1[p])
+				yp1.append(y1[p])
+				yp2.append(y2[p])
+
+				yp1_raw.append(y1_raw[p])
+				yp2_raw.append(y2_raw[p])
+
+
+
+			
+			
+
+			if self.fit_all_flag == False:
+				self.peaks.cla()
+				self.hist1.cla()
+				self.gp_hist.cla()
+
+				self.peaks.set_title("Intensity traces")
+				
+				self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+				self.peaks.set_ylabel('Intensity (a.u.)')
+				self.peaks.set_xlabel('Time (s)')
+
+				self.hist1.set_title("Intensity histograms")
+
+				self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+				self.hist1.set_ylabel('Counts')
+				self.hist1.set_xlabel('Intensity (a.u.)')
+
+
+
+				if which_channel == "channel 1" or which_channel == "both or" or which_channel == "both and":
+					self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
+					self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
+					
+					if (self.var.get() == 1):
+						self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
+
+					bins_1 = int(np.sqrt(len(yh1)))
+					if bins_1 == 0:
+						bins_1 = 1
+					self.hist1.hist(yh1, bins = bins_1)
+					
+
+				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
+					
+					self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
+					self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=2)
+
+					if (self.var.get() == 1):
+						self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
+
+					bins_2 = int(np.sqrt(len(yh2)))
+					if bins_2 == 0:
+						bins_2 = 1
+					self.hist1.hist(yh2, bins = bins_2)
+
+				"""if change_normal == False:
+														self.peaks.set_xlim(main_xlim)
+														self.peaks.set_ylim(main_ylim)"""
+
+			
+
+			gp_list_temp = []
+
+			
+
+			
+			for k in range (len(yp1_raw)):
+				gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
+
+
+
+				if abs(gp_1) < 1:
+					gp_list_temp.append(gp_1)
+
+
+
+			
+			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
+
+				
+			
+
+			self.x_bins=[]
+			for ii in range (len(bins)-1):
+				self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
+
+
+			if self.fit_all_flag == False:
+				self.gp_hist.set_title("GP histogram")
+				self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+				self.gp_hist.set_ylabel('Counts (Total: ' + str(len(gp_list_temp)) + ')' )
+				self.gp_hist.set_xlabel('GP')
+
+
+				if data_list_raw[file_index].gp_fitting[rep_index] != None:
+
+
+					x1 = np.linspace(min(self.x_bins), max(self.x_bins), num=500)
+					popt = []
+
+					for param in data_list_raw[file_index].gp_fitting[rep_index].keys():
+				
+
+						popt.append(np.float64(data_list_raw[file_index].gp_fitting[rep_index][param]))
+
+						
+
+
+
+					if self.Components.get() == '1 component':
+						#print("1 comp")
+						self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+
+					if self.Components.get() == '2 components':
+						#print("2 comp")
+						self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
+						popt1 = popt[:3]
+						popt2 = popt[3:6]
+						
+						self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
+						self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+
+					if self.Components.get() == '3 components':
+						self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
+						#print("3 comp")
+						popt1 = popt[:3]
+						popt2 = popt[3:6]
+						popt3 = popt[6:9]
+						
+						self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
+						self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+						self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
+
+
+
+
+
+				self.canvas5.draw_idle()
+
+				self.figure5.tight_layout()
 
 			
 
@@ -3568,6 +3595,18 @@ class Threshold_window:
 		self.Binning_choice.set(data_list_raw[file_index].binning)
 
 
+		self.channel_pairs = []
+		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
+			for i in range (data_list_raw[file_index].datasets_list[0].channels_number):
+				for j in range (i+1, data_list_raw[file_index].datasets_list[0].channels_number):
+					str1 = data_list_raw[file_index].datasets_list[0].channels_list[i].short_name + "/" + data_list_raw[file_index].datasets_list[0].channels_list[j].short_name
+					self.channel_pairs.append(str1)
+
+
+			self.Channel_pair__choice.config(values = self.channel_pairs)
+			self.Channel_pair__choice.set(self.channel_pairs[0])
+
+
 		rep = rep1-1
 
 
@@ -3720,27 +3759,27 @@ class Threshold_window:
 
 		self.figure5.tight_layout()
 
-		
+		self.channel_pairs = []
 
 		self.Channel_pair_label = tk.Label(self.frame001, text = "Channel pair: ")
 		self.Channel_pair_label.grid(row = 0, column = 0, sticky = 'w')
 
-		self.Channel_pair__choice = ttk.Combobox(self.frame001,values = divisors, width = 4 )
+		self.Channel_pair__choice = ttk.Combobox(self.frame001,values = self.channel_pairs,  width = 18 )
 		self.Channel_pair__choice.config(state = "readonly")
 
-		self.Channel_pair__choice.grid(row = 0, column = 1, sticky = 'w')
+		self.Channel_pair__choice.grid(row = 0, column = 1, columnspan = 2, sticky = 'ew')
 
 
 		self.Binning_label = tk.Label(self.frame001, text="Binning: ")
-		self.Binning_label.grid(row = 0, column = 0, sticky = 'w')
+		self.Binning_label.grid(row = 1, column = 0, sticky = 'w')
 
 		divisors = []
 
 
-		self.Binning_choice = ttk.Combobox(self.frame001,values = divisors, width = 4 )
+		self.Binning_choice = ttk.Combobox(self.frame001,values = divisors, width = 9 )
 		self.Binning_choice.config(state = "readonly")
 		
-		self.Binning_choice.grid(row = 0, column = 1, sticky = 'w')
+		self.Binning_choice.grid(row = 1, column = 1, sticky = 'ew')
 
 		
 
@@ -3748,12 +3787,12 @@ class Threshold_window:
 
 
 		self.Norm_label = tk.Label(self.frame001, text="Use for plot: ")
-		self.Norm_label.grid(row = 1, column = 0, sticky = 'w')
+		self.Norm_label.grid(row = 2, column = 0, sticky = 'ew')
 
 		self.Normalization_for_plot = ttk.Combobox(self.frame001,values = ["raw", "normalized"], width = 9 )
 		self.Normalization_for_plot.config(state = "readonly")
 		
-		self.Normalization_for_plot.grid(row = 1, column = 1)
+		self.Normalization_for_plot.grid(row = 2, column = 1, sticky = 'ew')
 
 		self.Normalization_for_plot.set("raw")
 
@@ -3762,7 +3801,7 @@ class Threshold_window:
 		self.var = tk.IntVar()
 
 		self.Peaks_button=tk.Checkbutton(self.frame001, text="Display peaks", variable=self.var, command=self.Update_thresholds)
-		self.Peaks_button.grid(row = 1, column = 3, sticky='w')
+		self.Peaks_button.grid(row = 2, column = 2, sticky='ew')
 
 
 
@@ -3772,13 +3811,13 @@ class Threshold_window:
 
 
 		self.Type_label = tk.Label(self.frame001, text="Detect: ")
-		self.Type_label.grid(row = 2, column = 0, sticky='w')
+		self.Type_label.grid(row = 3, column = 0, sticky='w')
 
 	
 
 		self.Threshold = ttk.Combobox(self.frame001,values = ["both and", "both or", "channel 1", "channel 2"], width = 9 )
 		self.Threshold.config(state = "readonly")
-		self.Threshold.grid(row = 2, column = 1)
+		self.Threshold.grid(row = 3, column = 1, sticky='ew')
 
 		self.Threshold.set("both and")
 
@@ -3788,12 +3827,12 @@ class Threshold_window:
 	
 		
 		self.Norm_label = tk.Label(self.frame001, text="Thresholding: ")
-		self.Norm_label.grid(row = 3, column = 0)
+		self.Norm_label.grid(row = 4, column = 0, sticky='ew')
 
 		self.Normalization = ttk.Combobox(self.frame001,values = ["manual", "z-score"], width = 9 )
 		self.Normalization.config(state = "readonly")
 								#Threshold.config(font=helv36)
-		self.Normalization.grid(row = 3, column = 1, sticky = 'w')
+		self.Normalization.grid(row = 4, column = 1, sticky = 'w')
 						
 		self.Normalization.set("z-score")
 						
@@ -3807,29 +3846,29 @@ class Threshold_window:
 
 
 		self.ch1_label = tk.Label(self.frame001, text="channel 1: ")
-		self.ch1_label.grid(row = 4, column = 0, sticky='w')
+		self.ch1_label.grid(row = 5, column = 0, sticky='w')
 
 		self.ch1_th = tk.Entry(self.frame001, width = 9)
-		self.ch1_th.grid(row = 4, column = 1, sticky='w')
+		self.ch1_th.grid(row = 5, column = 1, sticky='w')
 
 		self.ch1_th.insert("end", str(3))
 
 		self.ch2_label = tk.Label(self.frame001, text="channel 2: ")
-		self.ch2_label.grid(row = 5, column = 0, sticky='w')
+		self.ch2_label.grid(row = 6, column = 0, sticky='w')
 
 		
 
 		self.ch2_th = tk.Entry(self.frame001, width = 9)
-		self.ch2_th.grid(row = 5, column = 1, sticky='w')
+		self.ch2_th.grid(row = 6, column = 1, sticky='w')
 
 		self.ch2_th.insert("end", str(3))
 
 
 		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
-		self.Update_thresholds_button.grid(row = 6, column = 0, columnspan = 2, sticky='w')
+		self.Update_thresholds_button.grid(row = 7, column = 0, columnspan = 2, sticky='w')
 
 		self.Put_mean_button = tk.Button(self.frame001, text="Set to default", command=self.Put_default)
-		self.Put_mean_button.grid(row = 7, column = 0, columnspan = 2, sticky='w')
+		self.Put_mean_button.grid(row = 8, column = 0, columnspan = 2, sticky='w')
 
 
 
@@ -3917,7 +3956,33 @@ class Threshold_window:
 
 		#self.Normalize()
 
-		self.Put_default()
+		if self.normalization_index == "z-score":
+			self.ch1_th.delete(0,"end")
+			self.ch1_th.insert(0,str(3))
+
+			
+			self.ch2_th.delete(0,"end")
+			self.ch2_th.insert(0,str(3))
+
+		if self.normalization_index == "manual":
+
+
+
+			self.ch1_th.delete(0,"end")
+			self.ch1_th.insert(0,str(round(np.mean(y1),2)))
+
+			
+			self.ch2_th.delete(0,"end")
+			self.ch2_th.insert(0,str(round(np.mean(y2),2)))
+
+
+		self.channel_pairs = []
+		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
+			for i in range (data_list_raw[file_index].datasets_list[0].channels_number):
+				for j in range (i+1, data_list_raw[file_index].datasets_list[0].channels_number):
+					str1 = data_list_raw[file_index].datasets_list[0].channels_list[i].short_name + "/" + data_list_raw[file_index].datasets_list[0].channels_list[j].short_name
+					self.channel_pairs.append(str1)
+
 		self.tree_t.selection_set(treetree.child_id)
 
 		
