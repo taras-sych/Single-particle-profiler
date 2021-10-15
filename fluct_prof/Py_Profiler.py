@@ -678,8 +678,66 @@ def Restruct_fun():
 
 class Restruct_window:
 
-	def Temp(self):
-		print(1)
+	def Restructure_dataset(self):
+		global file_index
+		global rep_index
+
+		temp_dict = {}
+
+		for channel in range (data_list_raw[file_index].datasets_list[rep_index_i].channels_number):
+
+			x = []
+			y = []
+
+			temp_dict[channel] = fcs_importer.XY_plot(x,y)
+
+
+		
+
+			for rep_index_i in range (data_list_raw[file_index].repetitions):
+								
+					
+
+				#print ("adding repetition ", rep_index_i)
+
+
+				if len(temp_dict[channel].x) == 0:
+					x_min = 0
+				else:
+					x_min = max(x1) + temp_dict[channel].x[1] - temp_dict[channel].x[0]
+
+				x_temp_1 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.x]
+
+				temp_dict[channel].x.extend(x_temp_1)
+
+				temp_dict[channel].y.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.y)
+
+
+
+		repetitions_new = int(self.num_rep.get())
+
+
+		length_rep = int (len (temp_dict[0].x)/repetitions_new)
+
+		for rep_index_i in range (repetitions_new):
+
+			for channel in range (data_list_raw[file_index].datasets_list[rep_index_i].channels_number):
+
+				end = length_rep*(repetitions_new + 1)
+				start = length_rep*(repetitions_new + 1) - length_rep
+
+				x = temp_dict[channel].x[start : end]
+				y = temp_dict[channel].y[start : end]
+
+				Tr = fcs_importer.XY_plot(x,y)
+
+				x1 = 
+
+
+
+
+
+
 
 
 
