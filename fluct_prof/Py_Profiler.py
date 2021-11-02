@@ -746,6 +746,12 @@ class Restruct_window:
 				x = temp_dict[channel].x[start : end]
 				y = temp_dict[channel].y[start : end]
 
+				min1 = min(x)
+
+				x1 = [a - min1 for a in x]
+
+				x = x1
+
 				
 
 				Tr = fcs_importer.XY_plot(x,y)
@@ -764,7 +770,7 @@ class Restruct_window:
 
 				channels_list_arg.append(Ch_dataset)
 
-			FCS_Dataset =  fcs_importer.Dataset_fcs(data_list_raw[file_index].datasets_list[rep_index].channels_number, 0, channels_list_arg, [None] )
+			FCS_Dataset =  fcs_importer.Dataset_fcs(data_list_raw[file_index].datasets_list[rep_index].channels_number, 0, channels_list_arg, [] )
 
 			dataset_list_arg.append(FCS_Dataset)
 
@@ -798,14 +804,6 @@ class Restruct_window:
 		peaks_list.append([None] * dataset.repetitions)
 
 		list_of_channel_pairs.append([None])
-
-
-
-
-
-
-
-
 
 
 
@@ -995,17 +993,29 @@ class Restruct_window:
 		Label_1 = tk.Label(self.frame004, text="Repetitions: ")
 		Label_1.grid(row = 0, column = 0, sticky = 'w')
 
+
+
 		self.num_rep = tk.Entry(self.frame004, width = 9)
 		self.num_rep.grid(row = 0, column = 1, sticky='w')
 
 		self.num_rep.delete(0,"end")
-		self.num_rep.insert(0,data_list_raw[rep_index].repetitions)
+		self.num_rep.insert(0,data_list_raw[file_index].repetitions)
 
 		self.Rep_button = tk.Button(self.frame004, text="Apply reps", command=self.Restructure_dataset)
-		self.Rep_button.grid(row = 0, column = 2, sticky='w')
+		self.Rep_button.grid(row = 0, column = 2, rowspan = 2, sticky='w')
+
+		Label_2 = tk.Label(self.frame004, text="Each rep: ")
+		Label_2.grid(row = 1, column = 0, sticky = 'w')
+
+		text1 = str(round(data_list_raw[file_index].datasets_list[rep_index].channels_list[0].fluct_arr.x[-1],1)) + "sec"
+
+		Label_3 = tk.Label(self.frame004, text=text1)
+		Label_3.grid(row = 1, column = 1, sticky = 'w')
 
 		self.Remove_button = tk.Button(self.frame004, text="Remove dataset", command=self.Temp)
-		self.Remove_button.grid(row = 1, column = 0, columnspan = 3, sticky = 'ew')
+		self.Remove_button.grid(row = 2, column = 0, columnspan = 3, sticky = 'ew')
+
+
 
 		self.frame000 = tk.Frame(self.win_diff)
 		self.frame000.pack(side = "left", anchor = "nw")
@@ -2521,14 +2531,17 @@ class Diffusion_window :
 			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
 			column_counter +=1
 
-		for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
-			str1, str2 = item.short_name.split(" vs ")
-			str3, str4 = str1.split(" ")
-			very_short_name = "ch" + str4 + str2
-			self.cross_flags.append(tk.IntVar(value=1))
-			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame0003, text=very_short_name, variable=self.cross_flags[-1], command=self.Plot_curve)
-			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
-			column_counter +=1
+
+		if data_list_raw[file_index].datasets_list[rep_index].cross_number > 0:
+
+			for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
+				str1, str2 = item.short_name.split(" vs ")
+				str3, str4 = str1.split(" ")
+				very_short_name = "ch" + str4 + str2
+				self.cross_flags.append(tk.IntVar(value=1))
+				self.flags_dict[item.short_name] = tk.Checkbutton(self.frame0003, text=very_short_name, variable=self.cross_flags[-1], command=self.Plot_curve)
+				self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+				column_counter +=1
 
 
 
