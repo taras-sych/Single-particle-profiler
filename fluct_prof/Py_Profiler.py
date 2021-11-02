@@ -724,8 +724,11 @@ class Restruct_window:
 		
 
 		
-
+		dataset_list_arg = []
 		for rep_index_i in range (repetitions_new):
+
+
+			channels_list_arg = []
 
 			for channel in range (data_list_raw[file_index].datasets_list[rep_index].channels_number):
 
@@ -753,11 +756,50 @@ class Restruct_window:
 
 				AutoCorr = fcs_importer.XY_plot(x1,y1)
 
-				plt.plot(x1, y1)
+				long_name = data_list_raw[file_index].datasets_list[rep_index].channels_list[channel].name
 
-				plt.xscale('log')
+				short_name = data_list_raw[file_index].datasets_list[rep_index].channels_list[channel].short_name
 
-				plt.show()
+				Ch_dataset = fcs_importer.fcs_channel (long_name, Tr, AutoCorr, short_name)
+
+				channels_list_arg.append(Ch_dataset)
+
+			FCS_Dataset =  fcs_importer.Dataset_fcs(data_list_raw[file_index].datasets_list[rep_index].channels_number, 0, channels_list_arg, [None] )
+
+			dataset_list_arg.append(FCS_Dataset)
+
+
+
+		
+		dataset = 	fcs_importer.Full_dataset_fcs(repetitions_new, dataset_list_arg)
+
+		name = tree_list_name[file_index] + " " + str(repetitions_new)
+
+		treetree = Data_tree (self.tree, name, dataset.repetitions)
+
+		treetree = Data_tree (data_frame.tree, name, dataset.repetitions)
+
+		tree_list.append(treetree)
+
+		tree_list_name.append(name)
+
+		binning_list.append(1)
+
+
+		data_list_raw.append(dataset)
+
+
+		#data_list_current.append(dataset1)
+
+
+		total_channels_list.append(dataset.datasets_list[0].channels_number + dataset.datasets_list[0].cross_number)
+		repetitions_list.append(dataset.repetitions)
+
+		peaks_list.append([None] * dataset.repetitions)
+
+		list_of_channel_pairs.append([None])
+
+
 
 
 
@@ -790,14 +832,14 @@ class Restruct_window:
 		
 			self.curves.plot(x1, y1, label = item.short_name)
 
+		if data_list_raw[file_index].datasets_list[rep_index].cross_number > 0:
+			for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
 
-		for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
+				x1 = item.cross_corr_arr.x
+				y1 = item.cross_corr_arr.y
 
-			x1 = item.cross_corr_arr.x
-			y1 = item.cross_corr_arr.y
-
-		
-			self.curves.plot(x1, y1, label = item.short_name)
+			
+				self.curves.plot(x1, y1, label = item.short_name)
 
 
 
