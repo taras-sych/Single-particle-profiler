@@ -678,13 +678,16 @@ def Restruct_fun():
 
 class Restruct_window:
 
+	def Temp(self):
+		print ("It is temp")
+
 	def Restructure_dataset(self):
 		global file_index
 		global rep_index
 
 		temp_dict = {}
 
-		for channel in range (data_list_raw[file_index].datasets_list[rep_index_i].channels_number):
+		for channel in range (data_list_raw[file_index].datasets_list[rep_index].channels_number):
 
 			x = []
 			y = []
@@ -704,7 +707,7 @@ class Restruct_window:
 				if len(temp_dict[channel].x) == 0:
 					x_min = 0
 				else:
-					x_min = max(x1) + temp_dict[channel].x[1] - temp_dict[channel].x[0]
+					x_min = max(temp_dict[channel].x) + temp_dict[channel].x[1] - temp_dict[channel].x[0]
 
 				x_temp_1 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.x]
 
@@ -718,20 +721,46 @@ class Restruct_window:
 
 
 		length_rep = int (len (temp_dict[0].x)/repetitions_new)
+		
+
+		
 
 		for rep_index_i in range (repetitions_new):
 
-			for channel in range (data_list_raw[file_index].datasets_list[rep_index_i].channels_number):
+			for channel in range (data_list_raw[file_index].datasets_list[rep_index].channels_number):
 
-				end = length_rep*(repetitions_new + 1)
-				start = length_rep*(repetitions_new + 1) - length_rep
+				end = length_rep*(rep_index_i + 1)
+				start = end - length_rep
+
+				if rep_index_i == repetitions_new-1:
+
+					if end != len (temp_dict[0].x) - 1:
+
+						end = len (temp_dict[0].x) - 1
+
+				
 
 				x = temp_dict[channel].x[start : end]
 				y = temp_dict[channel].y[start : end]
 
+				
+
 				Tr = fcs_importer.XY_plot(x,y)
 
-				x1 = 
+				timestep = x[1] - x[0]
+
+				x1, y1 = corr_py.correlate_full (timestep, np.array(Tr.y), np.array(Tr.y))
+
+				AutoCorr = fcs_importer.XY_plot(x1,y1)
+
+				plt.plot(x1, y1)
+
+				plt.xscale('log')
+
+				plt.show()
+
+
+
 
 
 
@@ -930,7 +959,7 @@ class Restruct_window:
 		self.num_rep.delete(0,"end")
 		self.num_rep.insert(0,data_list_raw[rep_index].repetitions)
 
-		self.Rep_button = tk.Button(self.frame004, text="Apply reps", command=self.Temp)
+		self.Rep_button = tk.Button(self.frame004, text="Apply reps", command=self.Restructure_dataset)
 		self.Rep_button.grid(row = 0, column = 2, sticky='w')
 
 		self.Remove_button = tk.Button(self.frame004, text="Remove dataset", command=self.Temp)

@@ -20,11 +20,11 @@ def correlate_full (timestep, a, b):
 
     #Calculates smoothed version of curve using logarithmic bins.
     bins = logbins(a.size//2, 64)
-    scorr = smooth(corr_py.binaver(corr,bins))
+    scorr = smooth(binaver(corr,bins))
 
     time = bins*timestep
 
-    return time, corr
+    return time, scorr
 
 
 def correlate_linear(a, b):
