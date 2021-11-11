@@ -472,6 +472,7 @@ def Plot_diff():
 
 
 
+
 		file1 = file1-1
 		rep1 = rep1-1
 
@@ -487,24 +488,24 @@ def Plot_diff():
 
 				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name 
 
-			if key in thisdict.keys():
-				thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
-			else:
-				thisdict[key] = []
-				thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+				if key in thisdict.keys():
+					thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
 
-		for item in range(len(data_list_raw[file1].datasets_list[rep1].cross_list)):
-			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[item].short_name].get() == 1:
+		for i in range(len(data_list_raw[file1].datasets_list[rep1].cross_list)):
 
-				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].cross_list[item].short_name 
+			item = i + len(data_list_raw[file1].datasets_list[rep1].channels_list)
+			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1:
 
-			if key in thisdict.keys():
-				thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
-			else:
-				thisdict[key] = []
-				thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name 
 
-		
+				if key in thisdict.keys():
+					thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
 
 		
 
@@ -675,6 +676,10 @@ def Restruct_fun():
 
 
 	th_win = Restruct_window(win_width, win_height, dpi_all)
+
+
+def Export_function():
+	print(1)
 
 class Restruct_window:
 
@@ -1211,7 +1216,9 @@ class Left_frame :
 
 				list_of_channel_pairs.append([None])
 
-				root.update()   
+				root.update() 
+
+
 
 		self.pb.destroy()
 		self.value_label.destroy()
@@ -1393,7 +1400,7 @@ class Left_frame :
 		self.Add_to_plot_button = tk.Button(self.frame023, text="Plot", command=Which_tab)
 		self.Add_to_plot_button.grid(row = 3, column = 0, sticky="W")
 
-		self.Output_button = tk.Button(self.frame023, text="Output", command=Which_tab)
+		self.Output_button = tk.Button(self.frame023, text="Output", command=Export_function)
 		self.Output_button.grid(row = 4, column = 0, sticky="W")
 
 
@@ -1448,97 +1455,6 @@ class Left_frame :
 
 
 
-
-	
-
-class FFP_frame :
-
-	def Put_cross(self):
-		main_xlim = ffp.main.get_xlim()
-		main_ylim = ffp.main.get_ylim()
-
-		ver = float(self.X_cross.get())
-		hor = float(self.Y_cross.get())
-
-		Plot_main()
-
-		self.main.hlines(hor, main_xlim[0], main_xlim[1], color = 'black', zorder=3)
-		self.main.vlines(ver,main_ylim[0], main_ylim[1], color = 'black', zorder=3)
-
-		ffp.main.set_xlim(main_xlim)
-		ffp.main.set_ylim(main_ylim)
-
-		self.canvas3.draw_idle()
-
-		self.figure3.tight_layout()
-
-
-	def Type_plot_index(self, event):
-		self.plot_type = self.Type_plot.get()
-
-	def __init__(self, frame1, win_width, win_height, dpi_all):
-
-		
-
-
-		self.frame3 = tk.Frame(frame1)
-		self.frame3.pack(side="top", fill="x")
-
-		"""self.X_label = tk.Label(self.frame3, text="X cross: ")
-		self.X_label.grid(row = 0, column = 0)
-
-		self.X_cross = tk.Entry(self.frame3, width = 9)
-		self.X_cross.grid(row = 0, column = 1)
-
-		
-
-		self.Y_label = tk.Label(self.frame3, text="Y cross: ")
-		self.Y_label.grid(row = 1, column = 0)
-
-		self.Y_cross = tk.Entry(self.frame3, width = 9)
-		self.Y_cross.grid(row = 1, column = 1)
-
-		self.Put_cross_button = tk.Button(self.frame3, text="Put cross", command=self.Put_cross)
-		self.Put_cross_button.grid(row = 0, column = 2, rowspan = 2)"""
-
-		
-
-		self.plot_type = "dot plot"
-		self.Type_plot = ttk.Combobox(self.frame3,values = ["dot plot", "density plot"] )
-		self.Type_plot.config(state = "readonly")
-		#Threshold.config(font=helv36)
-		self.Type_plot.grid(row = 0, column = 2)
-
-		self.Type_plot.set("dot plot")
-
-		self.Type_plot.bind("<<ComboboxSelected>>", self.Type_plot_index)
-		
-
-
-		self.frame12 = tk.Frame(frame1)
-		self.frame12.pack(side="top", fill="x")
-
-
-		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi = dpi_all)
-		self.main = self.figure3.add_subplot(1, 1, 1)
-
-		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.main.set_ylabel('Intensity')
-		self.main.set_xlabel('Intensity')
-
-
-		self.canvas3 = FigureCanvasTkAgg(self.figure3, self.frame12)
-		self.canvas3.get_tk_widget().pack()
-
-
-		self.toolbar = NavigationToolbar2Tk(self.canvas3, self.frame12)
-		self.toolbar.update()
-		self.canvas3.get_tk_widget().pack()
-
-		self.figure3.tight_layout()
-
-		self.frame13 = tk.Frame(frame1)
-		self.frame13.pack(side="top", fill="x")
 
 
 
@@ -1625,195 +1541,7 @@ class Diff_frame :
 		
 class GP_frame :
 
-	def Export_plot(self):
-		global fit_list_x
-		global fit_list_y
 
-
-		#cwd = os.getcwd()
-		#filepath = cwd + os.path.sep + "Out.txt"
-		filepath = "C:\\Users\\taras.sych\\Desktop\\Output\\" + output_file_name + ".txt"
-		#filepath1 = "C:\\Users\\taras.sych\\Desktop\\Output\\Out_fit.txt"
-		file_export = open(filepath, "w+")
-
-		file_export.write("GP List:" +  "\n" )
-		
-		for i in range (0, len(gp.gp_all_points)):
-			file_export.write(str(gp.gp_all_points[i]) +  "\n" )
-
-
-		file_export.write("\n" + "GP Histogram:" +  "\n" )
-
-		
-   
-
-		for i in range (0, len(gp.gp_histogram)):
-			file_export.write(str(gp.gp_xbins[i]) + "\t" +  str(gp.gp_histogram[i]) + "\n" )
-
-	
-		#file_export.close()
-
-		
-		#file_export = open(filepath1, "w+")
-
-		file_export.write("\n" + "GP Histogram Fit:" +  "\n" )
-
-   
-
-		for i in range (0, len(fit_list_y)):
-			file_export.write(str(fit_list_x[i]) + "\t" +  str(fit_list_y[i]) + "\n" )
-
-	
-		
-
-		file_export.write("\n" + "Fitting parameters:" +  "\n" )
-		
-		if (len(Fit_params) == 3):
-			file_export.write ( "A: " + str(round (Fit_params[0],3)) + "\n")
-			file_export.write ( "Mean: " + str(round(Fit_params[1],3)) + "\n")
-			file_export.write ( "Sigma: " + str(round(Fit_params[2],3)) + "\n")
-
-		if (len(Fit_params) == 6):
-			file_export.write ( "Peak 1" + "\n")
-			file_export.write ( "A: " + str(round (Fit_params[0],3)) + "\n")
-			file_export.write ( "Mean: " + str(round(Fit_params[1],3)) + "\n")
-			file_export.write ( "Sigma: " + str(round(Fit_params[2],3)) + "\n")
-
-			file_export.write ( "Peak 2" + "\n")
-			file_export.write ( "A: " + str(round (Fit_params[3],3)) + "\n")
-			file_export.write ( "Mean: " + str(round(Fit_params[4],3)) + "\n")
-			file_export.write ( "Sigma: " + str(round(Fit_params[5],3)) + "\n")
-
-		file_export.close()
-
-
-	"""def Fit_gaus(self):
-			
-					
-					try:
-					
-						global fit_list_x
-						global fit_list_y
-						global Fit_params
-			
-						x = self.gp_xbins
-						y = self.gp_histogram
-			
-						x1 = np.linspace(min(x), max(x), num=500)
-			
-						if (self.gaus_number == 1):
-			
-							#m1 = float(self.gaus_mean_1.get())
-			
-							#popt,pcov = curve_fit(Gauss, x, y, bounds=((-np.inf,-0.8 ,-np.inf), (np.inf, 0.6 ,np.inf)))
-							popt,pcov = curve_fit(Gauss, x, y)
-			
-							#print(popt)
-			
-			
-							Plot_gp()
-							fit_list_x = x1
-							fit_list_y = Gauss(x1, *popt)
-							Fit_params = popt
-			
-							gp.main.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
-			
-							gp.canvas3.draw()
-			
-							gp.figure3.tight_layout()
-			
-							self.fit_parampampams.delete(0,'end')
-			
-							self.fit_parampampams.insert(0, "Fitting parameters:") 
-							self.fit_parampampams.insert(1, "A:\t" + str(round (popt[0],3)))
-							self.fit_parampampams.insert(1, "Mean:\t" + str(round(popt[1],3)))
-							self.fit_parampampams.insert(1, "Sigma:\t" + str(round(popt[2],3)))
-							
-			
-						if (self.gaus_number == 2):
-			
-							popt,pcov = curve_fit(Gauss2, x, y)
-			
-							Fit_params = popt
-			
-							popt1 = popt[0:3]
-			
-							popt2 = popt[3:6]
-			
-							#print(popt1)
-							#print(popt2)
-			
-							Plot_gp()
-							fit_list_x = x1
-							fit_list_y = Gauss2(x1, *popt)
-			
-							gp.main.plot(x1, Gauss(x1, *popt1), color = 'orange', label='fit')
-			
-							gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
-			
-							gp.main.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
-			
-							gp.canvas3.draw()
-			
-							gp.figure3.tight_layout()
-			
-							self.fit_parampampams.delete(0,'end')
-			
-							self.fit_parampampams.insert('end', "Fitting parameters:")
-							self.fit_parampampams.insert('end', "Peak 1:")
-							self.fit_parampampams.insert('end', "A:\t" + str(round (popt[0],3)))
-							self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[1],3)))
-							self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[2],3)))
-							self.fit_parampampams.insert('end', "Peak 2:")
-							self.fit_parampampams.insert('end', "A:\t" + str(round (popt[3],3)))
-							self.fit_parampampams.insert('end', "Mean:\t" + str(round(popt[4],3)))
-							self.fit_parampampams.insert('end', "Sigma:\t" + str(round(popt[5],3)))
-			
-					except:
-						tk.messagebox.showerror(title='Error', message=Message_generator())
-			
-			
-			
-			
-			
-					if (self.gaus_number == 3):
-			
-						popt,pcov = curve_fit(Gauss3, x, y)
-			
-						popt1 = popt[0:3]
-			
-						popt2 = popt[3:6]
-			
-						popt3 = popt[6:9]
-			
-						#print(popt1)
-						#print(popt2)
-						#print(popt3)
-			
-			
-						Plot_gp()
-			
-						gp.main.plot(x1, Gauss(x1, *popt1), color = 'orange', label='fit')
-			
-						gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
-			
-						gp.main.plot(x1, Gauss(x1, *popt3), color = 'orange', label='fit')
-			
-						gp.main.plot(x1, Gauss(x1, *popt2), color = 'orange', label='fit')
-			
-						gp.main.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
-			
-						gp.canvas3.draw()
-			
-						gp.figure3.tight_layout()
-			
-						self.fit_parampampams.delete(0,'end')"""
-
-
-
-	"""def How_many_gaus(self, event):
-			
-					self.gaus_number = int(self.Gauss_Fit.get())"""
 
 	def __init__(self, frame1, win_width, win_height, dpi_all):
 
@@ -2190,10 +1918,24 @@ class Diffusion_window :
 
 
 
+
+
+
 		data_list_raw[file_index].diff_fitting[rep_index, self.channel_index] = output_dict
 		#print(data_list_raw[file_index].diff_fitting)
 
 		#print(data_list_raw[file_index].diff_fitting)
+
+		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+
+			data_list_raw[file_index].N[rep_index, self.channel_index] = round(1/params["GN0"].value,3)
+			data_list_raw[file_index].cpm[rep_index, self.channel_index] = round(data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].count_rate/data_list_raw[file_index].N[rep_index, self.channel_index],3)
+
+			if self.fit_all_flag == False:
+
+				self.cpm_label.config(text = str(data_list_raw[file_index].cpm[rep_index, self.channel_index]))
+				self.N_label.config(text = str(data_list_raw[file_index].N[rep_index, self.channel_index]))
+				
 			
 
 
@@ -2460,6 +2202,20 @@ class Diffusion_window :
 				if self.list_of_params[i] in data_list_raw[file_index].diff_fitting[rep_index, self.channel_index].keys():
 					self.list_of_inits[i] = data_list_raw[file_index].diff_fitting[rep_index, self.channel_index][self.list_of_params[i]]
 
+		
+		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+			if 	data_list_raw[file_index].N[rep_index, self.channel_index] != None:
+
+				N = data_list_raw[file_index].N[rep_index, self.channel_index]
+			else:
+				N = 0
+
+			if 	data_list_raw[file_index].cpm[rep_index, self.channel_index] != None:
+
+				cpm = data_list_raw[file_index].cpm[rep_index, self.channel_index]
+			else:
+				cpm = 0
+
 		#print (self.list_of_inits)
 
 		Label_1 = tk.Label(self.frame004, text="Param")
@@ -2485,10 +2241,10 @@ class Diffusion_window :
 			self.fixed_list.append(tk.IntVar(value = 1))
 			thisdict = {
 						"Name": tk.Label(self.frame004, text=param),
-							"Init": tk.Entry(self.frame004, width = 5),
-							"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-2]),
-							"Min": tk.Entry(self.frame004, width = 5),
-							"Max": tk.Entry(self.frame004, width = 5),
+						"Init": tk.Entry(self.frame004, width = 5),
+						"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-2]),
+						"Min": tk.Entry(self.frame004, width = 5),
+						"Max": tk.Entry(self.frame004, width = 5),
 						}
 
 			self.full_dict[param] = thisdict
@@ -2507,6 +2263,20 @@ class Diffusion_window :
 			thisdict["Max"].insert(0,self.list_of_max[row_index-2])
 
 			row_index+=1
+
+		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+
+			self.N_label_l = tk.Label(self.frame004, text="N(FCS): ")
+			self.N_label_l.grid(row = row_index, column = 0, sticky = 'w')
+
+			self.N_label = tk.Label(self.frame004, text=str(round(N,2)))
+			self.N_label.grid(row = row_index, column = 1, columnspan = 3, sticky = 'w')
+
+			self.cpm_label_l = tk.Label(self.frame004, text="cpm (kHz): ")
+			self.cpm_label_l.grid(row = row_index+1, column = 0, sticky = 'w')
+
+			self.cpm_label = tk.Label(self.frame004, text=str(round(cpm,2)))
+			self.cpm_label.grid(row = row_index+1, column = 1, columnspan = 3, sticky = 'w')
 
 	def Curve_flags(self):
 
@@ -3344,6 +3114,8 @@ class Threshold_window:
 			
 			for k in range (len(yp1_raw)):
 				gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
+
+
 
 
 

@@ -22,6 +22,25 @@ class fcs_channel:
         self.auto_corr_arr = auto_corr_arr_arg
         self.short_name = short_name_arg
 
+        cr_list = []
+
+
+        ys = 0
+        counter = 1
+
+        for i in range(len(self.fluct_arr.x)):
+        
+            ys += self.fluct_arr.y[i]
+
+            if self.fluct_arr.x[i] >= counter:
+                cr_list.append(ys)
+                ys = 0
+                counter +=1
+
+        self.count_rate = np.mean(cr_list)/1000
+
+
+
 
 class fcs_cross:
     
@@ -51,10 +70,18 @@ class Full_dataset_fcs:
         self.binning = 1
         self.gp_fitting = [None] * repetitions_arg
         self.diff_fitting = {}
+        self.N = {}
+        self.cpm = {}
 
-        for i in range(self.datasets_list[0].channels_number + self.datasets_list[0].channels_number):
+        for i in range(self.datasets_list[0].channels_number + self.datasets_list[0].cross_number):
             for j in range(repetitions_arg):
                 self.diff_fitting[j, i] = None
+
+        for i in range(self.datasets_list[0].channels_number):
+            for j in range(repetitions_arg):
+                self.N[j, i] = None
+                self.cpm[j, i] = None
+
 
 
 
