@@ -596,10 +596,10 @@ def Plot_gp_diff():
 									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])"""
 
 		if output_file_name in thisdict_diff.keys():
-			thisdict_diff[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+			thisdict_diff[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, 0]["txy"])
 		else:
 			thisdict_diff[output_file_name] = []
-			thisdict_diff[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])
+			thisdict_diff[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, 0]["txy"])
 
 
 		if output_file_name in thisdict_gp.keys():
@@ -1805,47 +1805,39 @@ class Diffusion_window :
 			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
 
 
-		for file_index_i in range(len(data_list_raw)):
-			for rep_index_i in range (data_list_raw[file_index_i].repetitions): 
+
+		for file_index_i in range (len(data_list_raw)):
+			file_index = file_index_i
+			for rep_index_i in range (data_list_raw[file_index].repetitions): 
 				rep_index = rep_index_i
-				for channel_index_i in range(data_list_raw[file_index_i].datasets_list[rep_index].channels_number + data_list_raw[file_index_i].datasets_list[rep_index].cross_number):
-
-					print(file_index_i, rep_index_i, channel_index_i)
+				for channel_index_i in range(data_list_raw[file_index].datasets_list[rep_index].channels_number + data_list_raw[file_index].datasets_list[rep_index].cross_number):
 
 
+					if channel_index_i < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+						
+						if self.channels_flags[channel_index_i].get() == 1:
 
+							self.channel_index = channel_index_i
+							for param in self.list_of_params:
+								self.full_dict[param]["Init"].delete(0,"end")
+								self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 
-					if channel_index_i < data_list_raw[file_index_i].datasets_list[rep_index].channels_number:
-
-
-						if channel_index_i < len(self.channels_flags):
-							if self.channels_flags[channel_index_i].get() == 1:
-
-								self.channel_index = channel_index_i
-								for param in self.list_of_params:
-									self.full_dict[param]["Init"].delete(0,"end")
-									self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
-
-								self.Fit_corr_curve()
+							self.Fit_corr_curve()
 
 
 					else:
 
-						if channel_index_i < len(self.channels_flags):
+						if self.cross_flags[channel_index_i - data_list_raw[file_index].datasets_list[rep_index].channels_number].get() == 1:
 
-							if self.cross_flags[channel_index_i - data_list_raw[file_index_i].datasets_list[rep_index].channels_number].get() == 1:
+							self.channel_index = channel_index_i
+							for param in self.list_of_params:
+								self.full_dict[param]["Init"].delete(0,"end")
+								self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 
-								self.channel_index = channel_index_i
-								for param in self.list_of_params:
-									self.full_dict[param]["Init"].delete(0,"end")
-									self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
-
-								self.Fit_corr_curve()
+							self.Fit_corr_curve()
 
 
 
-
-					#self.Plot_curve()
 					
 
 		
