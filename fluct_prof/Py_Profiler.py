@@ -794,6 +794,7 @@ def Export_function():
 
 			line += "N" + "\t"
 			line += "cpm" + "\t"
+			line += "D" + "\t"
 
 
 			open_file.write(line + "\n")
@@ -808,8 +809,15 @@ def Export_function():
 
 					line += str(data_list_raw[file1].diff_fitting[rep1, channel][key]) + "\t"
 
-				line += str(data_list_raw[file1].N[rep1, channel]) + "\t"
-				line += str(data_list_raw[file1].cpm[rep1, channel]) + "\t"
+				
+				try:
+					line += str(data_list_raw[file1].N[rep1, channel]) + "\t"
+					line += str(data_list_raw[file1].cpm[rep1, channel]) + "\t"
+				except:
+					pass
+
+				line += str(data_list_raw[file1].diff_coeffs[rep1, channel]) + "\t"
+
 
 				open_file.write(line + "\n")
 
@@ -818,6 +826,8 @@ def Export_function():
 		open_file.write("GP data: \n")
 
 		rep0 = output_numbers_dict[file1][0]
+
+		line = "name\t"
 
 		for key in data_list_raw[file1].gp_fitting[rep0].keys():
 			line += key + "\t"
@@ -2080,15 +2090,23 @@ class Diffusion_window :
 
 		#print(data_list_raw[file_index].diff_fitting)
 
+		data_list_raw[file_index].diff_coeffs[rep_index, self.channel_index] = round(np.float64(self.Txy_entry.get()) * np.float64(self.D_cal_entry.get()) / params["txy"].value,3)
+
+		if self.fit_all_flag == False:
+
+			self.D_value.config(text = str(data_list_raw[file_index].diff_coeffs[rep_index, self.channel_index]))
+
 		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
 
 			data_list_raw[file_index].N[rep_index, self.channel_index] = round(1/params["GN0"].value,3)
 			data_list_raw[file_index].cpm[rep_index, self.channel_index] = round(data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].count_rate/data_list_raw[file_index].N[rep_index, self.channel_index],3)
+			
 
 			if self.fit_all_flag == False:
 
 				self.cpm_label.config(text = str(data_list_raw[file_index].cpm[rep_index, self.channel_index]))
 				self.N_label.config(text = str(data_list_raw[file_index].N[rep_index, self.channel_index]))
+				
 				
 			
 
@@ -2432,6 +2450,14 @@ class Diffusion_window :
 			self.cpm_label = tk.Label(self.frame004, text=str(round(cpm,2)))
 			self.cpm_label.grid(row = row_index+1, column = 1, columnspan = 3, sticky = 'w')
 
+			row_index+=2
+
+		self.D_label = tk.Label(self.frame004, text="D: ")
+		self.D_label.grid(row = row_index, column = 0, sticky = 'w')
+
+		self.D_value = tk.Label(self.frame004, text="0")
+		self.D_value.grid(row = row_index, column = 1, sticky = 'w')
+
 	def Curve_flags(self):
 
 		self.frame0003.destroy()
@@ -2660,8 +2686,28 @@ class Diffusion_window :
 		self.Fit_all_button_all = tk.Button(self.frame001, text="Fit all", command=self.Apply_to_all_all)
 		self.Fit_all_button_all.grid(row = 3, column = 1, sticky='ew')
 
+		self.Calibration_label = tk.Label(self.frame001, text="Calibration: ")
+		self.Calibration_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
+
+		self.D_cal_label = tk.Label(self.frame001, text="Diff coeff: ")
+		self.D_cal_label.grid(row = 5, column = 0, sticky = 'w')
+
+		self.D_cal_entry = tk.Entry(self.frame001, width = 9)
+		self.D_cal_entry.grid(row = 5, column = 1, sticky='w')
+
+		self.D_cal_entry.insert("end", str(430))
+
+		self.Txy_label = tk.Label(self.frame001, text="Diff time: ")
+		self.Txy_label.grid(row = 6, column = 0, sticky = 'w')
+
+
+		self.Txy_entry = tk.Entry(self.frame001, width = 9)
+		self.Txy_entry.grid(row = 6, column = 1, sticky='w')
+
+		self.Txy_entry.insert("end", str(0.025))
+
 		self.Table_label = tk.Label(self.frame001, text="Fitting parameters: ")
-		self.Table_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
+		self.Table_label.grid(row = 7, column = 0, columnspan = 2, sticky = 'w')
 
 
 
