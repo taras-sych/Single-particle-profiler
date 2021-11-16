@@ -811,6 +811,30 @@ def Export_function():
 				line += str(data_list_raw[file1].N[rep1, channel]) + "\t"
 				line += str(data_list_raw[file1].cpm[rep1, channel]) + "\t"
 
+				open_file.write(line + "\n")
+
+
+		open_file.write("\n")
+		open_file.write("GP data: \n")
+
+		rep0 = output_numbers_dict[file1][0]
+
+		for key in data_list_raw[file1].gp_fitting[rep0].keys():
+			line += key + "\t"
+
+		open_file.write(line + "\n")
+
+		for rep1 in output_numbers_dict[file1]:
+
+			line = "Repetition " + str(rep1 + 1) + "\t"
+
+			for key in data_list_raw[file1].gp_fitting[rep1].keys():
+
+				line += str(data_list_raw[file1].gp_fitting[rep1][key]) + "\t"
+
+
+			open_file.write(line + "\n")
+
 
 
 
@@ -1806,7 +1830,7 @@ class Diffusion_window :
 
 	def Apply_to_ticked(self):
 
-		print("Apply to ticked")
+		#print("Apply to ticked")
 
 		global file_index
 		global rep_index
