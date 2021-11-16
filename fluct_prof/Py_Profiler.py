@@ -2374,6 +2374,13 @@ class Diffusion_window :
 				if self.list_of_params[i] in data_list_raw[file_index].diff_fitting[rep_index, self.channel_index].keys():
 					self.list_of_inits[i] = data_list_raw[file_index].diff_fitting[rep_index, self.channel_index][self.list_of_params[i]]
 
+		if 	data_list_raw[file_index].diff_coeffs[rep_index, self.channel_index] != None:
+
+			diff_coef = data_list_raw[file_index].diff_coeffs[rep_index, self.channel_index]
+		else:
+			diff_coef = 0
+
+
 		
 		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
 			if 	data_list_raw[file_index].N[rep_index, self.channel_index] != None:
@@ -2455,7 +2462,7 @@ class Diffusion_window :
 		self.D_label = tk.Label(self.frame004, text="D: ")
 		self.D_label.grid(row = row_index, column = 0, sticky = 'w')
 
-		self.D_value = tk.Label(self.frame004, text="0")
+		self.D_value = tk.Label(self.frame004, text=str(round(diff_coef,2)))
 		self.D_value.grid(row = row_index, column = 1, sticky = 'w')
 
 	def Curve_flags(self):
