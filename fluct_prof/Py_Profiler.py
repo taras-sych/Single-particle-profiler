@@ -758,10 +758,63 @@ def Export_function():
 
 		open_file.write(output_file_name + "\n")
 
-		for rep1 in output_numbers_dict[file1]:
-			open_file.write(str(file1) + "\t" + str(rep1) + "\n")
+		open_file.write("Diffusion data: \n")
+
+		chan = {}
+
+
+		for channel in range(len(data_list_raw[file1].datasets_list[rep1].channels_list)):
+
+			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name].get() == 1:
+
+				chan[data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name] = channel
+
+
+		for i in range (len(data_list_raw[file1].datasets_list[rep1].cross_list)):
+
+			channel = i + len(data_list_raw[file1].datasets_list[rep1].channels_list)
+
+			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1:
+
+				chan[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name] = channel
 
 		
+		for name in chan.keys():
+
+			channel = chan[name]
+			open_file.write(name + "\n")
+
+			line = "name\t"
+
+			rep0 = output_numbers_dict[file1][0]
+
+			for key in data_list_raw[file1].diff_fitting[rep0, channel].keys():
+
+				line += key + "\t"
+
+			line += "N" + "\t"
+			line += "cpm" + "\t"
+
+
+			open_file.write(line + "\n")
+
+
+
+			for rep1 in output_numbers_dict[file1]:
+
+				line = "Repetition " + str(rep1 + 1) + "\t"
+
+				for key in data_list_raw[file1].diff_fitting[rep1, channel].keys():
+
+					line += str(data_list_raw[file1].diff_fitting[rep1, channel][key]) + "\t"
+
+				line += str(data_list_raw[file1].N[rep1, channel]) + "\t"
+				line += str(data_list_raw[file1].cpm[rep1, channel]) + "\t"
+
+
+
+
+
 		open_file.close()
 
 
