@@ -679,7 +679,72 @@ def Restruct_fun():
 
 
 def Export_function():
-	print(1)
+
+	global tree_list_name
+	global output_file_name
+	global initialdirectory
+
+	list1 = data_frame.tree.get_checked()
+
+
+
+	thisdict_gp = {}
+	thisdict_diff = {}
+
+	for index in list1:
+
+		num1, num = index.split('I')
+		
+
+		num = int(num, 16)
+
+		
+
+		sum1 = num 
+		file = 0
+		rep = 0
+		for i in range (len(data_list_raw)):
+			rep = 0
+			sum1-=1
+			file+=1
+			if sum1 == 0:
+				file1 = file
+				rep1 = rep
+
+			
+			for j in range (repetitions_list[i]):
+				sum1-=1
+				rep+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+
+
+		if rep1 == 0:
+			rep1+=1
+
+
+		
+
+
+		output_file_name = tree_list_name[file1-1][:-4]
+
+
+
+
+		file1 = file1-1
+		rep1 = rep1-1
+
+		filename = initialdirectory + "\\" + output_file_name[file_index] + ".xlsx"
+
+		open_file = open (filename, "w")
+		open_file.write(output_file_name[file_index], "\n")
+		open_file.write(file1, rep1, "\n")
+		open_file.close()
+
+
+
 
 class Restruct_window:
 
@@ -1676,7 +1741,6 @@ class Diffusion_window :
 		list1 = self.tree.get_checked()
 
 
-		print(list1)
 		for index in list1:
 
 			num1, num = index.split('I')
