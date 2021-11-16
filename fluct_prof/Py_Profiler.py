@@ -680,6 +680,8 @@ def Restruct_fun():
 
 def Export_function():
 
+	output_numbers_dict = {}
+
 	global tree_list_name
 	global output_file_name
 	global initialdirectory
@@ -728,7 +730,7 @@ def Export_function():
 		
 
 
-		output_file_name = tree_list_name[file1-1][:-4]
+		
 
 
 
@@ -736,11 +738,30 @@ def Export_function():
 		file1 = file1-1
 		rep1 = rep1-1
 
-		filename = initialdirectory + "\\" + output_file_name[file_index] + ".xlsx"
+		if file1 in output_numbers_dict.keys():
+			output_numbers_dict[file1].append(rep1)
+		else:
+			output_numbers_dict[file1] = []
+			output_numbers_dict[file1].append(rep1)
+
+	
+
+	for file1 in output_numbers_dict.keys():
+
+		output_file_name, str2 = tree_list_name[file1].split(".")
+
+
+
+		filename = initialdirectory + "\\" + output_file_name + ".txt"
 
 		open_file = open (filename, "w")
-		open_file.write(output_file_name[file_index], "\n")
-		open_file.write(file1, rep1, "\n")
+
+		open_file.write(output_file_name + "\n")
+
+		for rep1 in output_numbers_dict[file1]:
+			open_file.write(str(file1) + "\t" + str(rep1) + "\n")
+
+		
 		open_file.close()
 
 
