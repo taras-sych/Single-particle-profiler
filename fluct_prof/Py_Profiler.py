@@ -1786,6 +1786,19 @@ class GP_Diff_frame:
 
 class Diffusion_window :
 
+	def Save_plot_data(self):
+		filename = initialdirectory + "\\Plots_diffusion.txt"
+
+		open_file = open(filename, 'w')
+
+		for key in self.save_plot_dict.keys():
+			open_file.write(str(key) + "\n")
+
+			for i in range(len(self.save_plot_dict[key].x)):
+				open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+		open_file.close()
+
 	def Apply_to_all(self):
 	
 		global rep_index
@@ -2156,6 +2169,8 @@ class Diffusion_window :
 
 	def Plot_curve(self):
 
+		self.save_plot_dict = {}
+
 
 		global file_index
 		global rep_index
@@ -2177,6 +2192,8 @@ class Diffusion_window :
 				if self.fit_all_flag == False:
 					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name)
 
+					self.save_plot_dict [data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name] = fcs_importer.XY_plot(x1, y1)
+
 				if 	data_list_raw[file_index].diff_fitting[rep_index, i] != None:
 
 					popt = []
@@ -2190,9 +2207,18 @@ class Diffusion_window :
 						
 						self.curves.plot(x1, Corr_curve_2d(x1, *popt), label = "Fit")
 
+						key = str(data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, Corr_curve_2d(x1, *popt))
+
 					if len(popt) == 8:
 						
 						self.curves.plot(x1, Corr_curve_3d(x1, *popt), label = "Fit")
+
+						key = str(data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, Corr_curve_3d(x1, *popt))
+
 
 
 
@@ -2633,6 +2659,9 @@ class Diffusion_window :
 
 		self.figure5.tight_layout()
 
+		self.Export_plot_button = tk.Button(self.frame000, text="Save plot data", command=self.Save_plot_data)
+		self.Export_plot_button.pack(side = "top", anchor = "nw")
+
 
 
 		
@@ -2747,6 +2776,19 @@ class Diffusion_window :
 
 
 class Threshold_window:
+
+	def Save_plot_data(self):
+		filename = initialdirectory + "\\Plots_gp.txt"
+
+		open_file = open(filename, 'w')
+
+		for key in self.save_plot_dict.keys():
+			open_file.write(str(key) + "\n")
+
+			for i in range(len(self.save_plot_dict[key].x)):
+				open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+		open_file.close()
 
 	def Apply_to_all(self):
 
@@ -2982,22 +3024,32 @@ class Threshold_window:
 
 			if self.Components.get() == '1 component':
 				self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt))
 
 			if self.Components.get() == '2 components':
 				self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
+				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, Gauss2(x1, *popt))
 				popt1 = popt[:3]
 				popt2 = popt[3:6]
 				self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
 				self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
 
+				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt1))
+				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt2))
+
 			if self.Components.get() == '3 components':
 				self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
+				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, Gauss3(x1, *popt))
 				popt1 = popt[:3]
 				popt2 = popt[3:6]
 				popt3 = popt[6:9]
 				self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
 				self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
 				self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
+
+				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt1))
+				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt2))
+				self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt3))
 
 
 
@@ -3042,6 +3094,8 @@ class Threshold_window:
 
 
 	def Peaks (self):
+
+		self.save_plot_dict = {}
 
 
 		if self.fit_all_flag == False:
@@ -3293,12 +3347,15 @@ class Threshold_window:
 					if bins_1 == 0:
 						bins_1 = 1
 					self.hist1.hist(yh1, bins = bins_1)
+
+					self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
+					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
 					
 
 				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
 					
 					self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
-					self.peaks.hlines(th2, min(x1), max(x1), color = 'green', zorder=2)
+					self.peaks.hlines(th2, min(x2), max(x2), color = 'green', zorder=2)
 
 					if (self.var.get() == 1):
 						self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
@@ -3307,6 +3364,9 @@ class Threshold_window:
 					if bins_2 == 0:
 						bins_2 = 1
 					self.hist1.hist(yh2, bins = bins_2)
+
+					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
+					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
 
 				"""if change_normal == False:
 														self.peaks.set_xlim(main_xlim)
@@ -3341,6 +3401,8 @@ class Threshold_window:
 			for ii in range (len(bins)-1):
 				self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
 
+			self.save_plot_dict["gp histogram"] = fcs_importer.XY_plot(self.x_bins, self.n)
+
 
 			if self.fit_all_flag == False:
 				self.gp_hist.set_title("GP histogram")
@@ -3368,17 +3430,26 @@ class Threshold_window:
 						#print("1 comp")
 						self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
 
+						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt))
+						print(self.save_plot_dict.keys())
+
 					if self.Components.get() == '2 components':
 						#print("2 comp")
 						self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
+						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, Gauss2(x1, *popt))
+
 						popt1 = popt[:3]
 						popt2 = popt[3:6]
 						
 						self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
 						self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
 
+						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt1))
+						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt2))
+
 					if self.Components.get() == '3 components':
 						self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
+						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, Gauss3(x1, *popt))
 						#print("3 comp")
 						popt1 = popt[:3]
 						popt2 = popt[3:6]
@@ -3387,6 +3458,10 @@ class Threshold_window:
 						self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
 						self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
 						self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
+
+						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt1))
+						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt2))
+						self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt3))
 
 
 
@@ -3777,6 +3852,9 @@ class Threshold_window:
 	def __init__(self, win_width, win_height, dpi_all):
 
 
+		
+		self.save_plot_dict = {}
+
 		self.fit_all_flag = False
 		self.normalization_index = "z-score"
 
@@ -3879,6 +3957,9 @@ class Threshold_window:
 		self.canvas5.get_tk_widget().pack()
 
 		self.figure5.tight_layout()
+
+		self.Export_plot_button = tk.Button(self.frame000, text="Save plot data", command=self.Save_plot_data)
+		self.Export_plot_button.pack(side = "top", anchor = "nw")
 
 		self.channel_pairs = []
 
