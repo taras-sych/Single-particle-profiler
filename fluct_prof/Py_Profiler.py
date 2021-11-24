@@ -3337,11 +3337,11 @@ class Threshold_window:
 
 
 				if which_channel == "channel 1" or which_channel == "both or" or which_channel == "both and":
-					self.peaks.plot(x1, y1, '#1f77b4', zorder=1)
-					self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
+					self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
+					#self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
 					
 					if (self.var.get() == 1):
-						self.peaks.plot(xp1, yp1, "x", color = 'magenta', zorder = 3)
+						self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
 
 					bins_1 = int(np.sqrt(len(yh1)))
 					if bins_1 == 0:
@@ -3354,11 +3354,11 @@ class Threshold_window:
 
 				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
 					
-					self.peaks.plot(x2, y2, '#ff7f0e', zorder=1)
-					self.peaks.hlines(th2, min(x2), max(x2), color = 'green', zorder=2)
+					self.peaks.plot(x2, y2_raw, '#ff7f0e', zorder=1)
+					#self.peaks.hlines(th2, min(x2), max(x2), color = 'green', zorder=2)
 
 					if (self.var.get() == 1):
-						self.peaks.plot(xp2, yp2, "x", color = 'green', zorder = 3)
+						self.peaks.plot(xp2, yp2_raw, "x", color = 'green', zorder = 3)
 
 					bins_2 = int(np.sqrt(len(yh2)))
 					if bins_2 == 0:
