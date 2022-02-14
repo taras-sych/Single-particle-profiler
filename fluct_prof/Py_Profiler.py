@@ -2778,7 +2778,12 @@ class Diffusion_window :
 class Threshold_window:
 
 	def Save_plot_data(self):
-		filename = initialdirectory + "\\Plots_gp.txt"
+
+		global tree_list_name
+		global file_index
+
+		name = tree_list_name[file_index]
+		filename = initialdirectory + name + "\\_Plots_gp.txt"
 
 		open_file = open(filename, 'w')
 
@@ -3777,6 +3782,8 @@ class Threshold_window:
 
 		file_index = file1-1
 		rep_index = rep1-1
+
+		self.current_file_name = output_file_name
 
 		current_repetitions_number = data_list_raw[file_index].repetitions
 
