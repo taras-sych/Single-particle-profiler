@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import font as tkFont
 import matplotlib.pyplot as plt
 
-
+import csv
 
 import lmfit
 
@@ -27,6 +27,8 @@ from fluct_prof import Correlation as corr_py
 import codecs
 
 import os
+
+from datetime import datetime
 
 from scipy import stats
 
@@ -680,13 +682,36 @@ def Restruct_fun():
 
 def Export_function():
 
-	output_numbers_dict = {}
 
 	global tree_list_name
 	global output_file_name
 	global initialdirectory
 
+	now = datetime.now()
+	str1, str2 = str(now).split(".")
+	name_dir = str1 + " Analysis"
+
+	name_dir = name_dir.replace(":", "_")
+
+	initialdirectory
+
+	directory = os.path.join(initialdirectory, name_dir) 
+    
+
+	os.mkdir(directory) 
+
+
+
+
+	output_numbers_dict = {}
+
+
+
+
+
 	list1 = data_frame.tree.get_checked()
+
+
 
 
 
@@ -744,15 +769,39 @@ def Export_function():
 			output_numbers_dict[file1] = []
 			output_numbers_dict[file1].append(rep1)
 
-	
+	summary_diffusion_dict = {}
+	summary_gp_dict = {}
+
+
+	#filename = directory + os.path.sep + "Summary_Diffusion.csv"
+	#summary_diffusion_file = open(filename, 'w')
+
+	#filename = directory + os.path.sep + "Summary_Diffusion_Time.csv"
+	#summary_time_file = open(filename, 'w')
+
+	#filename = directory + os.path.sep + "Summary_GP.csv"
+	#summary_GP_file = open(filename, 'w')
+
+	#filename = directory + os.path.sep + "Clustering.csv"
+	#clustering_file = open(filename, 'w')
+
+	heading = ""
+	heading_line_1 = ""
+	heading_line_2 = ""
 
 	for file1 in output_numbers_dict.keys():
+
+		heading += str(file1)
+
+		heading_line_1 += str(file1) + "\t\t\t"
+
+		heading_line_2 += "GP" + "\t" + "Diffusion_coef" + "\t" + "Diffusion_time" + "\t"
 
 		output_file_name, str2 = tree_list_name[file1].split(".")
 
 
 
-		filename = initialdirectory + "\\" + output_file_name + ".txt"
+		filename = directory + os.path.sep + output_file_name + ".txt"
 
 		open_file = open (filename, "w")
 
@@ -2783,7 +2832,7 @@ class Threshold_window:
 		global file_index
 
 		name = tree_list_name[file_index]
-		filename = initialdirectory + name + "\\_Plots_gp.txt"
+		filename = initialdirectory + "\\" +  name + "_Plots_gp.txt"
 
 		open_file = open(filename, 'w')
 
@@ -3218,8 +3267,8 @@ class Threshold_window:
 
 				if self.normalization_index == "z-score":
 
-					th1 = 3
-					th2 = 3
+					th1 = 2
+					th2 = 2
 
 				if self.normalization_index == "manual":
 
@@ -3353,8 +3402,8 @@ class Threshold_window:
 						bins_1 = 1
 					self.hist1.hist(yh1, bins = bins_1)
 
-					self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
-					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
+					#self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
+					#self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
 					
 
 				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
@@ -3370,8 +3419,8 @@ class Threshold_window:
 						bins_2 = 1
 					self.hist1.hist(yh2, bins = bins_2)
 
-					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
-					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
+					#self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
+					#self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
 
 				"""if change_normal == False:
 														self.peaks.set_xlim(main_xlim)
@@ -3587,11 +3636,11 @@ class Threshold_window:
 
 		if self.normalization_index == "z-score":
 			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(3))
+			self.ch1_th.insert(0,str(2))
 
 			
 			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(3))
+			self.ch2_th.insert(0,str(2))
 
 		if self.normalization_index == "manual":
 
@@ -3783,7 +3832,7 @@ class Threshold_window:
 		file_index = file1-1
 		rep_index = rep1-1
 
-		self.current_file_name = output_file_name
+	
 
 		current_repetitions_number = data_list_raw[file_index].repetitions
 
@@ -4060,7 +4109,7 @@ class Threshold_window:
 		self.ch1_th = tk.Entry(self.frame001, width = 9)
 		self.ch1_th.grid(row = 5, column = 1, sticky='w')
 
-		self.ch1_th.insert("end", str(3))
+		self.ch1_th.insert("end", str(2))
 
 		self.ch2_label = tk.Label(self.frame001, text="channel 2: ")
 		self.ch2_label.grid(row = 6, column = 0, sticky='w')
@@ -4070,7 +4119,7 @@ class Threshold_window:
 		self.ch2_th = tk.Entry(self.frame001, width = 9)
 		self.ch2_th.grid(row = 6, column = 1, sticky='w')
 
-		self.ch2_th.insert("end", str(3))
+		self.ch2_th.insert("end", str(2))
 
 
 		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
