@@ -3044,6 +3044,7 @@ class Threshold_window:
 		params = o1.params
 		print ("Chi_Sqr = ", o1.chisqr)
 		print ("Reduced Chi_Sqr = ", o1.redchi)
+		print ("Score = ", o1.bic)
 		popt = []
 		for param in self.list_of_params:
 			
