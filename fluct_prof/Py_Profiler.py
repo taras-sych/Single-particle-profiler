@@ -1563,15 +1563,22 @@ class Left_frame :
 
 
 		self.frame02 = tk.Frame(frame0)
-		self.frame02.pack(side="top", fill="x")
+		self.frame02.pack(side="left", fill="x", anchor = "nw")
+
+		self.frame04 = tk.Frame(frame0)
+		self.frame04.pack(side="left", fill="x", anchor = "nw")
+
+
+		self.frame03 = tk.Frame(self.frame02)
+		self.frame03.pack(side="top", fill="x")
 
 
 
-		self.scrollbar = tk.Scrollbar(self.frame02)
+		self.scrollbar = tk.Scrollbar(self.frame03)
 		self.scrollbar.pack(side = "left", fill = "y")
 
 
-		self.Datalist = tk.Listbox(self.frame02, width = 100, height = 10)
+		self.Datalist = tk.Listbox(self.frame03, width = 100, height = 10)
 		self.Datalist.pack(side = "left", anchor = "nw")
 		
 		
@@ -1606,8 +1613,10 @@ class Left_frame :
 		self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)
 		"""
 
+
+
 		self.frame023 = tk.Frame(self.frame02)
-		self.frame023.pack(side="top", fill="x")
+		self.frame023.pack(side="left", fill="x")
 
 
 		self.Restruct_button = tk.Button(self.frame023, text="Restructure data", command=Restruct_fun)
@@ -1628,21 +1637,20 @@ class Left_frame :
 
 
 
-		self.frame04 = tk.Frame(frame0)
-		self.frame04.pack(side="top", fill="x")
-
-
-
-		fig_height = (win_height/1.89 - self.Datalist.winfo_height() - self.Import_Button.winfo_height())/dpi_all
-		self.figure1 = Figure(figsize=(win_width/(2*dpi_all),fig_height), dpi = dpi_all)
 
 
 
 
-		gs = self.figure1.add_gridspec(2, 1)
+		#fig_height = (win_height/1.89 - self.Datalist.winfo_height() - self.Import_Button.winfo_height())/dpi_all
+		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
 
 
-		self.traces = self.figure1.add_subplot(gs[:1, 0])
+
+
+		gs = self.figure1.add_gridspec(3, 2)
+
+
+		self.traces = self.figure1.add_subplot(gs[:1, :2])
 
 		self.traces.set_title("Intensity traces")
 
@@ -1650,15 +1658,31 @@ class Left_frame :
 		self.traces.set_ylabel('intensity (a.u.)')
 		self.traces.set_xlabel('Time (s)')
 
-		self.corr = self.figure1.add_subplot(gs[1, 0])
+		
 
 
+		self.corr = self.figure1.add_subplot(gs[1, :2])
 
 		self.corr.set_title("Correlation curves")
 
 		self.corr.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.corr.set_ylabel('G (tau)')
 		self.corr.set_xlabel('Delay time')
+
+
+		self.diff_plot = self.figure1.add_subplot(gs[2, 0])
+
+		self.diff_plot.set_title("Diffusion")
+		self.diff_plot.set_ylabel('Diff. Coeff.')
+		
+
+
+
+		self.gp_plot = self.figure1.add_subplot(gs[2, 1])
+
+		self.gp_plot.set_title("General Polarization")
+		self.gp_plot.set_ylabel('GP')
+
 
 
 
@@ -1738,7 +1762,7 @@ class Diff_frame :
 		self.frame12.pack(side="top", fill="x")
 
 
-		self.figure3 = Figure(figsize=(win_width/(2*dpi_all),win_width/(2.25*dpi_all)), dpi = dpi_all)
+		self.figure3 = Figure(figsize=(win_width/(4*dpi_all),win_width/(4.25*dpi_all)), dpi = dpi_all)
 		self.main = self.figure3.add_subplot(1, 1, 1)
 
 		self.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
@@ -4329,8 +4353,8 @@ root.title("PFF analysis")
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
 
-win_width = round(0.9 * screen_width)
-win_height = round (0.9 * screen_height)
+win_width = round(0.5 * screen_width)
+win_height = round (0.8 * screen_height)
 
 fontsize = round(win_width/85)
 
@@ -4343,37 +4367,41 @@ root.geometry(line)
 
 dpi_all = 75
 
-frame0 = tk.LabelFrame(root)
-frame0.pack(side = "left", anchor = "nw", expand =1, fill=tk.BOTH)
-frame0.config(bd=0, width = round(win_width/2), height = win_height)
-frame0.grid_propagate(0)
-
-tabs = ttk.Notebook(root, width=round(win_width/2), height=win_height, padding = 0)
+tabs = ttk.Notebook(root, width=win_width, height=win_height, padding = 0)
 
 tab = []
 
+frame0 = tk.Frame(tabs)
+frame1 = tk.Frame(tabs)
 
-frame1=ttk.Frame(tabs)
-frame4 = ttk.Frame(tabs)
-frame5 = ttk.Frame(tabs)
-frame6 = ttk.Frame(tabs)
 
-tabs.add(frame1, text = "Diffusion plot")
-tabs.add(frame4, text = "GP plot")
-tabs.add(frame5, text = "Diffusion vs GP")
-tabs.add(frame6, text = "Dot plot")
-tabs_number = 4;
+frame0_l = tk.LabelFrame(frame0)
+frame0_l.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
+frame0_l.config(bd=0, width = round(win_width * 0.5), height = win_height)
+frame0_l.grid_propagate(0)
+
+frame0_r = tk.LabelFrame(frame0)
+frame0_r.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
+frame0_r.config(bd=0, width = round(win_width * 0.5), height = win_height)
+frame0_r.grid_propagate(0)
+
+
+
+tabs.add(frame0, text = "Point FCS")
+tabs.add(frame1, text = "Scanning FCS")
+
+tabs_number = 2;
 
 tabs.pack(side = "left", anchor = "nw")
 
 
 
-data_frame = Left_frame(frame0, win_width, win_height, dpi_all )
+data_frame = Left_frame(frame0_l, win_width, win_height, dpi_all )
 
 #ffp = FFP_frame(frame1, win_width, win_height, dpi_all)
 
-diff = Diff_frame(frame1, win_width, win_height, dpi_all)
-gp = GP_frame(frame4, win_width, win_height, dpi_all)
-gp_diff = GP_Diff_frame(frame5, win_width, win_height, dpi_all)
+#diff = Diff_frame(frame0_r, win_width, win_height, dpi_all)
+#gp = GP_frame(frame4, win_width, win_height, dpi_all)
+#gp_diff = GP_Diff_frame(frame5, win_width, win_height, dpi_all)
 
 root.mainloop()
