@@ -1310,15 +1310,23 @@ class Left_frame :
 
 		self.corr.cla()
 
+
+
 		for i in range (datasets_pos.datasets_list[rep].channels_number): 
 
-			self.traces.plot(datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.x, datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.y, label = datasets_pos.datasets_list[rep].channels_list[i].short_name)
+			
 
-			self.corr.plot(datasets_pos.datasets_list[rep].channels_list[i].auto_corr_arr.x, datasets_pos.datasets_list[rep].channels_list[i].auto_corr_arr.y, label = datasets_pos.datasets_list[rep].channels_list[i].short_name)
+			if self.channels_flags[datasets_pos.datasets_list[rep].channels_list[i].short_name].get() == 1:
+
+				self.traces.plot(datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.x, datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.y, label = datasets_pos.datasets_list[rep].channels_list[i].short_name)
+
+				self.corr.plot(datasets_pos.datasets_list[rep].channels_list[i].auto_corr_arr.x, datasets_pos.datasets_list[rep].channels_list[i].auto_corr_arr.y, label = datasets_pos.datasets_list[rep].channels_list[i].short_name)
 
 		for i in range (datasets_pos.datasets_list[rep].cross_number):
 
-			self.corr.plot(datasets_pos.datasets_list[rep].cross_list[i].cross_corr_arr.x, datasets_pos.datasets_list[rep].cross_list[i].cross_corr_arr.y, label = datasets_pos.datasets_list[rep].cross_list[i].short_name)
+			if self.channels_flags[datasets_pos.datasets_list[rep].cross_list[i].short_name].get() == 1:
+
+				self.corr.plot(datasets_pos.datasets_list[rep].cross_list[i].cross_corr_arr.x, datasets_pos.datasets_list[rep].cross_list[i].cross_corr_arr.y, label = datasets_pos.datasets_list[rep].cross_list[i].short_name)
 
 
 		
@@ -1446,6 +1454,17 @@ class Left_frame :
 		self.value_label.destroy()
 
 
+
+	def Select_Unselect(self):
+
+		global file_index
+		global rep_index
+
+		self.Plot_this_data(data_list_raw[file_index], rep_index)
+
+		root.update()
+
+
 	def Plot_data(self, event):
 
 		start = time.time()
@@ -1506,7 +1525,7 @@ class Left_frame :
 		rep = rep1-1
 
 
-		diff.Curve_flags()
+		data_frame.Curve_flags()
 
 		
 
@@ -1541,6 +1560,44 @@ class Left_frame :
 		data_list_current = []
 		tree_list = []
 		tree_list_name = []
+
+
+	def Curve_flags(self):
+
+		self.frame0003.destroy()
+
+		self.frame0003 = tk.Frame(self.frame024)
+		self.frame0003.pack(side = "left", anchor = "nw")
+
+		self.flags_dict = {}
+		self.channels_flags = {}
+		self.cross_flags = []
+		column_counter = 0
+
+		channels_to_display = 0
+
+		for i in range (len(data_list_raw)):
+			if data_list_raw[i].datasets_list[0].channels_number > channels_to_display:
+				channels_to_display = data_list_raw[i].datasets_list[0].channels_number
+				file_index_local = i
+
+
+		for item in data_list_raw[file_index_local].datasets_list[rep_index].channels_list:
+			str1, str2 = item.short_name.split(" ")
+			very_short_name = "ch0" + str2
+			self.channels_flags[item.short_name] = tk.IntVar(value=1)
+			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame0003, text=very_short_name, variable=self.channels_flags[item.short_name], command = self.Select_Unselect)
+			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+			column_counter +=1
+
+		for item in data_list_raw[file_index_local].datasets_list[rep_index].cross_list:
+			str1, str2 = item.short_name.split(" vs ")
+			str3, str4 = str1.split(" ")
+			very_short_name = "ch" + str4 + str2
+			self.channels_flags[item.short_name] = tk.IntVar(value=1)
+			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame0003, text=very_short_name, variable=self.channels_flags[item.short_name], command = self.Select_Unselect)
+			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+			column_counter +=1
 
 
 	def __init__ (self, frame0, win_width, win_height, dpi_all):
@@ -1578,7 +1635,7 @@ class Left_frame :
 		self.scrollbar.pack(side = "left", fill = "y")
 
 
-		self.Datalist = tk.Listbox(self.frame03, width = 100, height = 10)
+		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10)
 		self.Datalist.pack(side = "left", anchor = "nw")
 		
 		
@@ -1594,26 +1651,16 @@ class Left_frame :
 		self.tree.bind('<<TreeviewSelect>>', self.Plot_data)
 
 		self.Datalist.config(width = 100, height = 10)
-		"""self.frame021 = tk.Frame(self.frame02)
-		self.frame021.pack(side="top", fill="x")
 
-		self.Norm_button = tk.Button(self.frame021, text="Normalize", command=self.Normalize)
-		self.Norm_button.grid(row = 0, column = 0)
+		self.frame024 = tk.Frame(self.frame02)
+		self.frame024.pack(side = "top", fill = "x", anchor='nw')
 
-		self.Raw_button = tk.Button(self.frame021, text="Restore raw", command=self.Restore)
-		self.Raw_button.grid(row = 0, column = 1)
-
-		self.Normalization = ttk.Combobox(self.frame021,values = ["z-score", "mean"] )
-		self.Normalization.config(state = "readonly")
-		#Threshold.config(font=helv36)
-		self.Normalization.grid(row = 0, column = 2)
-
-		self.Normalization.set("z-score")
-
-		self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)
-		"""
+		self.frame0003 = tk.Frame(self.frame024)
+		self.frame0003.pack(side = "left", fill = "x")
 
 
+		#self.chkbtn = tk.Checkbutton(self.frame0003, text="ch1", variable=1, command=Norm)
+		#self.chkbtn.grid(row = 0, column = 0, sticky='w')
 
 		self.frame023 = tk.Frame(self.frame02)
 		self.frame023.pack(side="left", fill="x")
@@ -1634,14 +1681,6 @@ class Left_frame :
 		self.Output_button = tk.Button(self.frame023, text="Output", command=Export_function)
 		self.Output_button.grid(row = 4, column = 0, sticky="W")
 
-
-
-
-
-
-
-
-		#fig_height = (win_height/1.89 - self.Datalist.winfo_height() - self.Import_Button.winfo_height())/dpi_all
 		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
 
 
@@ -2417,7 +2456,7 @@ class Diffusion_window :
 
 			file_index = file1-1
 
-			self.Curve_flags()
+		self.Curve_flags()
 		
 		rep_index = rep1-1
 
@@ -2672,24 +2711,6 @@ class Diffusion_window :
 		self.frame0003 = tk.Frame(self.frame003)
 		self.frame0003.pack(side = "top", anchor = "nw")
 
-		self.Curve_flags()
-
-		"""self.ch_01_var = tk.IntVar(value=1)
-								self.ch_02_var = tk.IntVar(value=1)
-								self.ch_12_var = tk.IntVar(value=1)
-								self.ch_21_var = tk.IntVar(value=1)"""
-
-		"""self.CH_01=tk.Checkbutton(self.frame003, text="CH_01", variable=self.ch_01_var, command=self.Plot_curve)
-								self.CH_01.grid(row = 0, column = 0, sticky='w')
-						
-								self.CH_02=tk.Checkbutton(self.frame003, text="CH_02", variable=self.ch_02_var, command=self.Plot_curve)
-								self.CH_02.grid(row = 0, column = 1, sticky='w')
-						
-								self.CH_12=tk.Checkbutton(self.frame003, text="CH_12", variable=self.ch_12_var, command=self.Plot_curve)
-								self.CH_12.grid(row = 0, column = 2, sticky='w')
-						
-								self.CH_21=tk.Checkbutton(self.frame003, text="CH_21", variable=self.ch_21_var, command=self.Plot_curve)
-								self.CH_21.grid(row = 0, column = 3, sticky='w')"""
 
 
 		self.frame001 = tk.Frame(self.frame002)
@@ -4347,7 +4368,7 @@ total_channels_list = []
 
 
 root = tk.Tk()
-root.title("PFF analysis")
+root.title("FCS all inclusive")
 
 
 screen_width = root.winfo_screenwidth()
@@ -4378,12 +4399,12 @@ frame1 = tk.Frame(tabs)
 frame0_l = tk.LabelFrame(frame0)
 frame0_l.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
 frame0_l.config(bd=0, width = round(win_width * 0.5), height = win_height)
-frame0_l.grid_propagate(0)
+frame0_l.grid_propagate(1)
 
 frame0_r = tk.LabelFrame(frame0)
 frame0_r.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
 frame0_r.config(bd=0, width = round(win_width * 0.5), height = win_height)
-frame0_r.grid_propagate(0)
+frame0_r.grid_propagate(1)
 
 
 
