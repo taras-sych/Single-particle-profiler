@@ -2166,7 +2166,7 @@ class Diffusion_window :
 		params = lmfit.Parameters()
 
 		row_index = 1
-		for param in self.list_of_params:
+		for param in self.full_dict.keys():
 
 			params.add(param, 
 				float(self.full_dict[param]["Init"].get()), 
@@ -2252,7 +2252,7 @@ class Diffusion_window :
 
 		param_list = []
 
-		for param in self.list_of_params:
+		for param in params.keys():
 
 			param_list.append( np.float64(params[param].value))
 
@@ -2562,6 +2562,7 @@ class Diffusion_window :
 						"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-2]),
 						"Min": tk.Entry(self.frame004, width = 5),
 						"Max": tk.Entry(self.frame004, width = 5),
+						#"fixed": tk.IntVar(value = 1)
 						}
 
 			self.full_dict[param] = thisdict
