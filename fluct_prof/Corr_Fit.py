@@ -27,7 +27,7 @@ def Corr_curve_2d(tc, offset, GN0, A1, txy1, alpha1, B1, tauT1):
 	return offset + GN0 * G_Diff * G_T
 
 
-def Fit_Curve():
+def Fit_Curve(full_dict):
 
 
 	params = lmfit.Parameters()
@@ -36,15 +36,15 @@ def Fit_Curve():
 	for param in list_of_params:
 
 		params.add(param, 
-			float(self.full_dict[param]["Init"].get()), 
+			float(full_dict[param]["Init"].get()), 
 			vary = self.fixed_list[row_index-1].get(), 
-			min = float(self.full_dict[param]["Min"].get()), 
-			max = float(self.full_dict[param]["Max"].get()))
+			min = float(full_dict[param]["Min"].get()), 
+			max = float(full_dict[param]["Max"].get()))
 
 		row_index+=1
 
 
-def resid (self, params, x, ydata ):
+def resid (params, x, ydata ):
 
 	param_list = []
 

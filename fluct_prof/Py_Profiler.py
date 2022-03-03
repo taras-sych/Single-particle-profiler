@@ -2562,7 +2562,7 @@ class Diffusion_window :
 						"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-2]),
 						"Min": tk.Entry(self.frame004, width = 5),
 						"Max": tk.Entry(self.frame004, width = 5),
-						#"fixed": tk.IntVar(value = 1)
+						"fixed": tk.IntVar(value = 1)
 						}
 
 			self.full_dict[param] = thisdict
