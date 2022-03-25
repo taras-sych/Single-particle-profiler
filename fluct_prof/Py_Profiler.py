@@ -271,7 +271,7 @@ def Plot_main():
 
 def Plot_gp():
 	gp_list = []
-	gp.main.cla()
+	data_frame.gp_plot.cla()
 
 	global tree_list_name
 	global output_file_name
@@ -328,72 +328,72 @@ def Plot_gp():
 		rep1 = rep1-1
 
 
-		
+		if data_list_raw[file1].gp_fitting[rep1] != None:
 
-		if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 3:
-
-
-			if output_file_name in thisdict.keys():
-
-				thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
-			else:
-				thisdict[output_file_name] = []
-				thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
-
-		if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 6:
-
-			key = output_file_name + " peak 1"
+			if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 3:
 
 
-			if key in thisdict.keys():
+				if output_file_name in thisdict.keys():
 
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
-			else:
-				thisdict[key] = []
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+					thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+				else:
+					thisdict[output_file_name] = []
+					thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
-			key = output_file_name + " peak 2"
+			if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 6:
 
-
-			if key in thisdict.keys():
-
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
-			else:
-				thisdict[key] = []
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+				key = output_file_name + " peak 1"
 
 
-		if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 9:
+				if key in thisdict.keys():
 
-			key = output_file_name + " peak 1"
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
 
-
-			if key in thisdict.keys():
-
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
-			else:
-				thisdict[key] = []
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
-
-			key = output_file_name + " peak 2"
+				key = output_file_name + " peak 2"
 
 
-			if key in thisdict.keys():
+				if key in thisdict.keys():
 
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
-			else:
-				thisdict[key] = []
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
-
-			key = output_file_name + " peak 3"
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
 
 
-			if key in thisdict.keys():
+			if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 9:
 
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean3"])
-			else:
-				thisdict[key] = []
-				thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean3"])
+				key = output_file_name + " peak 1"
+
+
+				if key in thisdict.keys():
+
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+
+				key = output_file_name + " peak 2"
+
+
+				if key in thisdict.keys():
+
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+
+				key = output_file_name + " peak 3"
+
+
+				if key in thisdict.keys():
+
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean3"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean3"])
 
 		
 		
@@ -407,21 +407,22 @@ def Plot_gp():
 		vals.append(thisdict[key])
 
 
-	
-	#sns.axlabel( ylabel="Diffusion time", fontsize=16)
-	sns.boxplot(data=vals, width=.18, ax = gp.main)
-	sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = gp.main)
+	if vals:
+		#sns.axlabel( ylabel="GP", fontsize=16)
+		sns.boxplot(data=vals, width=.18, ax = data_frame.gp_plot)
+		sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = data_frame.gp_plot)
 
-	# category labels
-	gp.main.set_xticklabels(keys)
-	#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		# category labels
+		data_frame.gp_plot.set_xticklabels(keys)
+		#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		data_frame.gp_plot.set_ylabel('GP')
 
 
 	
 	
 def Plot_diff():
 	diff_list = []
-	diff.main.cla()
+	data_frame.diff_plot.cla()
 
 	global tree_list_name
 	global output_file_name
@@ -486,7 +487,8 @@ def Plot_diff():
 									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])"""
 
 		for item in range(len(data_list_raw[file1].datasets_list[rep1].channels_list)):
-			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name].get() == 1:
+
+			if data_frame.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name].get() == 1 and data_list_raw[file1].diff_fitting[rep1, item]!= None:
 
 				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name 
 
@@ -499,7 +501,10 @@ def Plot_diff():
 		for i in range(len(data_list_raw[file1].datasets_list[rep1].cross_list)):
 
 			item = i + len(data_list_raw[file1].datasets_list[rep1].channels_list)
-			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1:
+
+
+
+			if data_frame.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1 and data_list_raw[file1].diff_fitting[rep1, item] != None:
 
 				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name 
 
@@ -520,15 +525,16 @@ def Plot_diff():
 		vals.append(thisdict[key])
 
 
+	if vals:
+		sns.set(context='notebook', style='whitegrid')
+		#sns.axlabel( ylabel="Diffusion time", fontsize=16)
+		sns.boxplot(data=vals, width=.18, ax = data_frame.diff_plot)
+		sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = data_frame.diff_plot)
 
-	sns.set(context='notebook', style='whitegrid')
-	#sns.axlabel( ylabel="Diffusion time", fontsize=16)
-	sns.boxplot(data=vals, width=.18, ax = diff.main)
-	sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = diff.main)
-
-	# category labels
-	diff.main.set_xticklabels(keys)
-	#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		# category labels
+		data_frame.diff_plot.set_xticklabels(keys)
+		#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		data_frame.diff_plot.set_ylabel('Diffusion time')
 		
 
 def Plot_gp_diff():
@@ -626,28 +632,23 @@ def Plot_gp_diff():
 def Which_tab():
 
 
-	#try:
-	if tabs.index(tabs.select()) == 0:
-		Plot_diff()
 
-		diff.canvas3.draw()
+	Plot_diff()
 
-		diff.figure3.tight_layout()
-		
 
-	if tabs.index(tabs.select()) == 1:
-		Plot_gp()
+	Plot_gp()
 
-		gp.canvas3.draw()
+	data_frame.canvas1.draw()
+	data_frame.figure1.tight_layout()
 
-		gp.figure3.tight_layout()
 
-	if tabs.index(tabs.select()) == 2:
-		Plot_gp_diff()
 
-		gp_diff.canvas3.draw()
+	#if tabs.index(tabs.select()) == 2:
+		#Plot_gp_diff()
 
-		gp_diff.figure3.tight_layout()
+		#gp_diff.canvas3.draw()
+
+		#gp_diff.figure3.tight_layout()
 
 	#except:
 		#tk.messagebox.showerror(title='Error', message=Message_generator())
@@ -752,14 +753,6 @@ def Export_function():
 			rep1+=1
 
 
-		
-
-
-		
-
-
-
-
 		file1 = file1-1
 		rep1 = rep1-1
 
@@ -814,7 +807,7 @@ def Export_function():
 
 		for channel in range(len(data_list_raw[file1].datasets_list[rep1].channels_list)):
 
-			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name].get() == 1:
+			if data_frame.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name].get() == 1:
 
 				chan[data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name] = channel
 
@@ -823,7 +816,7 @@ def Export_function():
 
 			channel = i + len(data_list_raw[file1].datasets_list[rep1].channels_list)
 
-			if diff.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1:
+			if data_frame.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1:
 
 				chan[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name] = channel
 
@@ -837,13 +830,15 @@ def Export_function():
 
 			rep0 = output_numbers_dict[file1][0]
 
-			for key in data_list_raw[file1].diff_fitting[rep0, channel].keys():
+			if data_list_raw[file1].diff_fitting[rep0, channel] != None:
 
-				line += key + "\t"
+				for key in data_list_raw[file1].diff_fitting[rep0, channel].keys():
 
-			line += "N" + "\t"
-			line += "cpm" + "\t"
-			line += "D" + "\t"
+					line += key + "\t"
+
+				line += "N" + "\t"
+				line += "cpm" + "\t"
+				line += "D" + "\t"
 
 
 			open_file.write(line + "\n")
@@ -854,9 +849,13 @@ def Export_function():
 
 				line = "Repetition " + str(rep1 + 1) + "\t"
 
-				for key in data_list_raw[file1].diff_fitting[rep1, channel].keys():
+				try:
 
-					line += str(data_list_raw[file1].diff_fitting[rep1, channel][key]) + "\t"
+					for key in data_list_raw[file1].diff_fitting[rep1, channel].keys():
+
+						line += str(data_list_raw[file1].diff_fitting[rep1, channel][key]) + "\t"
+				except: 
+					pass
 
 				
 				try:
@@ -865,7 +864,11 @@ def Export_function():
 				except:
 					pass
 
-				line += str(data_list_raw[file1].diff_coeffs[rep1, channel]) + "\t"
+				
+				try:
+					line += str(data_list_raw[file1].diff_coeffs[rep1, channel]) + "\t"
+				except:
+					pass
 
 
 				open_file.write(line + "\n")
@@ -878,8 +881,12 @@ def Export_function():
 
 		line = "name\t"
 
-		for key in data_list_raw[file1].gp_fitting[rep0].keys():
-			line += key + "\t"
+		try:
+
+			for key in data_list_raw[file1].gp_fitting[rep0].keys():
+				line += key + "\t"
+		except:
+			pass
 
 		open_file.write(line + "\n")
 
@@ -887,9 +894,14 @@ def Export_function():
 
 			line = "Repetition " + str(rep1 + 1) + "\t"
 
-			for key in data_list_raw[file1].gp_fitting[rep1].keys():
+			try:
 
-				line += str(data_list_raw[file1].gp_fitting[rep1][key]) + "\t"
+				for key in data_list_raw[file1].gp_fitting[rep1].keys():
+
+					line += str(data_list_raw[file1].gp_fitting[rep1][key]) + "\t"
+
+			except:
+				pass
 
 
 			open_file.write(line + "\n")
