@@ -674,6 +674,16 @@ def Diffusion_fun():
 
 		tk.messagebox.showerror(title='Error', message=Message_generator())
 
+def Dot_Plot_fun():
+
+	if len(tree_list_name) > 0:
+
+		dot_plot_win = Dot_Plot_Window(win_width, win_height, dpi_all)
+
+	if len(tree_list_name) == 0:
+
+		tk.messagebox.showerror(title='Error', message=Message_generator())
+
 
 def Restruct_fun():
 
@@ -1690,8 +1700,12 @@ class Left_frame :
 		self.Add_to_plot_button = tk.Button(self.frame023, text="Plot", command=Which_tab)
 		self.Add_to_plot_button.grid(row = 3, column = 0, sticky="W")
 
+		
+		self.Add_to_plot_button = tk.Button(self.frame023, text="Dot Plot", command=Dot_Plot_fun)
+		self.Add_to_plot_button.grid(row = 4, column = 0, sticky="W")
+
 		self.Output_button = tk.Button(self.frame023, text="Output", command=Export_function)
-		self.Output_button.grid(row = 4, column = 0, sticky="W")
+		self.Output_button.grid(row = 5, column = 0, sticky="W")
 
 		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
 
@@ -3434,6 +3448,7 @@ class Threshold_window:
 				self.peaks.cla()
 				self.hist1.cla()
 				self.gp_hist.cla()
+				self.dot_plot.cla()
 
 				self.peaks.set_title("Intensity traces")
 				
@@ -3488,6 +3503,8 @@ class Threshold_window:
 			
 
 			gp_list_temp = []
+			axis_y_temp = []
+			axis_x_temp = []
 
 			
 
@@ -3495,17 +3512,21 @@ class Threshold_window:
 			for k in range (len(yp1_raw)):
 				gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
 
-
-
+				axis_x_temp.append(yp1_raw[k])
+				axis_y_temp.append(yp2_raw[k])
 
 
 				if abs(gp_1) < 1:
 					gp_list_temp.append(gp_1)
 
 
-
+data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x
 			
 			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
+
+			self.dot_plot.scatter(axis_x_temp, axis_y_temp)
+			self.dot_plot.ticklabel_format(axis = "x", style="sci", scilimits = (0,0))
+			self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 
 				
 			
@@ -3535,7 +3556,6 @@ class Threshold_window:
 
 						popt.append(np.float64(data_list_raw[file_index].gp_fitting[rep_index][param]))
 
-						
 
 
 
@@ -4035,10 +4055,10 @@ class Threshold_window:
 
 		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
 						
-		gs = self.figure5.add_gridspec(2, 2)
+		gs = self.figure5.add_gridspec(2, 3)
 
 
-		self.peaks = self.figure5.add_subplot(gs[0, :2])
+		self.peaks = self.figure5.add_subplot(gs[0, :3])
 
 		self.peaks.set_title("Intensity traces")
 
@@ -4053,6 +4073,14 @@ class Threshold_window:
 		self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.hist1.set_ylabel('Counts')
 		self.hist1.set_xlabel('Intensity (a.u.)')
+
+		self.dot_plot = self.figure5.add_subplot(gs[1, 1])
+
+		self.dot_plot.set_title("Intensity dot plot")
+
+		self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.dot_plot.set_ylabel('channel 1')
+		self.dot_plot.set_xlabel('channel 2')
 
 
 		self.gp_hist = self.figure5.add_subplot(gs[1, -1])
@@ -4310,7 +4338,229 @@ class Threshold_window:
 		print(1)
 
 
+class Dot_Plot_Window:
 
+	def __init__(self, win_width, win_height, dpi_all):
+
+		self.channel_index = 0
+		self.fit_all_flag = False
+
+		global file_index
+		global rep_index
+
+		global tree_list
+		global tree_list_name
+		global repetitions_list
+
+		self.win_dot_plot = tk.Toplevel()
+
+		self.th_width = round(0.7*self.win_dot_plot.winfo_screenwidth())
+		self.th_height = round(0.4*self.win_dot_plot.winfo_screenwidth())
+
+		self.line1 = str(self.th_width) + "x" + str(self.th_height)
+
+
+		self.win_dot_plot.geometry(self.line1)
+
+		self.frame002 = tk.Frame(self.win_dot_plot)
+		self.frame002.pack(side = "left", anchor = "nw")
+
+		self.frame0002 = tk.Frame(self.frame002)
+		self.frame0002.pack(side = "top", anchor = "nw")
+
+
+
+		self.scrollbar = tk.Scrollbar(self.frame0002)
+		self.scrollbar.pack(side = "left", fill = "y")
+
+
+		self.Datalist = tk.Listbox(self.frame0002, width = 100, height = 10)
+		self.Datalist.pack(side = "top", anchor = "nw")
+		
+		
+		
+		self.tree = CheckboxTreeview(self.Datalist)
+		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
+		self.tree.pack()
+
+
+		self.tree.config(yscrollcommand = self.scrollbar.set)
+		self.scrollbar.config(command = self.tree.yview)
+
+		#self.tree.bind('<<TreeviewSelect>>', self.Choose_curve)
+
+
+
+		self.Datalist.config(width = 100, height = 10)
+
+		for i in range(0, len(tree_list_name)):
+			name = tree_list_name[i]
+			treetree = Data_tree_fcs_fit (self.tree, name, data_list_raw[i])
+
+
+		self.frame003 = tk.Frame(self.frame002)
+		self.frame003.pack(side = "top", anchor = "nw")
+
+		self.frame0003 = tk.Frame(self.frame003)
+		self.frame0003.pack(side = "top", anchor = "nw")
+
+
+
+		self.frame001 = tk.Frame(self.frame002)
+		self.frame001.pack(side = "top", anchor = "nw")
+
+		self.frame000 = tk.Frame(self.win_dot_plot)
+		self.frame000.pack(side = "left", anchor = "nw")
+
+
+		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
+						
+		gs = self.figure5.add_gridspec(1, 7)
+
+
+		self.dot_plot = self.figure5.add_subplot(gs[0, :3])
+
+		self.dot_plot.set_title("Dot Plot")
+
+
+		self.dot_plot.set_ylabel('axis 1')
+		self.dot_plot.set_xlabel('axis 2')
+
+
+		self.dens_plot = self.figure5.add_subplot(gs[0, 3:6])
+
+		self.dens_plot.set_title("Density Plot")
+
+
+		self.dens_plot.set_ylabel('axis 1')
+		self.dens_plot.set_xlabel('axis 2')
+
+		self.colorbar = self.figure5.add_subplot(gs[0, 6])
+
+		#self.hist1.set_title("Intensity histogram")
+
+		
+		
+
+
+
+
+		self.canvas5 = FigureCanvasTkAgg(self.figure5, self.frame000)
+		self.canvas5.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas5, self.frame000)
+		self.toolbar.update()
+		self.canvas5.get_tk_widget().pack()
+
+		self.figure5.tight_layout()
+
+		self.Export_plot_button = tk.Button(self.frame000, text="Save plot data", command=Norm)
+		self.Export_plot_button.pack(side = "top", anchor = "nw")
+
+
+
+		
+
+
+
+
+		
+		
+
+		
+
+		self.Norm_label = tk.Label(self.frame001, text="FCS curve fitting: ")
+		self.Norm_label.grid(row = 0, column = 0, columnspan = 2, sticky = 'w')
+
+		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet"], width = 9 )
+		self.Triplet.config(state = "readonly")
+		
+		self.Triplet.grid(row = 1, column = 0, sticky='ew')
+
+		self.Triplet.set("triplet")
+
+		#self.Triplet.bind("<<ComboboxSelected>>", self.Update_fitting)
+
+		self.Components = ttk.Combobox(self.frame001,values = ["1 component"], width = 9)
+		self.Components.config(state = "readonly")
+		
+		self.Components.grid(row = 1, column = 1, sticky='ew')
+
+		self.Components.set("1 component")
+
+		#self.Components.bind("<<ComboboxSelected>>", self.Update_fitting)
+
+		self.Dimension = ttk.Combobox(self.frame001,values = ["2D", "3D"], width = 9)
+		self.Dimension.config(state = "readonly")
+		
+		self.Dimension.grid(row = 1, column = 2, sticky='ew')
+
+		self.Dimension.set("3D")
+
+		#self.Dimension.bind("<<ComboboxSelected>>", self.Update_fitting)
+
+
+
+		self.Fit_button = tk.Button(self.frame001, text="Fit", command=Norm)
+		self.Fit_button.grid(row = 2, column = 0, sticky='ew')
+
+
+
+		self.Fit_all_button = tk.Button(self.frame001, text="Fit this file", command=Norm)
+		self.Fit_all_button.grid(row = 2, column = 1, sticky='ew')
+
+		self.Fit_button_ticked = tk.Button(self.frame001, text="Fit ticked", command=Norm)
+		self.Fit_button_ticked.grid(row = 3, column = 0, sticky='ew')
+
+
+
+		self.Fit_all_button_all = tk.Button(self.frame001, text="Fit all", command=Norm)
+		self.Fit_all_button_all.grid(row = 3, column = 1, sticky='ew')
+
+		self.Calibration_label = tk.Label(self.frame001, text="Calibration: ")
+		self.Calibration_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
+
+		self.D_cal_label = tk.Label(self.frame001, text="Diff coeff: ")
+		self.D_cal_label.grid(row = 5, column = 0, sticky = 'w')
+
+		self.D_cal_entry = tk.Entry(self.frame001, width = 9)
+		self.D_cal_entry.grid(row = 5, column = 1, sticky='w')
+
+		self.D_cal_entry.insert("end", str(430))
+
+		self.Txy_label = tk.Label(self.frame001, text="Diff time: ")
+		self.Txy_label.grid(row = 6, column = 0, sticky = 'w')
+
+
+		self.Txy_entry = tk.Entry(self.frame001, width = 9)
+		self.Txy_entry.grid(row = 6, column = 1, sticky='w')
+
+		self.Txy_entry.insert("end", str(0.025))
+
+		self.Table_label = tk.Label(self.frame001, text="Fitting parameters: ")
+		self.Table_label.grid(row = 7, column = 0, columnspan = 2, sticky = 'w')
+
+
+
+
+
+
+		
+		
+		
+
+
+
+		
+		self.tree.selection_set(treetree.child_id)
+
+
+
+
+		self.frame004 = tk.Frame(self.frame002)
+		self.frame004.pack(side = "top", anchor = "nw")
+
+		
 
 
 

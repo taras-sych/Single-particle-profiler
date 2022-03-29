@@ -22,6 +22,8 @@ class fcs_channel:
         self.auto_corr_arr = auto_corr_arr_arg
         self.short_name = short_name_arg
 
+        self.peaks = []
+
         cr_list = []
 
 
