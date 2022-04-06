@@ -237,7 +237,7 @@ class Left_frame :
 
 		
 
-		self.Plot_this_data(data_list_raw[file_index], rep_index)
+		self.Plot_this_data(data_list_raw[data_cont.file_index], data_cont.rep_index)
 
 		root.update()
 
@@ -290,8 +290,8 @@ class Left_frame :
 
 		
 
-		file_index = file1-1
-		rep_index = rep1-1
+		data_cont.file_index = file1-1
+		data_cont.rep_index = rep1-1
 
 
 		
@@ -305,7 +305,7 @@ class Left_frame :
 
 		
 
-		self.Plot_this_data(data_cont.data_list_raw[file_index], rep)
+		self.Plot_this_data(data_cont.data_list_raw[data_cont.file_index], rep)
 
 		#root.update()
 
@@ -355,7 +355,7 @@ class Left_frame :
 				file_index_local = i
 
 
-		for item in data_cont.data_list_raw[file_index_local].datasets_list[rep_index].channels_list:
+		for item in data_cont.data_list_raw[file_index_local].datasets_list[data_cont.rep_index].channels_list:
 			str1, str2 = item.short_name.split(" ")
 			very_short_name = "ch0" + str2
 			self.channels_flags[item.short_name] = tk.IntVar(value=1)
@@ -363,7 +363,7 @@ class Left_frame :
 			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
 			column_counter +=1
 
-		for item in data_cont.data_list_raw[file_index_local].datasets_list[rep_index].cross_list:
+		for item in data_cont.data_list_raw[file_index_local].datasets_list[data_cont.rep_index].cross_list:
 			str1, str2 = item.short_name.split(" vs ")
 			str3, str4 = str1.split(" ")
 			very_short_name = "ch" + str4 + str2

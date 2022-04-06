@@ -64,6 +64,10 @@ from fluct_prof import GP_Window as gp_win
 
 from fluct_prof import Dot_Plot as dot_plot
 
+from fluct_prof import Restructure_data as restruct_d
+
+from fluct_prof import Data_container as data_c
+
 
 #--------------------------
 #End of importing own modules
@@ -663,11 +667,11 @@ def Which_tab():
 
 def Threshold_fun():
 
-	if len(tree_list_name) > 0:
+	if len(data_c.tree_list_name) > 0:
 
-		th_win = Threshold_window(win_width, win_height, dpi_all)
+		th_win = gp_win.Threshold_window(data_c.win_width, data_c.win_height, data_c.dpi_all)
 
-	if len(tree_list_name) == 0:
+	if len(data_c.tree_list_name) == 0:
 
 		tk.messagebox.showerror(title='Error', message=Message_generator())
 
@@ -694,7 +698,7 @@ def Dot_Plot_fun():
 def Restruct_fun():
 
 
-	th_win = Restruct_window(win_width, win_height, dpi_all)
+	th_win = restruct_d.Restruct_window(data_c.win_width, data_c.win_height, data_c.dpi_all)
 
 
 def Export_function():

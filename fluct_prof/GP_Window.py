@@ -1,11 +1,91 @@
+#--------------------------
+#Importing general modules
+#--------------------------
+import tkinter as tk
+from tkinter import ttk
+from tkinter import font as tkFont
+import matplotlib.pyplot as plt
+
+import csv
+
+import lmfit
+
+import time
+
+
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+
+
+# Implement the default Matplotlib key bindings.
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
+from matplotlib import cm as mplcm
+
+from ttkwidgets import CheckboxTreeview
+
+
+
+import codecs
+
+import os
+
+from datetime import datetime
+
+from scipy import stats
+
+import copy
+
+import numpy as np
+
+from scipy.signal import find_peaks
+
+from scipy.optimize import curve_fit
+import random
+
+import seaborn as sns
+
+
+#--------------------------
+#End of importing general modules
+#--------------------------
+
+
+#--------------------------
+#Importing own modules
+#--------------------------
+
+from fluct_prof import Functions as fun
+
+from fluct_prof import Data_container as data_cont
+
+from fluct_prof import Data_tree as d_tree
+
+from fluct_prof import fcs_importer
+
+#--------------------------
+#End of importing own modules
+#--------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class Threshold_window:
 
 	def Save_plot_data(self):
 
-		global tree_list_name
-		global file_index
 
-		name = tree_list_name[file_index]
+
+		name = data_cont.tree_list_name[data_cont.file_index]
 		filename = initialdirectory + "\\" +  name + "_Plots_gp.txt"
 
 		open_file = open(filename, 'w')
@@ -20,7 +100,7 @@ class Threshold_window:
 
 	def Apply_to_all(self):
 
-		global rep_index
+		
 
 		self.fit_all_flag = True
 
@@ -29,12 +109,12 @@ class Threshold_window:
 		for param in self.list_of_params:
 			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
 
-		for rep_index_i in range (data_list_raw[file_index].repetitions):
+		for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
 			for param in self.list_of_params:
 				self.full_dict[param]["Init"].delete(0,"end")
 				self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 				
-			rep_index = rep_index_i
+			data_cont.rep_index = rep_index_i
 			#self.Normalize()
 			self.Peaks()
 			self.Fit_gaus()
@@ -47,8 +127,7 @@ class Threshold_window:
 
 	def Apply_to_all_ticks(self):
 
-		global file_index
-		global rep_index
+
 
 		self.fit_all_flag = True
 
@@ -57,12 +136,11 @@ class Threshold_window:
 		for param in self.list_of_params:
 			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
 
-		global tree_list_name
-		global output_file_name
+
 
 		list1 = self.tree_t.get_checked()
 
-		#print (data_frame.tree.selection())
+
 
 		thisdict = {}
 
@@ -78,7 +156,7 @@ class Threshold_window:
 			sum1 = num 
 			file = 0
 			rep = 0
-			for i in range (len(data_list_raw)):
+			for i in range (len(data_cont.data_list_raw)):
 				rep = 0
 				sum1-=1
 				file+=1
@@ -87,7 +165,7 @@ class Threshold_window:
 					rep1 = rep
 
 				
-				for j in range (repetitions_list[i]):
+				for j in range (data_cont.repetitions_list[i]):
 					sum1-=1
 					rep+=1
 					if sum1 == 0:
@@ -101,8 +179,8 @@ class Threshold_window:
 
 
 
-			file_index = file1-1
-			rep_index = rep1-1
+			data_cont.file_index = file1-1
+			data_cont.rep_index = rep1-1
 
 
 
@@ -123,8 +201,7 @@ class Threshold_window:
 
 	def Apply_to_all_all(self):
 
-		global rep_index
-		global file_index
+
 
 		self.fit_all_flag = True
 
@@ -133,14 +210,14 @@ class Threshold_window:
 		for param in self.list_of_params:
 			self.list_of_inits_for_fit_all[param] = self.full_dict[param]["Init"].get()
 
-		for file_index_i in range (len(data_list_raw)):	
-			for rep_index_i in range (data_list_raw[file_index_i].repetitions):
+		for file_index_i in range (len(data_cont.data_list_raw)):	
+			for rep_index_i in range (data_cont.data_list_raw[file_index_i].repetitions):
 				for param in self.list_of_params:
 					self.full_dict[param]["Init"].delete(0,"end")
 					self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
 					
-				rep_index = rep_index_i
-				file_index = file_index_i
+				data_cont.rep_index = rep_index_i
+				data_cont.file_index = file_index_i
 
 				#self.Normalize()
 				self.Peaks()
@@ -162,13 +239,13 @@ class Threshold_window:
 		
 		
 		if self.Components.get() == '1 component':
-			y_model = Gauss(x, *param_list)
+			y_model = fun.Gauss(x, *param_list)
 
 		if self.Components.get() == '2 components':
-			y_model = Gauss2(x, *param_list)
+			y_model = fun.Gauss2(x, *param_list)
 
 		if self.Components.get() == '3 components':
-			y_model = Gauss3(x, *param_list)
+			y_model = fun.Gauss3(x, *param_list)
 		return y_model - ydata
 
 
@@ -179,9 +256,7 @@ class Threshold_window:
 
 			
 		
-		global fit_list_x
-		global fit_list_y
-		global Fit_params
+
 
 		x = self.x_bins
 		y = self.n
@@ -228,7 +303,7 @@ class Threshold_window:
 			output_dict[param] = np.float64(params[param].value)
 
 
-		data_list_raw[file_index].gp_fitting[rep_index] = output_dict
+		data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = output_dict
 
 		#print(data_list_raw[file_index].gp_fitting)
 
@@ -252,33 +327,33 @@ class Threshold_window:
 			
 
 			if self.Components.get() == '1 component':
-				self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
-				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt))
+				self.gp_hist.plot(x1, fun.Gauss(x1, *popt), 'r-', label='fit')
+				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt))
 
 			if self.Components.get() == '2 components':
-				self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
-				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, Gauss2(x1, *popt))
+				self.gp_hist.plot(x1, fun.Gauss2(x1, *popt), 'r-', label='fit')
+				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss2(x1, *popt))
 				popt1 = popt[:3]
 				popt2 = popt[3:6]
-				self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
-				self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+				self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
+				self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
 
-				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt1))
-				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt2))
+				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
+				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
 
 			if self.Components.get() == '3 components':
-				self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
-				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, Gauss3(x1, *popt))
+				self.gp_hist.plot(x1, fun.Gauss3(x1, *popt), 'r-', label='fit')
+				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss3(x1, *popt))
 				popt1 = popt[:3]
 				popt2 = popt[3:6]
 				popt3 = popt[6:9]
-				self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
-				self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
-				self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
+				self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
+				self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
+				self.gp_hist.plot(x1, fun.Gauss(x1, *popt3), color = 'yellow', label='fit')
 
-				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt1))
-				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt2))
-				self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt3))
+				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
+				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
+				self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt3))
 
 
 
@@ -289,8 +364,8 @@ class Threshold_window:
 	
 	def Update_thresholds (self):
 
-		global change_normal
-		change_normal = False
+
+		data_cont.change_normal = False
 
 
 
@@ -300,15 +375,15 @@ class Threshold_window:
 
 
 
-		if data_list_raw[file_index].gp_fitting[rep_index] != None:
-			data_list_raw[file_index].gp_fitting[rep_index] = None
+		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
+			data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
 
 
 
 
 
-		data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
-		data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
+		data_cont.data_list_raw[data_cont.file_index].threshold_list[0] = float(self.ch1_th.get())
+		data_cont.data_list_raw[data_cont.file_index].threshold_list[1] = float(self.ch2_th.get())
 
 
 
@@ -344,7 +419,7 @@ class Threshold_window:
 		
 
 
-		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
 
 
 
@@ -369,7 +444,7 @@ class Threshold_window:
 
 
 
-			int_div = int(rep_index/data_list_raw[file_index].binning)
+			int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
 
 			
 
@@ -386,9 +461,9 @@ class Threshold_window:
 
 
 
-			for rep_index_i in range (data_list_raw[file_index].repetitions):
+			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
 							
-				if int(rep_index_i/data_list_raw[file_index].binning) == int_div:
+				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
 
 					#print ("adding repetition ", rep_index_i)
 
@@ -398,17 +473,17 @@ class Threshold_window:
 					else:
 						x_min = max(x1) + x1[1] - x1[0]
 
-					x_temp_1 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x]
-					x_temp_2 = [elem + x_min for elem in data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.x]
+					x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x]
+					x_temp_2 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.x]
 
 
 					x1.extend(x_temp_1)
-					#y1.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
-					y1_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.y)
+					#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+					y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.y)
 
 					x2.extend(x_temp_2)
-					#y2.extend(data_list_current[file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
-					y2_raw.extend(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.y)
+					#y2.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
+					y2_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.y)
 
 
 
@@ -435,8 +510,8 @@ class Threshold_window:
 
 
 
-			th1 = data_list_raw[file_index].threshold_list[ch1_ind]
-			th2 = data_list_raw[file_index].threshold_list[ch2_ind]
+			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[ch1_ind]
+			th2 = data_cont.data_list_raw[data_cont.file_index].threshold_list[ch2_ind]
 
 			if th1 == None or th2 == None:
 
@@ -598,7 +673,7 @@ class Threshold_window:
 					#self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
 					#self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
 
-				"""if change_normal == False:
+				"""if data_cont.change_normal == False:
 														self.peaks.set_xlim(main_xlim)
 														self.peaks.set_ylim(main_ylim)"""
 
@@ -622,11 +697,11 @@ class Threshold_window:
 					gp_list_temp.append(gp_1)
 
 
-			data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].peaks = axis_x_temp
-			data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch2_ind].peaks = axis_y_temp
+			data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].peaks = axis_x_temp
+			data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].peaks = axis_y_temp
 
-			print(file_index, rep_index_i)
-			print(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].peaks)
+			print(data_cont.file_index, rep_index_i)
+			print(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].peaks)
 			
 			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
 
@@ -651,56 +726,56 @@ class Threshold_window:
 				self.gp_hist.set_xlabel('GP')
 
 
-				if data_list_raw[file_index].gp_fitting[rep_index] != None:
+				if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
 
 
 					x1 = np.linspace(min(self.x_bins), max(self.x_bins), num=500)
 					popt = []
 
-					for param in data_list_raw[file_index].gp_fitting[rep_index].keys():
+					for param in data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys():
 				
 
-						popt.append(np.float64(data_list_raw[file_index].gp_fitting[rep_index][param]))
+						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index][param]))
 
 
 
 
 					if self.Components.get() == '1 component':
 						#print("1 comp")
-						self.gp_hist.plot(x1, Gauss(x1, *popt), 'r-', label='fit')
+						self.gp_hist.plot(x1, fun.Gauss(x1, *popt), 'r-', label='fit')
 
-						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt))
+						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt))
 						print(self.save_plot_dict.keys())
 
 					if self.Components.get() == '2 components':
 						#print("2 comp")
-						self.gp_hist.plot(x1, Gauss2(x1, *popt), 'r-', label='fit')
-						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, Gauss2(x1, *popt))
+						self.gp_hist.plot(x1, fun.Gauss2(x1, *popt), 'r-', label='fit')
+						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss2(x1, *popt))
 
 						popt1 = popt[:3]
 						popt2 = popt[3:6]
 						
-						self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
-						self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
+						self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
+						self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
 
-						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt1))
-						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt2))
+						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
+						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
 
 					if self.Components.get() == '3 components':
-						self.gp_hist.plot(x1, Gauss3(x1, *popt), 'r-', label='fit')
-						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, Gauss3(x1, *popt))
+						self.gp_hist.plot(x1, fun.Gauss3(x1, *popt), 'r-', label='fit')
+						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss3(x1, *popt))
 						#print("3 comp")
 						popt1 = popt[:3]
 						popt2 = popt[3:6]
 						popt3 = popt[6:9]
 						
-						self.gp_hist.plot(x1, Gauss(x1, *popt1), color = 'yellow', label='fit')
-						self.gp_hist.plot(x1, Gauss(x1, *popt2), color = 'yellow', label='fit')
-						self.gp_hist.plot(x1, Gauss(x1, *popt3), color = 'yellow', label='fit')
+						self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
+						self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
+						self.gp_hist.plot(x1, fun.Gauss(x1, *popt3), color = 'yellow', label='fit')
 
-						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt1))
-						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt2))
-						self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, Gauss(x1, *popt3))
+						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
+						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
+						self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt3))
 
 
 
@@ -799,10 +874,10 @@ class Threshold_window:
 			thisdict["Max"].delete(0,"end")
 			thisdict["Max"].insert(0,self.list_of_max[row_index-1])
 
-			if data_list_raw[file_index].gp_fitting[rep_index] != None and len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == len(self.list_of_params) :
+			if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None and len(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys()) == len(self.list_of_params) :
 
 				thisdict["Init"].delete(0,"end")
-				thisdict["Init"].insert(0,data_list_raw[file_index].gp_fitting[rep_index][param])
+				thisdict["Init"].insert(0,data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index][param])
 
 
 
@@ -847,8 +922,7 @@ class Threshold_window:
 
 		
 
-		global file_index
-		global rep_index
+
 
 		
 		
@@ -860,11 +934,11 @@ class Threshold_window:
 
 		
 
-		for rep in range(repetitions_list[file_index]):
+		for rep in range(data_cont.repetitions_list[data_cont.file_index]):
 
 
-			y1 = data_list_raw[file_index].datasets_list[rep].channels_list[0].fluct_arr.y
-			y2 = data_list_raw[file_index].datasets_list[rep].channels_list[1].fluct_arr.y
+			y1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[rep].channels_list[0].fluct_arr.y
+			y2 = data_cont.data_list_raw[data_cont.file_index].datasets_list[rep].channels_list[1].fluct_arr.y
 			
 				
 			if self.normalization_index == "z-score":
@@ -872,8 +946,8 @@ class Threshold_window:
 				y2z = stats.zscore(y2)
 
 
-				data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
-				data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
+				data_cont.data_list_raw[data_cont.file_index].threshold_list[0] = float(self.ch1_th.get())
+				data_cont.data_list_raw[data_cont.file_index].threshold_list[1] = float(self.ch2_th.get())
 
 				#data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1z
 				#data_list_current[file_index].datasets_list[rep].channels_list[1].fluct_arr.y = y2z
@@ -892,8 +966,8 @@ class Threshold_window:
 
 				
 
-				data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
-				data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
+				data_cont.data_list_raw[data_cont.file_index].threshold_list[0] = float(self.ch1_th.get())
+				data_cont.data_list_raw[data_cont.file_index].threshold_list[1] = float(self.ch2_th.get())
 				
 
 				#data_list_current[file_index].datasets_list[rep].channels_list[0].fluct_arr.y = y1m
@@ -935,8 +1009,8 @@ class Threshold_window:
 			self.ch2_th.delete(0,"end")
 			self.ch2_th.insert(0,str(1))
 
-		if data_list_raw[file_index].gp_fitting[rep_index] != None:
-			data_list_raw[file_index].gp_fitting[rep_index] = None
+		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
+			data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
 		
 		self.Peaks()
 
@@ -958,8 +1032,7 @@ class Threshold_window:
 
 	def Plot_trace(self, event):
 
-		global file_index
-		global rep_index
+
 
 
 
@@ -987,7 +1060,7 @@ class Threshold_window:
 		
 
 
-		for i in range (len(data_list_raw)):
+		for i in range (len(data_cont.data_list_raw)):
 			
 			rep = 0
 			sum1-=1
@@ -997,7 +1070,7 @@ class Threshold_window:
 				rep1 = rep
 
 			
-			for j in range (repetitions_list[i]):
+			for j in range (data_cont.repetitions_list[i]):
 				sum1-=1
 				rep+=1
 				if sum1 == 0:
@@ -1014,12 +1087,12 @@ class Threshold_window:
 
 		
 
-		file_index = file1-1
-		rep_index = rep1-1
+		data_cont.file_index = file1-1
+		data_cont.rep_index = rep1-1
 
 	
 
-		current_repetitions_number = data_list_raw[file_index].repetitions
+		current_repetitions_number = data_cont.data_list_raw[data_cont.file_index].repetitions
 
 		#print(current_repetitions_number)
 
@@ -1029,14 +1102,14 @@ class Threshold_window:
 				divisors.append(divdiv)
 
 		self.Binning_choice.config(values = divisors)
-		self.Binning_choice.set(data_list_raw[file_index].binning)
+		self.Binning_choice.set(data_cont.data_list_raw[data_cont.file_index].binning)
 
 
 		self.channel_pairs = []
-		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
-			for i in range (data_list_raw[file_index].datasets_list[0].channels_number):
-				for j in range (i+1, data_list_raw[file_index].datasets_list[0].channels_number):
-					str1 = data_list_raw[file_index].datasets_list[0].channels_list[i].short_name + "/" + data_list_raw[file_index].datasets_list[0].channels_list[j].short_name
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
+			for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
+				for j in range (i+1, data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
+					str1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name + "/" + data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[j].short_name
 					self.channel_pairs.append(str1)
 
 
@@ -1047,22 +1120,22 @@ class Threshold_window:
 		rep = rep1-1
 
 
-		if data_list_raw[file_index].gp_fitting[rep_index] != None:
+		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
 
 
-			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 3:
+			if len(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys()) == 3:
 
 				
 
 				self.Components.set("1 component")
 
-			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 6:
+			if len(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys()) == 6:
 
 				
 
 				self.Components.set("2 components")
 
-			if len(data_list_raw[file_index].gp_fitting[rep_index].keys()) == 9:
+			if len(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys()) == 9:
 
 				self.Components.set("3 components")
 
@@ -1076,15 +1149,12 @@ class Threshold_window:
 
 	
 	def Binning(self, event):
-		global file_index
-		global rep_index
-
-		global change_normal
-
-		change_normal = True
 
 
-		data_list_raw[file_index].binning = int(self.Binning_choice.get())
+		data_cont.change_normal = True
+
+
+		data_cont.data_list_raw[data_cont.file_index].binning = int(self.Binning_choice.get())
 
 		
 
@@ -1106,8 +1176,6 @@ class Threshold_window:
 
 		self.gp_xbins = []
 
-		global file_index
-		global rep_index
 
 		self.win_threshold = tk.Toplevel()
 
@@ -1361,9 +1429,7 @@ class Threshold_window:
 
 
 
-		global tree_list
-		global tree_list_name
-		global repetitions_list
+
 		
 
 
@@ -1401,9 +1467,9 @@ class Threshold_window:
 		self.Fitting_frame()
 
 
-		for i in range(0, len(tree_list_name)):
-			name = tree_list_name[i]
-			treetree = Data_tree (self.tree_t, name, data_list_raw[i].repetitions)
+		for i in range(0, len(data_cont.tree_list_name)):
+			name = data_cont.tree_list_name[i]
+			treetree = d_tree.Data_tree (self.tree_t, name, data_cont.data_list_raw[i].repetitions)
 
 		#self.Normalize()
 
@@ -1428,10 +1494,10 @@ class Threshold_window:
 
 
 		self.channel_pairs = []
-		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
-			for i in range (data_list_raw[file_index].datasets_list[0].channels_number):
-				for j in range (i+1, data_list_raw[file_index].datasets_list[0].channels_number):
-					str1 = data_list_raw[file_index].datasets_list[0].channels_list[i].short_name + "/" + data_list_raw[file_index].datasets_list[0].channels_list[j].short_name
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
+			for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
+				for j in range (i+1, data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
+					str1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name + "/" + data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[j].short_name
 					self.channel_pairs.append(str1)
 
 		self.tree_t.selection_set(treetree.child_id)
