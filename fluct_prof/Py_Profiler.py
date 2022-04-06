@@ -1,3 +1,6 @@
+#Multiple files
+
+
 import tkinter as tk
 from tkinter import ttk
 from tkinter import font as tkFont
@@ -278,6 +281,8 @@ def Plot_gp():
 
 	list1 = data_frame.tree.get_checked()
 
+	print(list1)
+
 	#print (data_frame.tree.selection())
 
 	thisdict = {}
@@ -317,7 +322,7 @@ def Plot_gp():
 
 
 		
-
+		print(rep1)
 
 		output_file_name = tree_list_name[file1-1][:-4]
 		#print(output_file_name)
@@ -326,6 +331,8 @@ def Plot_gp():
 
 		file1 = file1-1
 		rep1 = rep1-1
+
+
 
 
 		if data_list_raw[file1].gp_fitting[rep1] != None:
@@ -1689,23 +1696,23 @@ class Left_frame :
 
 
 		self.Restruct_button = tk.Button(self.frame023, text="Restructure data", command=Restruct_fun)
-		self.Restruct_button.grid(row = 0, column = 0, sticky="W")
+		self.Restruct_button.grid(row = 0, column = 0, sticky="EW")
 
 		self.Threshold_button = tk.Button(self.frame023, text="Peak analysis", command=Threshold_fun)
-		self.Threshold_button.grid(row = 1, column = 0, sticky="W")
+		self.Threshold_button.grid(row = 1, column = 0, sticky="EW")
 
 		self.Diffusion_button = tk.Button(self.frame023, text="Diffusion analysis", command=Diffusion_fun)
-		self.Diffusion_button.grid(row = 2, column = 0, sticky="W")
+		self.Diffusion_button.grid(row = 2, column = 0, sticky="EW")
 
 		self.Add_to_plot_button = tk.Button(self.frame023, text="Plot", command=Which_tab)
-		self.Add_to_plot_button.grid(row = 3, column = 0, sticky="W")
+		self.Add_to_plot_button.grid(row = 3, column = 0, sticky="EW")
 
 		
 		self.Add_to_plot_button = tk.Button(self.frame023, text="Dot Plot", command=Dot_Plot_fun)
-		self.Add_to_plot_button.grid(row = 4, column = 0, sticky="W")
+		self.Add_to_plot_button.grid(row = 4, column = 0, sticky="EW")
 
 		self.Output_button = tk.Button(self.frame023, text="Output", command=Export_function)
-		self.Output_button.grid(row = 5, column = 0, sticky="W")
+		self.Output_button.grid(row = 5, column = 0, sticky="EW")
 
 		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
 
@@ -3520,7 +3527,11 @@ class Threshold_window:
 					gp_list_temp.append(gp_1)
 
 
-data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x
+			data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].peaks = axis_x_temp
+			data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch2_ind].peaks = axis_y_temp
+
+			print(file_index, rep_index_i)
+			print(data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].peaks)
 			
 			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
 
@@ -4107,7 +4118,7 @@ data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluc
 		self.channel_pairs = []
 
 		self.Channel_pair_label = tk.Label(self.frame001, text = "Channel pair: ")
-		self.Channel_pair_label.grid(row = 0, column = 0, sticky = 'w')
+		self.Channel_pair_label.grid(row = 0, column = 0, sticky = 'ew')
 
 		self.Channel_pair__choice = ttk.Combobox(self.frame001,values = self.channel_pairs,  width = 18 )
 		self.Channel_pair__choice.config(state = "readonly")
@@ -4116,7 +4127,7 @@ data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluc
 
 
 		self.Binning_label = tk.Label(self.frame001, text="Binning: ")
-		self.Binning_label.grid(row = 1, column = 0, sticky = 'w')
+		self.Binning_label.grid(row = 1, column = 0, sticky = 'ew')
 
 		divisors = []
 
@@ -4156,7 +4167,7 @@ data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluc
 
 
 		self.Type_label = tk.Label(self.frame001, text="Detect: ")
-		self.Type_label.grid(row = 3, column = 0, sticky='w')
+		self.Type_label.grid(row = 3, column = 0, sticky='ew')
 
 	
 
@@ -4177,7 +4188,7 @@ data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluc
 		self.Normalization = ttk.Combobox(self.frame001,values = ["manual", "z-score"], width = 9 )
 		self.Normalization.config(state = "readonly")
 								#Threshold.config(font=helv36)
-		self.Normalization.grid(row = 4, column = 1, sticky = 'w')
+		self.Normalization.grid(row = 4, column = 1, sticky = 'ew')
 						
 		self.Normalization.set("z-score")
 						
@@ -4191,29 +4202,29 @@ data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluc
 
 
 		self.ch1_label = tk.Label(self.frame001, text="channel 1: ")
-		self.ch1_label.grid(row = 5, column = 0, sticky='w')
+		self.ch1_label.grid(row = 5, column = 0, sticky='ew')
 
 		self.ch1_th = tk.Entry(self.frame001, width = 9)
-		self.ch1_th.grid(row = 5, column = 1, sticky='w')
+		self.ch1_th.grid(row = 5, column = 1, sticky='ew')
 
 		self.ch1_th.insert("end", str(2))
 
 		self.ch2_label = tk.Label(self.frame001, text="channel 2: ")
-		self.ch2_label.grid(row = 6, column = 0, sticky='w')
+		self.ch2_label.grid(row = 6, column = 0, sticky='ew')
 
 		
 
 		self.ch2_th = tk.Entry(self.frame001, width = 9)
-		self.ch2_th.grid(row = 6, column = 1, sticky='w')
+		self.ch2_th.grid(row = 6, column = 1, sticky='ew')
 
 		self.ch2_th.insert("end", str(2))
 
 
 		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
-		self.Update_thresholds_button.grid(row = 7, column = 0, columnspan = 2, sticky='w')
+		self.Update_thresholds_button.grid(row = 7, column = 0, columnspan = 2, sticky='ew')
 
 		self.Put_mean_button = tk.Button(self.frame001, text="Set to default", command=self.Put_default)
-		self.Put_mean_button.grid(row = 8, column = 0, columnspan = 2, sticky='w')
+		self.Put_mean_button.grid(row = 8, column = 0, columnspan = 2, sticky='ew')
 
 
 
@@ -4280,13 +4291,13 @@ data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluc
 
 		self.Components = ttk.Combobox(self.frame007,values = ["1 component", "2 components", "3 components"], width = 13 )
 		self.Components.config(state = "readonly")
-		self.Components.grid(row = 2, column = 0, columnspan = 2, sticky='w')
+		self.Components.grid(row = 2, column = 0, columnspan = 2, sticky='ew')
 		self.Components.set("1 component")
 
 		self.Components.bind("<<ComboboxSelected>>", self.Choose_components)
 
 		self.Param_label = tk.Label(self.frame007, text="Fitting parameters:")
-		self.Param_label.grid(row = 3, column = 0, sticky='w', columnspan = 2)
+		self.Param_label.grid(row = 3, column = 0, sticky='ew', columnspan = 2)
 
 
 		self.frame004 = tk.Frame(self.frame002)
@@ -4340,6 +4351,296 @@ data_list_raw[file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluc
 
 class Dot_Plot_Window:
 
+	def Choose_dataset(self, event):
+
+
+
+
+		index = self.tree.selection()
+
+		num1, num = index[0].split('I')
+		
+
+		num = int(num, 16)
+
+		
+
+		sum1 = num 
+		file = 0
+		rep = 0
+		for i in range (len(data_list_raw)):
+			rep = 0
+			sum1-=1
+			file+=1
+			if sum1 == 0:
+				file1 = file
+				rep1 = rep
+
+			
+			for j in range (repetitions_list[i]):
+				sum1-=1
+				rep+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+
+
+		if rep1 == 0:
+			rep1+=1
+
+
+		
+
+
+		output_file_name = tree_list_name[file1-1][:-4]
+		#print(output_file_name)
+
+
+
+		file1 = file1-1
+		rep1 = rep1-1
+
+
+
+
+		output_file_name = tree_list_name[file1-1][:-4]
+
+
+
+
+		file_index = file1-1
+		rep_index = rep1-1
+
+		self.axis_choice = []
+
+
+		
+
+		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
+			for i in range (data_list_raw[file_index].datasets_list[0].channels_number):
+				
+				str1 = data_list_raw[file_index].datasets_list[0].channels_list[i].short_name
+				self.axis_choice.append(str1)
+
+
+		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
+			for i in range (data_list_raw[file_index].datasets_list[0].channels_number):
+				
+				str1 = "Diff_" + data_list_raw[file_index].datasets_list[0].channels_list[i].short_name
+				self.axis_choice.append(str1)
+
+		if data_list_raw[file_index].datasets_list[0].cross_number > 1:
+			for i in range (data_list_raw[file_index].datasets_list[0].cross_number):
+				
+				str1 = "Diff_" + data_list_raw[file_index].datasets_list[0].cross_list[i].short_name
+				self.axis_choice.append(str1)
+
+		self.axis_choice.append("GP")
+
+
+		self.Axis_y_label__choice.config(values = self.axis_choice)
+		self.Axis_x_label__choice.config(values = self.axis_choice)
+
+
+
+
+		
+
+
+
+
+	def Plot_dataset(self):
+
+
+
+		global file_index
+		global rep_index
+
+		self.dot_plot.cla()
+		self.dens_plot.cla()
+
+		global tree_list_name
+		global output_file_name
+
+		list1 = self.tree.get_checked()
+
+		
+
+
+
+		thisdict_axis_1 = {}
+		thisdict_axis_2 = {}
+
+		for index in list1:
+
+			num1, num = index.split('I')
+			
+
+			num = int(num, 16)
+
+			
+
+			sum1 = num 
+			file = 0
+			rep = 0
+			for i in range (len(data_list_raw)):
+				rep = 0
+				sum1-=1
+				file+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+				
+				for j in range (repetitions_list[i]):
+					sum1-=1
+					rep+=1
+					if sum1 == 0:
+						file1 = file
+						rep1 = rep
+
+
+
+			if rep1 == 0:
+				rep1+=1
+
+
+			
+			
+
+			output_file_name = tree_list_name[file1-1][:-4]
+			print("Output file name: ", output_file_name)
+			print("Repetiotion: ", rep1-1)
+
+
+
+			file1 = file1-1
+			rep1 = rep1-1
+
+
+			
+
+
+
+
+		
+
+			string_x = self.Axis_x_label__choice.get()
+			string_y = self.Axis_y_label__choice.get()
+
+
+			if string_x.__contains__("Diff") == True:
+
+				str1, str2 = string_x.split("_")
+
+				if data_list_raw[file1].datasets_list[rep1].channels_number > 1:
+					for i in range (data_list_raw[file1].datasets_list[rep1].channels_number):
+						
+						if str2 == data_list_raw[file1].datasets_list[rep1].channels_list[i].short_name:
+							channel_number = i
+
+				if data_list_raw[file1].datasets_list[rep1].cross_number > 1:
+					for i in range (data_list_raw[file1].datasets_list[rep1].cross_number):
+						
+						if str2 == data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name:
+							channel_number = i + data_list_raw[file1].datasets_list[rep1].channels_number
+
+
+
+				if output_file_name in thisdict_axis_1.keys():
+					thisdict_axis_1[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+				else:
+					thisdict_axis_1[output_file_name] = []
+					thisdict_axis_1[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+
+
+			if string_y.__contains__("Diff") == True:
+
+				str1, str2 = string_y.split("_")
+
+				if data_list_raw[file1].datasets_list[rep1].channels_number > 1:
+					for i in range (data_list_raw[file1].datasets_list[rep1].channels_number):
+						
+						if str2 == data_list_raw[file1].datasets_list[rep1].channels_list[i].short_name:
+							channel_number = i
+
+
+
+				if data_list_raw[file1].datasets_list[rep1].cross_number > 1:
+					for i in range (data_list_raw[file1].datasets_list[rep1].cross_number):
+						
+						if str2 == data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name:
+							channel_number = i + data_list_raw[file1].datasets_list[rep1].channels_number
+
+
+
+
+				if output_file_name in thisdict_axis_2.keys():
+					thisdict_axis_2[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+				else:
+					thisdict_axis_2[output_file_name] = []
+					thisdict_axis_2[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+
+
+
+			if string_x.__contains__("GP") == True:
+
+
+				if output_file_name in thisdict_axis_1.keys():
+					thisdict_axis_1[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["txy"])
+				else:
+					thisdict_axis_1[output_file_name] = []
+					thisdict_axis_1[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["txy"])
+
+			if string_y.__contains__("GP") == True:
+
+
+				if output_file_name in thisdict_axis_2.keys():
+					thisdict_axis_2[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["txy"])
+				else:
+					thisdict_axis_2[output_file_name] = []
+					thisdict_axis_2[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["txy"])
+
+
+			if string_x.__contains__("GP") == False and string_x.__contains__("Diff") == False:
+				str1, str2 = string_x.split(" ")
+				channel_number = int(str2) - 1
+
+
+				if output_file_name in thisdict_axis_1.keys():
+					thisdict_axis_1[output_file_name].append(data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+				else:
+					thisdict_axis_1[output_file_name] = []
+					thisdict_axis_1[output_file_name].append(data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+
+			if string_y.__contains__("GP") == False and string_y.__contains__("Diff") == False:
+				str1, str2 = string_y.split(" ")
+				channel_number = int(str2) - 1
+
+				data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks
+
+				if output_file_name in thisdict_axis_2.keys():
+					thisdict_axis_2[output_file_name].append(data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+				else:
+					thisdict_axis_2[output_file_name] = []
+					thisdict_axis_2[output_file_name].append(data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+
+
+
+
+
+
+
+		
+			
+		"""		for key in thisdict_axis_1.keys():
+			self.dot_plot.scatter(thisdict_axis_1[key], thisdict_axis_2[key], label = key )
+			self.dot_plot.legend(loc='upper right')
+
+		self.dot_plot.set_ylabel(string_x)
+		self.dot_plot.set_xlabel(string_y)"""
+
 	def __init__(self, win_width, win_height, dpi_all):
 
 		self.channel_index = 0
@@ -4376,6 +4677,7 @@ class Dot_Plot_Window:
 
 		self.Datalist = tk.Listbox(self.frame0002, width = 100, height = 10)
 		self.Datalist.pack(side = "top", anchor = "nw")
+
 		
 		
 		
@@ -4387,7 +4689,7 @@ class Dot_Plot_Window:
 		self.tree.config(yscrollcommand = self.scrollbar.set)
 		self.scrollbar.config(command = self.tree.yview)
 
-		#self.tree.bind('<<TreeviewSelect>>', self.Choose_curve)
+		self.tree.bind('<<TreeviewSelect>>', self.Choose_dataset)
 
 
 
@@ -4395,7 +4697,7 @@ class Dot_Plot_Window:
 
 		for i in range(0, len(tree_list_name)):
 			name = tree_list_name[i]
-			treetree = Data_tree_fcs_fit (self.tree, name, data_list_raw[i])
+			treetree = Data_tree (self.tree, name, data_list_raw[i].repetitions)
 
 
 		self.frame003 = tk.Frame(self.frame002)
@@ -4444,7 +4746,6 @@ class Dot_Plot_Window:
 
 
 
-
 		self.canvas5 = FigureCanvasTkAgg(self.figure5, self.frame000)
 		self.canvas5.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
 
@@ -4457,98 +4758,29 @@ class Dot_Plot_Window:
 		self.Export_plot_button = tk.Button(self.frame000, text="Save plot data", command=Norm)
 		self.Export_plot_button.pack(side = "top", anchor = "nw")
 
-
-
 		
 
+		self.axis_choice = []
 
 
+		self.Axis_x_label = tk.Label(self.frame001, text = "X axis: ")
+		self.Axis_x_label.grid(row = 0, column = 0, sticky = 'ew')
 
-		
-		
+		self.Axis_x_label__choice = ttk.Combobox(self.frame001,values = self.axis_choice,  width = 18 )
+		self.Axis_x_label__choice.config(state = "readonly")
 
-		
+		self.Axis_x_label__choice.grid(row = 0, column = 1)
 
-		self.Norm_label = tk.Label(self.frame001, text="FCS curve fitting: ")
-		self.Norm_label.grid(row = 0, column = 0, columnspan = 2, sticky = 'w')
+		self.Axis_y_label = tk.Label(self.frame001, text = "Y axis: ")
+		self.Axis_y_label.grid(row = 1, column = 0, sticky = 'ew')
 
-		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet"], width = 9 )
-		self.Triplet.config(state = "readonly")
-		
-		self.Triplet.grid(row = 1, column = 0, sticky='ew')
+		self.Axis_y_label__choice = ttk.Combobox(self.frame001,values = self.axis_choice,  width = 18 )
+		self.Axis_y_label__choice.config(state = "readonly")
 
-		self.Triplet.set("triplet")
+		self.Axis_y_label__choice.grid(row = 1, column = 1)
 
-		#self.Triplet.bind("<<ComboboxSelected>>", self.Update_fitting)
-
-		self.Components = ttk.Combobox(self.frame001,values = ["1 component"], width = 9)
-		self.Components.config(state = "readonly")
-		
-		self.Components.grid(row = 1, column = 1, sticky='ew')
-
-		self.Components.set("1 component")
-
-		#self.Components.bind("<<ComboboxSelected>>", self.Update_fitting)
-
-		self.Dimension = ttk.Combobox(self.frame001,values = ["2D", "3D"], width = 9)
-		self.Dimension.config(state = "readonly")
-		
-		self.Dimension.grid(row = 1, column = 2, sticky='ew')
-
-		self.Dimension.set("3D")
-
-		#self.Dimension.bind("<<ComboboxSelected>>", self.Update_fitting)
-
-
-
-		self.Fit_button = tk.Button(self.frame001, text="Fit", command=Norm)
-		self.Fit_button.grid(row = 2, column = 0, sticky='ew')
-
-
-
-		self.Fit_all_button = tk.Button(self.frame001, text="Fit this file", command=Norm)
-		self.Fit_all_button.grid(row = 2, column = 1, sticky='ew')
-
-		self.Fit_button_ticked = tk.Button(self.frame001, text="Fit ticked", command=Norm)
-		self.Fit_button_ticked.grid(row = 3, column = 0, sticky='ew')
-
-
-
-		self.Fit_all_button_all = tk.Button(self.frame001, text="Fit all", command=Norm)
-		self.Fit_all_button_all.grid(row = 3, column = 1, sticky='ew')
-
-		self.Calibration_label = tk.Label(self.frame001, text="Calibration: ")
-		self.Calibration_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
-
-		self.D_cal_label = tk.Label(self.frame001, text="Diff coeff: ")
-		self.D_cal_label.grid(row = 5, column = 0, sticky = 'w')
-
-		self.D_cal_entry = tk.Entry(self.frame001, width = 9)
-		self.D_cal_entry.grid(row = 5, column = 1, sticky='w')
-
-		self.D_cal_entry.insert("end", str(430))
-
-		self.Txy_label = tk.Label(self.frame001, text="Diff time: ")
-		self.Txy_label.grid(row = 6, column = 0, sticky = 'w')
-
-
-		self.Txy_entry = tk.Entry(self.frame001, width = 9)
-		self.Txy_entry.grid(row = 6, column = 1, sticky='w')
-
-		self.Txy_entry.insert("end", str(0.025))
-
-		self.Table_label = tk.Label(self.frame001, text="Fitting parameters: ")
-		self.Table_label.grid(row = 7, column = 0, columnspan = 2, sticky = 'w')
-
-
-
-
-
-
-		
-		
-		
-
+		self.Plot_button = tk.Button(self.frame001, text="Plot", command=self.Plot_dataset)
+		self.Plot_button.grid(row = 2, column = 0, columnspan = 2, sticky = 'ew')
 
 
 		
@@ -4557,8 +4789,7 @@ class Dot_Plot_Window:
 
 
 
-		self.frame004 = tk.Frame(self.frame002)
-		self.frame004.pack(side = "top", anchor = "nw")
+
 
 		
 
