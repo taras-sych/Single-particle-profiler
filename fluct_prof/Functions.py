@@ -134,8 +134,7 @@ def Norm():
 	print (1)
 
 def Plot_main():
-	global main_xlim
-	global main_ylim
+
 	ffp.main.cla()
 	#ffp.figure3.clf()
 
@@ -158,7 +157,7 @@ def Plot_main():
 
 
 
-	list1 = data_frame.tree.get_checked()
+	list1 = data_c.data_frame.tree.get_checked()
 
 	flag = False
 
@@ -174,7 +173,7 @@ def Plot_main():
 		sum1 = num 
 		file = 0
 		rep = 0
-		for i in range (len(data_list_raw)):
+		for i in range (len(data_c.data_list_raw)):
 			rep = 0
 			sum1-=1
 			file+=1
@@ -183,7 +182,7 @@ def Plot_main():
 				rep1 = rep
 
 			
-			for j in range (repetitions_list[i]):
+			for j in range (data_c.repetitions_list[i]):
 				sum1-=1
 				rep+=1
 				if sum1 == 0:
@@ -277,12 +276,11 @@ def Plot_main():
 
 def Plot_gp():
 	gp_list = []
-	data_frame.gp_plot.cla()
+	data_c.data_frame.gp_plot.cla()
 
-	global tree_list_name
-	global output_file_name
 
-	list1 = data_frame.tree.get_checked()
+
+	list1 = data_c.data_frame.tree.get_checked()
 
 	print(list1)
 
@@ -302,7 +300,7 @@ def Plot_gp():
 		sum1 = num 
 		file = 0
 		rep = 0
-		for i in range (len(data_list_raw)):
+		for i in range (len(data_c.data_list_raw)):
 			rep = 0
 			sum1-=1
 			file+=1
@@ -311,7 +309,7 @@ def Plot_gp():
 				rep1 = rep
 
 			
-			for j in range (repetitions_list[i]):
+			for j in range (data_c.repetitions_list[i]):
 				sum1-=1
 				rep+=1
 				if sum1 == 0:
@@ -327,7 +325,7 @@ def Plot_gp():
 		
 		print(rep1)
 
-		output_file_name = tree_list_name[file1-1][:-4]
+		output_file_name = data_c.tree_list_name[file1-1][:-4]
 		#print(output_file_name)
 
 
@@ -338,72 +336,72 @@ def Plot_gp():
 
 
 
-		if data_list_raw[file1].gp_fitting[rep1] != None:
+		if data_c.data_list_raw[file1].gp_fitting[rep1] != None:
 
-			if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 3:
+			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 3:
 
 
 				if output_file_name in thisdict.keys():
 
-					thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+					thisdict[output_file_name].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 				else:
 					thisdict[output_file_name] = []
-					thisdict[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+					thisdict[output_file_name].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
-			if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 6:
-
-				key = output_file_name + " peak 1"
-
-
-				if key in thisdict.keys():
-
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
-				else:
-					thisdict[key] = []
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
-
-				key = output_file_name + " peak 2"
-
-
-				if key in thisdict.keys():
-
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
-				else:
-					thisdict[key] = []
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
-
-
-			if len(data_list_raw[file1].gp_fitting[rep1].keys()) == 9:
+			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 6:
 
 				key = output_file_name + " peak 1"
 
 
 				if key in thisdict.keys():
 
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean1"])
 				else:
 					thisdict[key] = []
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean1"])
 
 				key = output_file_name + " peak 2"
 
 
 				if key in thisdict.keys():
 
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean2"])
 				else:
 					thisdict[key] = []
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+
+
+			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 9:
+
+				key = output_file_name + " peak 1"
+
+
+				if key in thisdict.keys():
+
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean1"])
+
+				key = output_file_name + " peak 2"
+
+
+				if key in thisdict.keys():
+
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean2"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean2"])
 
 				key = output_file_name + " peak 3"
 
 
 				if key in thisdict.keys():
 
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean3"])
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean3"])
 				else:
 					thisdict[key] = []
-					thisdict[key].append(data_list_raw[file1].gp_fitting[rep1]["Mean3"])
+					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean3"])
 
 		
 		
@@ -419,25 +417,24 @@ def Plot_gp():
 
 	if vals:
 		#sns.axlabel( ylabel="GP", fontsize=16)
-		sns.boxplot(data=vals, width=.18, ax = data_frame.gp_plot)
-		sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = data_frame.gp_plot)
+		sns.boxplot(data=vals, width=.18, ax = data_c.data_frame.gp_plot)
+		sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = data_c.data_frame.gp_plot)
 
 		# category labels
-		data_frame.gp_plot.set_xticklabels(keys)
+		data_c.data_frame.gp_plot.set_xticklabels(keys)
 		#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		data_frame.gp_plot.set_ylabel('GP')
+		data_c.data_frame.gp_plot.set_ylabel('GP')
 
 
 	
 	
 def Plot_diff():
 	diff_list = []
-	data_frame.diff_plot.cla()
+	data_c.data_frame.diff_plot.cla()
 
-	global tree_list_name
-	global output_file_name
 
-	list1 = data_frame.tree.get_checked()
+
+	list1 = data_c.data_frame.tree.get_checked()
 
 
 
@@ -455,7 +452,7 @@ def Plot_diff():
 		sum1 = num 
 		file = 0
 		rep = 0
-		for i in range (len(data_list_raw)):
+		for i in range (len(data_c.data_list_raw)):
 			rep = 0
 			sum1-=1
 			file+=1
@@ -464,7 +461,7 @@ def Plot_diff():
 				rep1 = rep
 
 			
-			for j in range (repetitions_list[i]):
+			for j in range (data_c.repetitions_list[i]):
 				sum1-=1
 				rep+=1
 				if sum1 == 0:
@@ -480,7 +477,7 @@ def Plot_diff():
 		
 
 
-		output_file_name = tree_list_name[file1-1][:-4]
+		data_c.output_file_name = data_c.tree_list_name[file1-1][:-4]
 
 
 
@@ -496,33 +493,33 @@ def Plot_diff():
 									thisdict[output_file_name] = []
 									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])"""
 
-		for item in range(len(data_list_raw[file1].datasets_list[rep1].channels_list)):
+		for item in range(len(data_c.data_list_raw[file1].datasets_list[rep1].channels_list)):
 
-			if data_frame.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name].get() == 1 and data_list_raw[file1].diff_fitting[rep1, item]!= None:
+			if data_c.data_frame.channels_flags[data_c.data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name].get() == 1 and data_c.data_list_raw[file1].diff_fitting[rep1, item]!= None:
 
-				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name 
-
-				if key in thisdict.keys():
-					thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
-				else:
-					thisdict[key] = []
-					thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
-
-		for i in range(len(data_list_raw[file1].datasets_list[rep1].cross_list)):
-
-			item = i + len(data_list_raw[file1].datasets_list[rep1].channels_list)
-
-
-
-			if data_frame.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1 and data_list_raw[file1].diff_fitting[rep1, item] != None:
-
-				key = output_file_name + " " + data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name 
+				key = output_file_name + " " + data_c.data_list_raw[file1].datasets_list[rep1].channels_list[item].short_name 
 
 				if key in thisdict.keys():
-					thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+					thisdict[key].append(data_c.data_list_raw[file1].diff_fitting[rep1, item]["txy"])
 				else:
 					thisdict[key] = []
-					thisdict[key].append(data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+					thisdict[key].append(data_c.data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+
+		for i in range(len(data_c.data_list_raw[file1].datasets_list[rep1].cross_list)):
+
+			item = i + len(data_c.data_list_raw[file1].datasets_list[rep1].channels_list)
+
+
+
+			if data_c.data_frame.channels_flags[data_c.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1 and data_c.data_list_raw[file1].diff_fitting[rep1, item] != None:
+
+				key = output_file_name + " " + data_c.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name 
+
+				if key in thisdict.keys():
+					thisdict[key].append(data_c.data_list_raw[file1].diff_fitting[rep1, item]["txy"])
+				else:
+					thisdict[key] = []
+					thisdict[key].append(data_c.data_list_raw[file1].diff_fitting[rep1, item]["txy"])
 
 		
 
@@ -538,23 +535,22 @@ def Plot_diff():
 	if vals:
 		sns.set(context='notebook', style='whitegrid')
 		#sns.axlabel( ylabel="Diffusion time", fontsize=16)
-		sns.boxplot(data=vals, width=.18, ax = data_frame.diff_plot)
-		sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = data_frame.diff_plot)
+		sns.boxplot(data=vals, width=.18, ax = data_c.data_frame.diff_plot)
+		sns.swarmplot(data=vals, size=6, edgecolor="black", linewidth=.9, ax = data_c.data_frame.diff_plot)
 
 		# category labels
-		data_frame.diff_plot.set_xticklabels(keys)
+		data_c.data_frame.diff_plot.set_xticklabels(keys)
 		#diff.main.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		data_frame.diff_plot.set_ylabel('Diffusion time')
+		data_c.data_frame.diff_plot.set_ylabel('Diffusion time')
 		
 
 def Plot_gp_diff():
 
 	gp_diff.main.cla()
 
-	global tree_list_name
-	global output_file_name
 
-	list1 = data_frame.tree.get_checked()
+
+	list1 = data_c.data_frame.tree.get_checked()
 
 
 
@@ -573,7 +569,7 @@ def Plot_gp_diff():
 		sum1 = num 
 		file = 0
 		rep = 0
-		for i in range (len(data_list_raw)):
+		for i in range (len(data_c.data_list_raw)):
 			rep = 0
 			sum1-=1
 			file+=1
@@ -582,7 +578,7 @@ def Plot_gp_diff():
 				rep1 = rep
 
 			
-			for j in range (repetitions_list[i]):
+			for j in range (data_c.repetitions_list[i]):
 				sum1-=1
 				rep+=1
 				if sum1 == 0:
@@ -598,7 +594,7 @@ def Plot_gp_diff():
 		
 
 
-		output_file_name = tree_list_name[file1-1][:-4]
+		data_c.output_file_name = data_c.tree_list_name[file1-1][:-4]
 
 
 
@@ -614,17 +610,17 @@ def Plot_gp_diff():
 									thisdict[output_file_name].append(data_list_raw[file1].diff_fitting[rep1]["txy"])"""
 
 		if output_file_name in thisdict_diff.keys():
-			thisdict_diff[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, 0]["txy"])
+			thisdict_diff[output_file_name].append(data_c.data_list_raw[file1].diff_fitting[rep1, 0]["txy"])
 		else:
 			thisdict_diff[output_file_name] = []
-			thisdict_diff[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, 0]["txy"])
+			thisdict_diff[output_file_name].append(data_c.data_list_raw[file1].diff_fitting[rep1, 0]["txy"])
 
 
 		if output_file_name in thisdict_gp.keys():
-			thisdict_gp[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+			thisdict_gp[output_file_name].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 		else:
 			thisdict_gp[output_file_name] = []
-			thisdict_gp[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["Mean"])
+			thisdict_gp[output_file_name].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
 		
 	for key in thisdict_diff.keys():
@@ -648,8 +644,8 @@ def Which_tab():
 
 	Plot_gp()
 
-	data_frame.canvas1.draw()
-	data_frame.figure1.tight_layout()
+	data_c.data_frame.canvas1.draw()
+	data_c.data_frame.figure1.tight_layout()
 
 
 
@@ -680,17 +676,17 @@ def Diffusion_fun():
 
 		th_win = diff_win.Diffusion_window(data_c.win_width, data_c.win_height, data_c.dpi_all)
 
-	if len(tree_list_name) == 0:
+	if len(data_c.tree_list_name) == 0:
 
 		tk.messagebox.showerror(title='Error', message=Message_generator())
 
 def Dot_Plot_fun():
 
-	if len(tree_list_name) > 0:
+	if len(data_c.tree_list_name) > 0:
 
 		dot_plot_win = Dot_Plot_Window(win_width, win_height, dpi_all)
 
-	if len(tree_list_name) == 0:
+	if len(data_c.tree_list_name) == 0:
 
 		tk.messagebox.showerror(title='Error', message=Message_generator())
 
@@ -704,9 +700,7 @@ def Restruct_fun():
 def Export_function():
 
 
-	global tree_list_name
-	global output_file_name
-	global initialdirectory
+
 
 	now = datetime.now()
 	str1, str2 = str(now).split(".")
@@ -730,7 +724,7 @@ def Export_function():
 
 
 
-	list1 = data_frame.tree.get_checked()
+	list1 = data_c.data_frame.tree.get_checked()
 
 
 
@@ -751,7 +745,7 @@ def Export_function():
 		sum1 = num 
 		file = 0
 		rep = 0
-		for i in range (len(data_list_raw)):
+		for i in range (len(data_c.data_list_raw)):
 			rep = 0
 			sum1-=1
 			file+=1
@@ -810,7 +804,7 @@ def Export_function():
 
 		heading_line_2 += "GP" + "\t" + "Diffusion_coef" + "\t" + "Diffusion_time" + "\t"
 
-		output_file_name, str2 = tree_list_name[file1].split(".")
+		output_file_name, str2 = data_c.tree_list_name[file1].split(".")
 
 
 
@@ -825,20 +819,20 @@ def Export_function():
 		chan = {}
 
 
-		for channel in range(len(data_list_raw[file1].datasets_list[rep1].channels_list)):
+		for channel in range(len(data_c.data_list_raw[file1].datasets_list[rep1].channels_list)):
 
-			if data_frame.channels_flags[data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name].get() == 1:
+			if data_c.data_frame.channels_flags[data_c.data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name].get() == 1:
 
-				chan[data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name] = channel
+				chan[data_c.data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name] = channel
 
 
-		for i in range (len(data_list_raw[file1].datasets_list[rep1].cross_list)):
+		for i in range (len(data_c.data_list_raw[file1].datasets_list[rep1].cross_list)):
 
-			channel = i + len(data_list_raw[file1].datasets_list[rep1].channels_list)
+			channel = i + len(data_c.data_list_raw[file1].datasets_list[rep1].channels_list)
 
-			if data_frame.channels_flags[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1:
+			if data_c.data_frame.channels_flags[data_c.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name].get() == 1:
 
-				chan[data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name] = channel
+				chan[data_c.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name] = channel
 
 		
 		for name in chan.keys():
@@ -850,9 +844,9 @@ def Export_function():
 
 			rep0 = output_numbers_dict[file1][0]
 
-			if data_list_raw[file1].diff_fitting[rep0, channel] != None:
+			if data_c.data_list_raw[file1].diff_fitting[rep0, channel] != None:
 
-				for key in data_list_raw[file1].diff_fitting[rep0, channel].keys():
+				for key in data_c.data_list_raw[file1].diff_fitting[rep0, channel].keys():
 
 					line += key + "\t"
 
@@ -871,22 +865,22 @@ def Export_function():
 
 				try:
 
-					for key in data_list_raw[file1].diff_fitting[rep1, channel].keys():
+					for key in data_c.data_list_raw[file1].diff_fitting[rep1, channel].keys():
 
-						line += str(data_list_raw[file1].diff_fitting[rep1, channel][key]) + "\t"
+						line += str(data_c.data_list_raw[file1].diff_fitting[rep1, channel][key]) + "\t"
 				except: 
 					pass
 
 				
 				try:
-					line += str(data_list_raw[file1].N[rep1, channel]) + "\t"
-					line += str(data_list_raw[file1].cpm[rep1, channel]) + "\t"
+					line += str(data_c.data_list_raw[file1].N[rep1, channel]) + "\t"
+					line += str(data_c.data_list_raw[file1].cpm[rep1, channel]) + "\t"
 				except:
 					pass
 
 				
 				try:
-					line += str(data_list_raw[file1].diff_coeffs[rep1, channel]) + "\t"
+					line += str(data_c.data_list_raw[file1].diff_coeffs[rep1, channel]) + "\t"
 				except:
 					pass
 
@@ -903,7 +897,7 @@ def Export_function():
 
 		try:
 
-			for key in data_list_raw[file1].gp_fitting[rep0].keys():
+			for key in data_c.data_list_raw[file1].gp_fitting[rep0].keys():
 				line += key + "\t"
 		except:
 			pass
@@ -916,9 +910,9 @@ def Export_function():
 
 			try:
 
-				for key in data_list_raw[file1].gp_fitting[rep1].keys():
+				for key in data_c.data_list_raw[file1].gp_fitting[rep1].keys():
 
-					line += str(data_list_raw[file1].gp_fitting[rep1][key]) + "\t"
+					line += str(data_c.data_list_raw[file1].gp_fitting[rep1][key]) + "\t"
 
 			except:
 				pass

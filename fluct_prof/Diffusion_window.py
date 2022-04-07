@@ -176,7 +176,7 @@ class Diffusion_window :
 					ch1 = ch
 				
 				
-				for j in range (repetitions_list[i]):
+				for j in range (data_cont.repetitions_list[i]):
 					ch = 0
 					sum1-=1
 					
@@ -186,7 +186,7 @@ class Diffusion_window :
 						rep1 = rep
 						ch1 = ch
 
-					for k in range (total_channels_list[i]):
+					for k in range (data_cont.total_channels_list[i]):
 						sum1-=1
 
 						ch+=1
@@ -395,7 +395,7 @@ class Diffusion_window :
 		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 
 			data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index] = round(1/params["GN0"].value,3)
-			data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, self.channel_index] = round(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[self.channel_index].count_rate/data_cont.data_list_raw[file_index].N[data_cont.rep_index, self.channel_index],3)
+			data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, self.channel_index] = round(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[self.channel_index].count_rate/data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index],3)
 			
 
 			if self.fit_all_flag == False:
@@ -434,10 +434,10 @@ class Diffusion_window :
 		
 		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D":
 
-			y_model = Corr_curve_3d(x, *param_list)
+			y_model = fun.Corr_curve_3d(x, *param_list)
 
 		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D":
-			y_model = Corr_curve_2d(x, *param_list)
+			y_model = fun.Corr_curve_2d(x, *param_list)
 
 
 		return y_model - ydata
@@ -487,19 +487,19 @@ class Diffusion_window :
 
 					if len(popt) == 7:
 						
-						self.curves.plot(x1, Corr_curve_2d(x1, *popt), label = "Fit")
+						self.curves.plot(x1, fun.Corr_curve_2d(x1, *popt), label = "Fit")
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
-						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, Corr_curve_2d(x1, *popt))
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d(x1, *popt))
 
 					if len(popt) == 8:
 						
-						self.curves.plot(x1, Corr_curve_3d(x1, *popt), label = "Fit")
+						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
-						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, Corr_curve_3d(x1, *popt))
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d(x1, *popt))
 
 
 
@@ -528,11 +528,11 @@ class Diffusion_window :
 
 					if len(popt) == 7:
 						
-						self.curves.plot(x1, Corr_curve_2d(x1, *popt), label = "Fit")
+						self.curves.plot(x1, fun.Corr_curve_2d(x1, *popt), label = "Fit")
 
 					if len(popt) == 8:
 						
-						self.curves.plot(x1, Corr_curve_3d(x1, *popt), label = "Fit")
+						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
 
 
 
@@ -867,7 +867,7 @@ class Diffusion_window :
 
 		for i in range(0, len(data_cont.tree_list_name)):
 			name = data_cont.tree_list_name[i]
-			treetree = Data_tree_fcs_fit (self.tree, name, data_cont.data_list_raw[i])
+			treetree = d_tree.Data_tree_fcs_fit (self.tree, name, data_cont.data_list_raw[i])
 
 
 		self.frame003 = tk.Frame(self.frame002)
