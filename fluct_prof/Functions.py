@@ -676,9 +676,9 @@ def Threshold_fun():
 		tk.messagebox.showerror(title='Error', message=Message_generator())
 
 def Diffusion_fun():
-	if len(tree_list_name) > 0:
+	if len(data_c.tree_list_name) > 0:
 
-		th_win = Diffusion_window(win_width, win_height, dpi_all)
+		th_win = diff_win.Diffusion_window(data_c.win_width, data_c.win_height, data_c.dpi_all)
 
 	if len(tree_list_name) == 0:
 

@@ -1,3 +1,74 @@
+#--------------------------
+#Importing general modules
+#--------------------------
+import tkinter as tk
+from tkinter import ttk
+from tkinter import font as tkFont
+import matplotlib.pyplot as plt
+
+import csv
+
+import lmfit
+
+import time
+
+
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+
+
+# Implement the default Matplotlib key bindings.
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
+from matplotlib import cm as mplcm
+
+from ttkwidgets import CheckboxTreeview
+
+
+
+import codecs
+
+import os
+
+from datetime import datetime
+
+from scipy import stats
+
+import copy
+
+import numpy as np
+
+from scipy.signal import find_peaks
+
+from scipy.optimize import curve_fit
+import random
+
+import seaborn as sns
+
+
+#--------------------------
+#End of importing general modules
+#--------------------------
+
+
+#--------------------------
+#Importing own modules
+#--------------------------
+
+from fluct_prof import Functions as fun
+
+from fluct_prof import Data_container as data_cont
+
+from fluct_prof import Data_tree as d_tree
+
+from fluct_prof import fcs_importer
+
+#--------------------------
+#End of importing own modules
+#--------------------------
+
+
+
+
 class Diffusion_window :
 
 	def Save_plot_data(self):
@@ -15,7 +86,7 @@ class Diffusion_window :
 
 	def Apply_to_all(self):
 	
-		global rep_index
+		
 
 		self.fit_all_flag = True
 
@@ -26,12 +97,12 @@ class Diffusion_window :
 
 
 
-		for rep_index_i in range (data_list_raw[file_index].repetitions): 
-			rep_index = rep_index_i
-			for channel_index_i in range(data_list_raw[file_index].datasets_list[rep_index].channels_number + data_list_raw[file_index].datasets_list[rep_index].cross_number):
+		for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions): 
+			data_cont.rep_index = rep_index_i
+			for channel_index_i in range(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number + data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_number):
 
 
-				if channel_index_i < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+				if channel_index_i < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 					
 					if self.channels_flags[channel_index_i].get() == 1:
 
@@ -45,7 +116,7 @@ class Diffusion_window :
 
 				else:
 
-					if self.cross_flags[channel_index_i - data_list_raw[file_index].datasets_list[rep_index].channels_number].get() == 1:
+					if self.cross_flags[channel_index_i - data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number].get() == 1:
 
 						self.channel_index = channel_index_i
 						for param in self.list_of_params:
@@ -69,8 +140,7 @@ class Diffusion_window :
 
 		#print("Apply to ticked")
 
-		global file_index
-		global rep_index
+
 		#self.curve_index = 0
 
 		list1 = self.tree.get_checked()
@@ -94,7 +164,7 @@ class Diffusion_window :
 			
 			
 
-			for i in range (len(data_list_raw)):
+			for i in range (len(data_cont.data_list_raw)):
 				#print ("I am here")
 				rep = 0
 				ch = 0
@@ -136,9 +206,9 @@ class Diffusion_window :
 			if ch1 == 0:
 				ch1+=1
 
-			file_index = file1-1
+			data_cont.file_index = file1-1
 			
-			rep_index = rep1-1
+			data_cont.rep_index = rep1-1
 
 			self.channel_index = ch1-1
 			
@@ -157,7 +227,7 @@ class Diffusion_window :
 			channel_index_i = self.channel_index
 
 
-			if channel_index_i < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+			if channel_index_i < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 				
 				if self.channels_flags[channel_index_i].get() == 1:
 
@@ -171,7 +241,7 @@ class Diffusion_window :
 
 			else:
 
-				if self.cross_flags[channel_index_i - data_list_raw[file_index].datasets_list[rep_index].channels_number].get() == 1:
+				if self.cross_flags[channel_index_i - data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number].get() == 1:
 
 					self.channel_index = channel_index_i
 					for param in self.list_of_params:
@@ -193,8 +263,7 @@ class Diffusion_window :
 	def Apply_to_all_all(self):
 				
 
-		global rep_index
-		global file_index
+
 
 		self.fit_all_flag = True
 
@@ -205,14 +274,14 @@ class Diffusion_window :
 
 
 
-		for file_index_i in range (len(data_list_raw)):
-			file_index = file_index_i
-			for rep_index_i in range (data_list_raw[file_index].repetitions): 
-				rep_index = rep_index_i
-				for channel_index_i in range(data_list_raw[file_index].datasets_list[rep_index].channels_number + data_list_raw[file_index].datasets_list[rep_index].cross_number):
+		for file_index_i in range (len(data_cont.data_list_raw)):
+			data_cont.file_index = file_index_i
+			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions): 
+				data_cont.rep_index = rep_index_i
+				for channel_index_i in range(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number + data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_number):
 
 
-					if channel_index_i < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+					if channel_index_i < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 						
 						if self.channels_flags[channel_index_i].get() == 1:
 
@@ -226,7 +295,7 @@ class Diffusion_window :
 
 					else:
 
-						if self.cross_flags[channel_index_i - data_list_raw[file_index].datasets_list[rep_index].channels_number].get() == 1:
+						if self.cross_flags[channel_index_i - data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number].get() == 1:
 
 							self.channel_index = channel_index_i
 							for param in self.list_of_params:
@@ -251,17 +320,17 @@ class Diffusion_window :
 
 
 		
-		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 			#print('Channel to process', self.channel_index)
-			x = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].auto_corr_arr.x
-			y = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].auto_corr_arr.y
+			x = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[self.channel_index].auto_corr_arr.x
+			y = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[self.channel_index].auto_corr_arr.y
 
 		else:
 
-			num = data_list_raw[file_index].datasets_list[rep_index].channels_number
+			num = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number
 			#print('Cross to process', num - self.channel_index)
-			x = data_list_raw[file_index].datasets_list[rep_index].cross_list[self.channel_index - num].cross_corr_arr.x
-			y = data_list_raw[file_index].datasets_list[rep_index].cross_list[self.channel_index - num].cross_corr_arr.y
+			x = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[self.channel_index - num].cross_corr_arr.x
+			y = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[self.channel_index - num].cross_corr_arr.y
 
 
 
@@ -312,27 +381,27 @@ class Diffusion_window :
 
 
 
-		data_list_raw[file_index].diff_fitting[rep_index, self.channel_index] = output_dict
+		data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, self.channel_index] = output_dict
 		#print(data_list_raw[file_index].diff_fitting)
 
 		#print(data_list_raw[file_index].diff_fitting)
 
-		data_list_raw[file_index].diff_coeffs[rep_index, self.channel_index] = round(np.float64(self.Txy_entry.get()) * np.float64(self.D_cal_entry.get()) / params["txy"].value,3)
+		data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index] = round(np.float64(self.Txy_entry.get()) * np.float64(self.D_cal_entry.get()) / params["txy"].value,3)
 
 		if self.fit_all_flag == False:
 
-			self.D_value.config(text = str(data_list_raw[file_index].diff_coeffs[rep_index, self.channel_index]))
+			self.D_value.config(text = str(data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index]))
 
-		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 
-			data_list_raw[file_index].N[rep_index, self.channel_index] = round(1/params["GN0"].value,3)
-			data_list_raw[file_index].cpm[rep_index, self.channel_index] = round(data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].count_rate/data_list_raw[file_index].N[rep_index, self.channel_index],3)
+			data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index] = round(1/params["GN0"].value,3)
+			data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, self.channel_index] = round(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[self.channel_index].count_rate/data_cont.data_list_raw[file_index].N[data_cont.rep_index, self.channel_index],3)
 			
 
 			if self.fit_all_flag == False:
 
-				self.cpm_label.config(text = str(data_list_raw[file_index].cpm[rep_index, self.channel_index]))
-				self.N_label.config(text = str(data_list_raw[file_index].N[rep_index, self.channel_index]))
+				self.cpm_label.config(text = str(data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, self.channel_index]))
+				self.N_label.config(text = str(data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index]))
 				
 				
 			
@@ -386,8 +455,7 @@ class Diffusion_window :
 		self.save_plot_dict = {}
 
 
-		global file_index
-		global rep_index
+
 
 		if self.fit_all_flag == False:
 			self.curves.cla()
@@ -395,33 +463,33 @@ class Diffusion_window :
 		
 
 
-		num = len(data_list_raw[file_index].datasets_list[rep_index].channels_list)
-		for i in range (len(data_list_raw[file_index].datasets_list[rep_index].channels_list)):
+		num = len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)
+		for i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
 			if self.channels_flags[i].get() == 1:
 
-				x1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].auto_corr_arr.x
-				y1 = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].auto_corr_arr.y
+				x1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].auto_corr_arr.x
+				y1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].auto_corr_arr.y
 
 				if self.fit_all_flag == False:
-					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name)
+					self.curves.scatter(x1, y1, label = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name)
 
-					self.save_plot_dict [data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name] = fcs_importer.XY_plot(x1, y1)
+					self.save_plot_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name] = fcs_importer.XY_plot(x1, y1)
 
-				if 	data_list_raw[file_index].diff_fitting[rep_index, i] != None:
+				if 	data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i] != None:
 
 					popt = []
 
-					for key in data_list_raw[file_index].diff_fitting[rep_index, i].keys():
+					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i].keys():
 
-						popt.append(np.float64(data_list_raw[file_index].diff_fitting[rep_index, i][key]))
+						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i][key]))
 
 
 					if len(popt) == 7:
 						
 						self.curves.plot(x1, Corr_curve_2d(x1, *popt), label = "Fit")
 
-						key = str(data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name) + " Fit"
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, Corr_curve_2d(x1, *popt))
 
@@ -429,33 +497,33 @@ class Diffusion_window :
 						
 						self.curves.plot(x1, Corr_curve_3d(x1, *popt), label = "Fit")
 
-						key = str(data_list_raw[file_index].datasets_list[rep_index].channels_list[i].short_name) + " Fit"
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, Corr_curve_3d(x1, *popt))
 
 
 
 
-		for i in range (len(data_list_raw[file_index].datasets_list[rep_index].cross_list)):
+		for i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list)):
 
 			if self.cross_flags[i].get() == 1:
 
-				x1 = data_list_raw[file_index].datasets_list[rep_index].cross_list[i].cross_corr_arr.x
-				y1 = data_list_raw[file_index].datasets_list[rep_index].cross_list[i].cross_corr_arr.y
+				x1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].cross_corr_arr.x
+				y1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].cross_corr_arr.y
 
 				if self.fit_all_flag == False:
-					self.curves.scatter(x1, y1, label = data_list_raw[file_index].datasets_list[rep_index].cross_list[i].short_name)
+					self.curves.scatter(x1, y1, label = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name)
 
-				k = i + len(data_list_raw[file_index].datasets_list[rep_index].channels_list)
+				k = i + len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)
 
-				if 	data_list_raw[file_index].diff_fitting[rep_index, k] != None:
+				if 	data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k] != None:
 
 					popt = []
 
 
-					for key in data_list_raw[file_index].diff_fitting[rep_index, k].keys():
+					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k].keys():
 
-						popt.append(np.float64(data_list_raw[file_index].diff_fitting[rep_index, k][key]))
+						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k][key]))
 
 
 					if len(popt) == 7:
@@ -488,8 +556,7 @@ class Diffusion_window :
 
 	def Choose_curve(self, event):
 
-		global file_index
-		global rep_index
+
 		#self.curve_index = 0
 
 		index = self.tree.selection()
@@ -509,7 +576,7 @@ class Diffusion_window :
 		
 		
 
-		for i in range (len(data_list_raw)):
+		for i in range (len(data_cont.data_list_raw)):
 			#print ("I am here")
 			rep = 0
 			ch = 0
@@ -521,7 +588,7 @@ class Diffusion_window :
 				ch1 = ch
 			
 			
-			for j in range (repetitions_list[i]):
+			for j in range (data_cont.repetitions_list[i]):
 				ch = 0
 				sum1-=1
 				
@@ -531,7 +598,7 @@ class Diffusion_window :
 					rep1 = rep
 					ch1 = ch
 
-				for k in range (total_channels_list[i]):
+				for k in range (data_cont.total_channels_list[i]):
 					sum1-=1
 
 					ch+=1
@@ -554,13 +621,13 @@ class Diffusion_window :
 
 
 
-		if file_index != file1-1:
+		if data_cont.file_index != file1-1:
 
-			file_index = file1-1
+			data_cont.file_index = file1-1
 
 		self.Curve_flags()
 		
-		rep_index = rep1-1
+		data_cont.rep_index = rep1-1
 
 		self.channel_index = ch1-1
 
@@ -582,14 +649,14 @@ class Diffusion_window :
 		self.frame004 = tk.Frame(self.frame002)
 		self.frame004.pack(side = "top", anchor = "nw")
 
-		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 
-			text2 = data_list_raw[file_index].datasets_list[rep_index].channels_list[self.channel_index].short_name
+			text2 = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[self.channel_index].short_name
 		else:
-			imd = self.channel_index - data_list_raw[file_index].datasets_list[rep_index].channels_number
-			text2 = data_list_raw[file_index].datasets_list[rep_index].cross_list[imd].short_name
+			imd = self.channel_index - data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number
+			text2 = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[imd].short_name
 
-		text1 = tree_list_name[file_index] + "; repetition: " + str(rep_index) + "; " + text2
+		text1 = data_cont.tree_list_name[data_cont.file_index] + "; repetition: " + str(data_cont.rep_index) + "; " + text2
 		Label_1 = tk.Label(self.frame004, text=text1)
 		Label_1.grid(row = 0, column = 0, columnspan = 6, sticky = 'w')
 
@@ -609,29 +676,29 @@ class Diffusion_window :
 
 
 
-		if 	data_list_raw[file_index].diff_fitting[rep_index, self.channel_index] != None:
+		if 	data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, self.channel_index] != None:
 			for i in range (len(self.list_of_params)):
-				if self.list_of_params[i] in data_list_raw[file_index].diff_fitting[rep_index, self.channel_index].keys():
-					self.list_of_inits[i] = data_list_raw[file_index].diff_fitting[rep_index, self.channel_index][self.list_of_params[i]]
+				if self.list_of_params[i] in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, self.channel_index].keys():
+					self.list_of_inits[i] = data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, self.channel_index][self.list_of_params[i]]
 
-		if 	data_list_raw[file_index].diff_coeffs[rep_index, self.channel_index] != None:
+		if 	data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index] != None:
 
-			diff_coef = data_list_raw[file_index].diff_coeffs[rep_index, self.channel_index]
+			diff_coef = data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index]
 		else:
 			diff_coef = 0
 
 
 		
-		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
-			if 	data_list_raw[file_index].N[rep_index, self.channel_index] != None:
+		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
+			if 	data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index] != None:
 
-				N = data_list_raw[file_index].N[rep_index, self.channel_index]
+				N = data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index]
 			else:
 				N = 0
 
-			if 	data_list_raw[file_index].cpm[rep_index, self.channel_index] != None:
+			if 	data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, self.channel_index] != None:
 
-				cpm = data_list_raw[file_index].cpm[rep_index, self.channel_index]
+				cpm = data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, self.channel_index]
 			else:
 				cpm = 0
 
@@ -684,7 +751,7 @@ class Diffusion_window :
 
 			row_index+=1
 
-		if self.channel_index < data_list_raw[file_index].datasets_list[rep_index].channels_number:
+		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 
 			self.N_label_l = tk.Label(self.frame004, text="N(FCS): ")
 			self.N_label_l.grid(row = row_index, column = 0, sticky = 'w')
@@ -721,7 +788,7 @@ class Diffusion_window :
 
 		counter = 0
 
-		for item in data_list_raw[file_index].datasets_list[rep_index].channels_list:
+		for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
 			str1, str2 = item.short_name.split(" ")
 			very_short_name = "ch0" + str2
 			self.channels_flags.append(tk.IntVar(value=1))
@@ -730,9 +797,9 @@ class Diffusion_window :
 			column_counter +=1
 
 
-		if data_list_raw[file_index].datasets_list[rep_index].cross_number > 0:
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_number > 0:
 
-			for item in data_list_raw[file_index].datasets_list[rep_index].cross_list:
+			for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list:
 				str1, str2 = item.short_name.split(" vs ")
 				str3, str4 = str1.split(" ")
 				very_short_name = "ch" + str4 + str2
@@ -755,12 +822,7 @@ class Diffusion_window :
 		self.channel_index = 0
 		self.fit_all_flag = False
 
-		global file_index
-		global rep_index
 
-		global tree_list
-		global tree_list_name
-		global repetitions_list
 
 		self.win_diff = tk.Toplevel()
 
@@ -803,9 +865,9 @@ class Diffusion_window :
 
 		self.Datalist.config(width = 100, height = 10)
 
-		for i in range(0, len(tree_list_name)):
-			name = tree_list_name[i]
-			treetree = Data_tree_fcs_fit (self.tree, name, data_list_raw[i])
+		for i in range(0, len(data_cont.tree_list_name)):
+			name = data_cont.tree_list_name[i]
+			treetree = Data_tree_fcs_fit (self.tree, name, data_cont.data_list_raw[i])
 
 
 		self.frame003 = tk.Frame(self.frame002)
