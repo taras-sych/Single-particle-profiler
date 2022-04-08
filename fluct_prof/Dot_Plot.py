@@ -1,3 +1,77 @@
+#--------------------------
+#Importing general modules
+#--------------------------
+import tkinter as tk
+from tkinter import ttk
+from tkinter import font as tkFont
+import matplotlib.pyplot as plt
+
+import csv
+
+import lmfit
+
+import time
+
+
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+
+
+# Implement the default Matplotlib key bindings.
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
+from matplotlib import cm as mplcm
+
+from ttkwidgets import CheckboxTreeview
+
+
+
+import codecs
+
+import os
+
+from datetime import datetime
+
+from scipy import stats
+
+import copy
+
+import numpy as np
+
+from scipy.signal import find_peaks
+
+from scipy.optimize import curve_fit
+import random
+
+import seaborn as sns
+
+
+#--------------------------
+#End of importing general modules
+#--------------------------
+
+
+#--------------------------
+#Importing own modules
+#--------------------------
+
+from fluct_prof import fcs_importer
+
+from fluct_prof import Correlation as corr_py
+
+from fluct_prof import Functions as fun
+
+from fluct_prof import Data_container as data_cont
+
+from fluct_prof import Data_tree as d_tree
+
+#--------------------------
+#End of importing own modules
+#--------------------------
+
+
+
+
+
 class Dot_Plot_Window:
 
 	def Choose_dataset(self, event):
@@ -17,7 +91,7 @@ class Dot_Plot_Window:
 		sum1 = num 
 		file = 0
 		rep = 0
-		for i in range (len(data_list_raw)):
+		for i in range (len(data_cont.data_list_raw)):
 			rep = 0
 			sum1-=1
 			file+=1
@@ -26,7 +100,7 @@ class Dot_Plot_Window:
 				rep1 = rep
 
 			
-			for j in range (repetitions_list[i]):
+			for j in range (data_cont.repetitions_list[i]):
 				sum1-=1
 				rep+=1
 				if sum1 == 0:
@@ -42,7 +116,7 @@ class Dot_Plot_Window:
 		
 
 
-		output_file_name = tree_list_name[file1-1][:-4]
+		output_file_name = data_cont.tree_list_name[file1-1][:-4]
 		#print(output_file_name)
 
 
@@ -53,36 +127,36 @@ class Dot_Plot_Window:
 
 
 
-		output_file_name = tree_list_name[file1-1][:-4]
+		output_file_name = data_cont.tree_list_name[file1-1][:-4]
 
 
 
 
-		file_index = file1-1
-		rep_index = rep1-1
+		data_cont.file_index = file1-1
+		data_cont.rep_index = rep1-1
 
 		self.axis_choice = []
 
 
 		
 
-		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
-			for i in range (data_list_raw[file_index].datasets_list[0].channels_number):
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
+			for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
 				
-				str1 = data_list_raw[file_index].datasets_list[0].channels_list[i].short_name
+				str1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name
 				self.axis_choice.append(str1)
 
 
-		if data_list_raw[file_index].datasets_list[0].channels_number > 1:
-			for i in range (data_list_raw[file_index].datasets_list[0].channels_number):
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
+			for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
 				
-				str1 = "Diff_" + data_list_raw[file_index].datasets_list[0].channels_list[i].short_name
+				str1 = "Diff_" + data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name
 				self.axis_choice.append(str1)
 
-		if data_list_raw[file_index].datasets_list[0].cross_number > 1:
-			for i in range (data_list_raw[file_index].datasets_list[0].cross_number):
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].cross_number > 1:
+			for i in range (data_cont.data_list_raw[file_index].datasets_list[0].cross_number):
 				
-				str1 = "Diff_" + data_list_raw[file_index].datasets_list[0].cross_list[i].short_name
+				str1 = "Diff_" + data_cont.data_list_raw[data_cont.file_index].datasets_list[0].cross_list[i].short_name
 				self.axis_choice.append(str1)
 
 		self.axis_choice.append("GP")
@@ -103,14 +177,12 @@ class Dot_Plot_Window:
 
 
 
-		global file_index
-		global rep_index
+
 
 		self.dot_plot.cla()
 		self.dens_plot.cla()
 
-		global tree_list_name
-		global output_file_name
+
 
 		list1 = self.tree.get_checked()
 
@@ -133,7 +205,7 @@ class Dot_Plot_Window:
 			sum1 = num 
 			file = 0
 			rep = 0
-			for i in range (len(data_list_raw)):
+			for i in range (len(data_cont.data_list_raw)):
 				rep = 0
 				sum1-=1
 				file+=1
@@ -142,7 +214,7 @@ class Dot_Plot_Window:
 					rep1 = rep
 
 				
-				for j in range (repetitions_list[i]):
+				for j in range (data_cont.repetitions_list[i]):
 					sum1-=1
 					rep+=1
 					if sum1 == 0:
@@ -158,7 +230,7 @@ class Dot_Plot_Window:
 			
 			
 
-			output_file_name = tree_list_name[file1-1][:-4]
+			output_file_name = data_cont.tree_list_name[file1-1][:-4]
 			print("Output file name: ", output_file_name)
 			print("Repetiotion: ", rep1-1)
 
@@ -183,53 +255,53 @@ class Dot_Plot_Window:
 
 				str1, str2 = string_x.split("_")
 
-				if data_list_raw[file1].datasets_list[rep1].channels_number > 1:
-					for i in range (data_list_raw[file1].datasets_list[rep1].channels_number):
+				if data_cont.data_list_raw[file1].datasets_list[rep1].channels_number > 1:
+					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].channels_number):
 						
-						if str2 == data_list_raw[file1].datasets_list[rep1].channels_list[i].short_name:
+						if str2 == data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[i].short_name:
 							channel_number = i
 
-				if data_list_raw[file1].datasets_list[rep1].cross_number > 1:
-					for i in range (data_list_raw[file1].datasets_list[rep1].cross_number):
+				if data_cont.data_list_raw[file1].datasets_list[rep1].cross_number > 1:
+					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].cross_number):
 						
-						if str2 == data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name:
-							channel_number = i + data_list_raw[file1].datasets_list[rep1].channels_number
+						if str2 == data_cont.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name:
+							channel_number = i + data_cont.data_list_raw[file1].datasets_list[rep1].channels_number
 
 
 
 				if output_file_name in thisdict_axis_1.keys():
-					thisdict_axis_1[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
 				else:
 					thisdict_axis_1[output_file_name] = []
-					thisdict_axis_1[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
 
 
 			if string_y.__contains__("Diff") == True:
 
 				str1, str2 = string_y.split("_")
 
-				if data_list_raw[file1].datasets_list[rep1].channels_number > 1:
-					for i in range (data_list_raw[file1].datasets_list[rep1].channels_number):
+				if data_cont.data_list_raw[file1].datasets_list[rep1].channels_number > 1:
+					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].channels_number):
 						
-						if str2 == data_list_raw[file1].datasets_list[rep1].channels_list[i].short_name:
+						if str2 == data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[i].short_name:
 							channel_number = i
 
 
 
-				if data_list_raw[file1].datasets_list[rep1].cross_number > 1:
-					for i in range (data_list_raw[file1].datasets_list[rep1].cross_number):
+				if data_cont.data_list_raw[file1].datasets_list[rep1].cross_number > 1:
+					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].cross_number):
 						
-						if str2 == data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name:
-							channel_number = i + data_list_raw[file1].datasets_list[rep1].channels_number
+						if str2 == data_cont.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name:
+							channel_number = i + data_cont.data_list_raw[file1].datasets_list[rep1].channels_number
 
 
 
 
 				if output_file_name in thisdict_axis_2.keys():
-					thisdict_axis_2[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
 				else:
 					thisdict_axis_2[output_file_name] = []
-					thisdict_axis_2[output_file_name].append(data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
 
 
 
@@ -237,19 +309,19 @@ class Dot_Plot_Window:
 
 
 				if output_file_name in thisdict_axis_1.keys():
-					thisdict_axis_1[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["txy"])
+					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["txy"])
 				else:
 					thisdict_axis_1[output_file_name] = []
-					thisdict_axis_1[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["txy"])
+					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["txy"])
 
 			if string_y.__contains__("GP") == True:
 
 
 				if output_file_name in thisdict_axis_2.keys():
-					thisdict_axis_2[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["txy"])
+					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["txy"])
 				else:
 					thisdict_axis_2[output_file_name] = []
-					thisdict_axis_2[output_file_name].append(data_list_raw[file1].gp_fitting[rep1]["txy"])
+					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["txy"])
 
 
 			if string_x.__contains__("GP") == False and string_x.__contains__("Diff") == False:
@@ -258,22 +330,22 @@ class Dot_Plot_Window:
 
 
 				if output_file_name in thisdict_axis_1.keys():
-					thisdict_axis_1[output_file_name].append(data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
 				else:
 					thisdict_axis_1[output_file_name] = []
-					thisdict_axis_1[output_file_name].append(data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
 
 			if string_y.__contains__("GP") == False and string_y.__contains__("Diff") == False:
 				str1, str2 = string_y.split(" ")
 				channel_number = int(str2) - 1
 
-				data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks
+				data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks
 
 				if output_file_name in thisdict_axis_2.keys():
-					thisdict_axis_2[output_file_name].append(data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
 				else:
 					thisdict_axis_2[output_file_name] = []
-					thisdict_axis_2[output_file_name].append(data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
 
 
 
@@ -295,12 +367,6 @@ class Dot_Plot_Window:
 		self.channel_index = 0
 		self.fit_all_flag = False
 
-		global file_index
-		global rep_index
-
-		global tree_list
-		global tree_list_name
-		global repetitions_list
 
 		self.win_dot_plot = tk.Toplevel()
 
@@ -344,9 +410,9 @@ class Dot_Plot_Window:
 
 		self.Datalist.config(width = 100, height = 10)
 
-		for i in range(0, len(tree_list_name)):
-			name = tree_list_name[i]
-			treetree = Data_tree (self.tree, name, data_list_raw[i].repetitions)
+		for i in range(0, len(data_cont.tree_list_name)):
+			name = data_cont.tree_list_name[i]
+			treetree = Data_tree (self.tree, name, data_cont.data_list_raw[i].repetitions)
 
 
 		self.frame003 = tk.Frame(self.frame002)

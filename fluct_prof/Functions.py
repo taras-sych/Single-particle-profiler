@@ -708,9 +708,9 @@ def Export_function():
 
 	name_dir = name_dir.replace(":", "_")
 
-	initialdirectory
+	
 
-	directory = os.path.join(initialdirectory, name_dir) 
+	directory = os.path.join(data_c.initialdirectory, name_dir) 
     
 
 	os.mkdir(directory) 
@@ -754,7 +754,7 @@ def Export_function():
 				rep1 = rep
 
 			
-			for j in range (repetitions_list[i]):
+			for j in range (data_c.repetitions_list[i]):
 				sum1-=1
 				rep+=1
 				if sum1 == 0:
