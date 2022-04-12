@@ -118,7 +118,7 @@ class Dot_Plot_Window:
 
 
 		output_file_name = data_cont.tree_list_name[file1-1][:-4]
-		#print(output_file_name)
+
 
 
 
@@ -232,8 +232,7 @@ class Dot_Plot_Window:
 			
 
 			output_file_name = data_cont.tree_list_name[file1-1][:-4]
-			print("Output file name: ", output_file_name)
-			print("Repetiotion: ", rep1-1)
+
 
 
 
@@ -357,8 +356,7 @@ class Dot_Plot_Window:
 		
 			
 		for key in thisdict_axis_1.keys():
-			#print(key)
-			#print(thisdict_axis_1[key])
+
 			self.dot_plot.scatter(thisdict_axis_1[key], thisdict_axis_2[key], label = key )
 			self.dot_plot.legend(loc='upper right')
 

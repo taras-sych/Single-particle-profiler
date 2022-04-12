@@ -305,7 +305,7 @@ class Threshold_window:
 
 		data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = output_dict
 
-		#print(data_list_raw[file_index].gp_fitting)
+		
 
 
 			
@@ -465,7 +465,7 @@ class Threshold_window:
 							
 				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
 
-					#print ("adding repetition ", rep_index_i)
+					
 
 
 					if len(x1) == 0:
@@ -703,10 +703,6 @@ class Threshold_window:
 			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch2_ind] = axis_y_temp
 
 
-
-
-			print(data_cont.file_index, data_cont.rep_index)
-			print(data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch1_ind])
 			
 			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
 
@@ -923,16 +919,7 @@ class Threshold_window:
 
 	def Normalize(self):
 
-		#print ("normalize called")
 
-		
-
-
-
-		
-		
-
-		#data_list_current[file_index] = copy.deepcopy(data_list_raw[file_index])
 
 		
 
@@ -1099,7 +1086,7 @@ class Threshold_window:
 
 		current_repetitions_number = data_cont.data_list_raw[data_cont.file_index].repetitions
 
-		#print(current_repetitions_number)
+
 
 		divisors = []
 		for divdiv in range(1, current_repetitions_number+1):
@@ -1512,4 +1499,4 @@ class Threshold_window:
 
 
 	def Temp(self):
-		print(1)
+		print("Temp function called")
