@@ -697,11 +697,16 @@ class Threshold_window:
 					gp_list_temp.append(gp_1)
 
 
-			data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].peaks = axis_x_temp
-			data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].peaks = axis_y_temp
 
-			print(data_cont.file_index, rep_index_i)
-			print(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].peaks)
+
+			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch1_ind] = axis_x_temp
+			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch2_ind] = axis_y_temp
+
+
+
+
+			print(data_cont.file_index, data_cont.rep_index)
+			print(data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch1_ind])
 			
 			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
 

@@ -68,7 +68,8 @@ from fluct_prof import Data_tree as d_tree
 #End of importing own modules
 #--------------------------
 
-
+def Norm():
+	print("This is a temporary function")
 
 
 
@@ -154,7 +155,7 @@ class Dot_Plot_Window:
 				self.axis_choice.append(str1)
 
 		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].cross_number > 1:
-			for i in range (data_cont.data_list_raw[file_index].datasets_list[0].cross_number):
+			for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].cross_number):
 				
 				str1 = "Diff_" + data_cont.data_list_raw[data_cont.file_index].datasets_list[0].cross_list[i].short_name
 				self.axis_choice.append(str1)
@@ -309,19 +310,19 @@ class Dot_Plot_Window:
 
 
 				if output_file_name in thisdict_axis_1.keys():
-					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["txy"])
+					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 				else:
 					thisdict_axis_1[output_file_name] = []
-					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["txy"])
+					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
 			if string_y.__contains__("GP") == True:
 
 
 				if output_file_name in thisdict_axis_2.keys():
-					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["txy"])
+					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 				else:
 					thisdict_axis_2[output_file_name] = []
-					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["txy"])
+					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
 
 			if string_x.__contains__("GP") == False and string_x.__contains__("Diff") == False:
@@ -330,22 +331,22 @@ class Dot_Plot_Window:
 
 
 				if output_file_name in thisdict_axis_1.keys():
-					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+					thisdict_axis_1[output_file_name] = thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
 				else:
 					thisdict_axis_1[output_file_name] = []
-					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+					thisdict_axis_1[output_file_name]= thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
 
 			if string_y.__contains__("GP") == False and string_y.__contains__("Diff") == False:
 				str1, str2 = string_y.split(" ")
 				channel_number = int(str2) - 1
 
-				data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks
+			
 
 				if output_file_name in thisdict_axis_2.keys():
-					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+					thisdict_axis_2[output_file_name] = thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
 				else:
 					thisdict_axis_2[output_file_name] = []
-					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[channel_number].peaks)
+					thisdict_axis_2[output_file_name] = thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
 
 
 
@@ -355,12 +356,19 @@ class Dot_Plot_Window:
 
 		
 			
-		"""		for key in thisdict_axis_1.keys():
+		for key in thisdict_axis_1.keys():
+			#print(key)
+			#print(thisdict_axis_1[key])
 			self.dot_plot.scatter(thisdict_axis_1[key], thisdict_axis_2[key], label = key )
 			self.dot_plot.legend(loc='upper right')
 
 		self.dot_plot.set_ylabel(string_x)
-		self.dot_plot.set_xlabel(string_y)"""
+		self.dot_plot.set_xlabel(string_y)
+
+
+		self.canvas5.draw_idle()
+
+		self.figure5.tight_layout()
 
 	def __init__(self, win_width, win_height, dpi_all):
 
@@ -412,7 +420,7 @@ class Dot_Plot_Window:
 
 		for i in range(0, len(data_cont.tree_list_name)):
 			name = data_cont.tree_list_name[i]
-			treetree = Data_tree (self.tree, name, data_cont.data_list_raw[i].repetitions)
+			treetree = d_tree.Data_tree (self.tree, name, data_cont.data_list_raw[i].repetitions)
 
 
 		self.frame003 = tk.Frame(self.frame002)

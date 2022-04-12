@@ -22,7 +22,7 @@ class fcs_channel:
         self.auto_corr_arr = auto_corr_arr_arg
         self.short_name = short_name_arg
 
-        self.peaks = []
+        
 
         cr_list = []
 
@@ -72,6 +72,7 @@ class Full_dataset_fcs:
         self.threshold_list = [None] * self.datasets_list[0].channels_number
         
         self.binning = 1
+        self.peaks = {}
         self.gp_fitting = [None] * repetitions_arg
         self.diff_fitting = {}
         self.N = {}
@@ -89,6 +90,10 @@ class Full_dataset_fcs:
             for j in range(repetitions_arg):
                 self.N[j, i] = None
                 self.cpm[j, i] = None
+
+        for i in range(self.datasets_list[0].channels_number):
+            for j in range(repetitions_arg):
+                self.peaks[j, i] = None
 
 
 

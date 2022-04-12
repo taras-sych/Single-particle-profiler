@@ -684,7 +684,7 @@ def Dot_Plot_fun():
 
 	if len(data_c.tree_list_name) > 0:
 
-		dot_plot_win = Dot_Plot_Window(win_width, win_height, dpi_all)
+		dot_plot_win = dot_plot.Dot_Plot_Window(data_c.win_width, data_c.win_height, data_c.dpi_all)
 
 	if len(data_c.tree_list_name) == 0:
 
