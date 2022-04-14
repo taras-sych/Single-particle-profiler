@@ -4,6 +4,8 @@ from tkinter import ttk
 
 from fluct_prof import Main_window as main_w
 
+from sFCS_sources import sFCS_window as sFCS_w 
+
 global root
 global win_width
 global win_height
@@ -64,6 +66,7 @@ def Create_root():
 
 
 	data_frame = main_w.Left_frame(frame0_l, win_width, win_height, dpi_all )
+	sFCS_frame = sFCS_w.Left_frame(frame1, win_width, win_height, dpi_all )
 
 binning_list = []
 
