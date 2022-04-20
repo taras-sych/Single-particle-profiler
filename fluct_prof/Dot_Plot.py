@@ -75,6 +75,26 @@ def Norm():
 
 class Dot_Plot_Window:
 
+	def Save_plot_data(self):
+
+		for key in self.thisdict_axis_1.keys():
+
+
+			filename = data_cont.initialdirectory + "\\" +  key + "_Dot_Plot.txt"
+
+			open_file = open(filename, 'w')
+
+
+			open_file.write(str(key) + "\n")
+			open_file.write(str(self.string_x) + "\t" + str(self.string_y) + "\n")
+
+			for i in range(len(self.thisdict_axis_1[key])):
+				open_file.write(str(self.thisdict_axis_1[key][i]) + "\t" + str(self.thisdict_axis_2[key][i]) + "\n")
+
+			open_file.close()
+
+
+
 	def Choose_dataset(self, event):
 
 
@@ -191,8 +211,8 @@ class Dot_Plot_Window:
 
 
 
-		thisdict_axis_1 = {}
-		thisdict_axis_2 = {}
+		self.thisdict_axis_1 = {}
+		self.thisdict_axis_2 = {}
 
 		for index in list1:
 
@@ -247,13 +267,13 @@ class Dot_Plot_Window:
 
 		
 
-			string_x = self.Axis_x_label__choice.get()
-			string_y = self.Axis_y_label__choice.get()
+			self.string_x = self.Axis_x_label__choice.get()
+			self.string_y = self.Axis_y_label__choice.get()
 
 
-			if string_x.__contains__("Diff") == True:
+			if self.string_x.__contains__("Diff") == True:
 
-				str1, str2 = string_x.split("_")
+				str1, str2 = self.string_x.split("_")
 
 				if data_cont.data_list_raw[file1].datasets_list[rep1].channels_number > 1:
 					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].channels_number):
@@ -269,16 +289,16 @@ class Dot_Plot_Window:
 
 
 
-				if output_file_name in thisdict_axis_1.keys():
-					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+				if output_file_name in self.thisdict_axis_1.keys():
+					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
 				else:
-					thisdict_axis_1[output_file_name] = []
-					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					self.thisdict_axis_1[output_file_name] = []
+					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
 
 
-			if string_y.__contains__("Diff") == True:
+			if self.string_y.__contains__("Diff") == True:
 
-				str1, str2 = string_y.split("_")
+				str1, str2 = self.string_y.split("_")
 
 				if data_cont.data_list_raw[file1].datasets_list[rep1].channels_number > 1:
 					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].channels_number):
@@ -297,55 +317,55 @@ class Dot_Plot_Window:
 
 
 
-				if output_file_name in thisdict_axis_2.keys():
-					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+				if output_file_name in self.thisdict_axis_2.keys():
+					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
 				else:
-					thisdict_axis_2[output_file_name] = []
-					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					self.thisdict_axis_2[output_file_name] = []
+					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
 
 
 
-			if string_x.__contains__("GP") == True:
+			if self.string_x.__contains__("GP") == True:
 
 
-				if output_file_name in thisdict_axis_1.keys():
-					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
+				if output_file_name in self.thisdict_axis_1.keys():
+					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 				else:
-					thisdict_axis_1[output_file_name] = []
-					thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
+					self.thisdict_axis_1[output_file_name] = []
+					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
-			if string_y.__contains__("GP") == True:
+			if self.string_y.__contains__("GP") == True:
 
 
-				if output_file_name in thisdict_axis_2.keys():
-					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
+				if output_file_name in self.thisdict_axis_2.keys():
+					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 				else:
-					thisdict_axis_2[output_file_name] = []
-					thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
+					self.thisdict_axis_2[output_file_name] = []
+					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
 
-			if string_x.__contains__("GP") == False and string_x.__contains__("Diff") == False:
-				str1, str2 = string_x.split(" ")
+			if self.string_x.__contains__("GP") == False and self.string_x.__contains__("Diff") == False:
+				str1, str2 = self.string_x.split(" ")
 				channel_number = int(str2) - 1
 
 
-				if output_file_name in thisdict_axis_1.keys():
-					thisdict_axis_1[output_file_name] = thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+				if output_file_name in self.thisdict_axis_1.keys():
+					self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
 				else:
-					thisdict_axis_1[output_file_name] = []
-					thisdict_axis_1[output_file_name]= thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+					self.thisdict_axis_1[output_file_name] = []
+					self.thisdict_axis_1[output_file_name]= self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
 
-			if string_y.__contains__("GP") == False and string_y.__contains__("Diff") == False:
-				str1, str2 = string_y.split(" ")
+			if self.string_y.__contains__("GP") == False and self.string_y.__contains__("Diff") == False:
+				str1, str2 = self.string_y.split(" ")
 				channel_number = int(str2) - 1
 
 			
 
-				if output_file_name in thisdict_axis_2.keys():
-					thisdict_axis_2[output_file_name] = thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+				if output_file_name in self.thisdict_axis_2.keys():
+					self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
 				else:
-					thisdict_axis_2[output_file_name] = []
-					thisdict_axis_2[output_file_name] = thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+					self.thisdict_axis_2[output_file_name] = []
+					self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
 
 
 
@@ -355,13 +375,15 @@ class Dot_Plot_Window:
 
 		
 			
-		for key in thisdict_axis_1.keys():
+		for key in self.thisdict_axis_1.keys():
 
-			self.dot_plot.scatter(thisdict_axis_1[key], thisdict_axis_2[key], label = key )
+			self.dot_plot.scatter(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key )
 			self.dot_plot.legend(loc='upper right')
 
-		self.dot_plot.set_ylabel(string_x)
-		self.dot_plot.set_xlabel(string_y)
+		self.dot_plot.set_ylabel(self.string_x)
+		self.dot_plot.set_xlabel(self.string_y)
+
+
 
 
 		self.canvas5.draw_idle()
@@ -476,7 +498,7 @@ class Dot_Plot_Window:
 
 		self.figure5.tight_layout()
 
-		self.Export_plot_button = tk.Button(self.frame000, text="Save plot data", command=Norm)
+		self.Export_plot_button = tk.Button(self.frame000, text="Save plot data", command=self.Save_plot_data)
 		self.Export_plot_button.pack(side = "top", anchor = "nw")
 
 		

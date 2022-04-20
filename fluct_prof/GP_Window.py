@@ -86,7 +86,7 @@ class Threshold_window:
 
 
 		name = data_cont.tree_list_name[data_cont.file_index]
-		filename = initialdirectory + "\\" +  name + "_Plots_gp.txt"
+		filename = data_cont.initialdirectory + "\\" +  name + "_Plots_gp.txt"
 
 		open_file = open(filename, 'w')
 
