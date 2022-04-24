@@ -6,6 +6,8 @@ from tkinter import ttk
 from tkinter import font as tkFont
 import matplotlib.pyplot as plt
 
+from scipy.stats import kde
+
 import csv
 
 import lmfit
@@ -380,8 +382,33 @@ class Dot_Plot_Window:
 			self.dot_plot.scatter(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key )
 			self.dot_plot.legend(loc='upper right')
 
+
+			self.dens_plot.hist2d(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key)
+
 		self.dot_plot.set_ylabel(self.string_x)
 		self.dot_plot.set_xlabel(self.string_y)
+
+		self.dens_plot.set_ylabel(self.string_x)
+		self.dens_plot.set_xlabel(self.string_y)
+
+		x = np.array(self.thisdict_axis_1[key])
+		y = np.array(self.thisdict_axis_2[key])
+
+
+		nbins_x = np.sqrt(len(x))
+		nbins_y = np.sqrt(len(y))
+
+		k = kde.gaussian_kde([x,y])
+		xi, yi = np.mgrid[x.min():x.max():nbins_x*1j, y.min():y.max():nbins_yСмільниця*1j]
+		zi = k(np.vstack([xi.flatten(), yi.flatten()]))
+		 
+		# Make the plot
+		self.dens_plot.pcolormesh(xi, yi, zi.reshape(xi.shape), shading='auto')
+		#plt.show()
+		 
+		# Change color palette
+		#plt.pcolormesh(xi, yi, zi.reshape(xi.shape), shading='auto', cmap=plt.cm.Greens_r)
+		#plt.show()
 
 
 

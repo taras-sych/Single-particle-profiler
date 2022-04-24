@@ -91,10 +91,45 @@ class Threshold_window:
 		open_file = open(filename, 'w')
 
 		for key in self.save_plot_dict.keys():
-			open_file.write(str(key) + "\n")
 
-			for i in range(len(self.save_plot_dict[key].x)):
-				open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+			if key.__contains__("channel") == True and key.__contains__("fluct") == True and self.plot_var["Traces"].get() == 1:
+
+			#print(key)
+				open_file.write(str(key) + "\n")
+
+				for i in range(len(self.save_plot_dict[key].x)):
+					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+
+			if key.__contains__("channel") == True and key.__contains__("peaks") == True and self.plot_var["Peaks"].get() == 1:
+
+				open_file.write(str(key) + "\n")
+
+				for i in range(len(self.save_plot_dict[key].x)):
+					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+
+			if key.__contains__("gp") == True and self.plot_var["GP Plot"].get() == 1:
+
+				open_file.write(str(key) + "\n")
+
+				for i in range(len(self.save_plot_dict[key].x)):
+					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+
+			if key.__contains__("sum") == True and self.plot_var["GP Fit"].get() == 1:
+
+				open_file.write(str(key) + "\n")
+
+				for i in range(len(self.save_plot_dict[key].x)):
+					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+			if key.__contains__("component") == True and self.plot_var["GP Fit"].get() == 1:
+
+				open_file.write(str(key) + "\n")
+
+				for i in range(len(self.save_plot_dict[key].x)):
+					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
 
 		open_file.close()
 
@@ -653,8 +688,8 @@ class Threshold_window:
 						bins_1 = 1
 					self.hist1.hist(yh1, bins = bins_1)
 
-					#self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
-					#self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
+					self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
+					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
 					
 
 				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
@@ -670,8 +705,8 @@ class Threshold_window:
 						bins_2 = 1
 					self.hist1.hist(yh2, bins = bins_2)
 
-					#self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
-					#self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
+					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
+					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
 
 				"""if data_cont.change_normal == False:
 														self.peaks.set_xlim(main_xlim)
@@ -746,7 +781,7 @@ class Threshold_window:
 						self.gp_hist.plot(x1, fun.Gauss(x1, *popt), 'r-', label='fit')
 
 						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt))
-						print(self.save_plot_dict.keys())
+						
 
 					if self.Components.get() == '2 components':
 						#print("2 comp")
@@ -1267,8 +1302,41 @@ class Threshold_window:
 
 		self.figure5.tight_layout()
 
-		self.Export_plot_button = tk.Button(self.frame000, text="Save plot data", command=self.Save_plot_data)
-		self.Export_plot_button.pack(side = "top", anchor = "nw")
+		self.frame00000001 = tk.Frame(self.frame000)
+		self.frame00000001.pack(side = "top", anchor = "nw")
+
+		self.Export_plot_button = tk.Button(self.frame00000001, text="Save plot data", command=self.Save_plot_data)
+		self.Export_plot_button.pack(side = "left", anchor = "nw")
+
+		self.plot_var = {}
+
+		self.plot_var["Traces"] = tk.IntVar()
+		self.plot_var["Peaks"] = tk.IntVar()
+		self.plot_var["Intensity Histogram"] = tk.IntVar()
+		self.plot_var["Dot Plot"] = tk.IntVar()
+		self.plot_var["GP Plot"] = tk.IntVar()
+		self.plot_var["GP Fit"] = tk.IntVar()
+
+		for key in self.plot_var.keys():
+			self.plot_var[key].set(1)
+
+		self.traces_check=tk.Checkbutton(self.frame00000001, text="Traces", variable=self.plot_var["Traces"], command=self.Temp)
+		self.traces_check.pack(side = "left", anchor = "nw")
+
+		self.peaks_check=tk.Checkbutton(self.frame00000001, text="Peaks", variable=self.plot_var["Peaks"], command=self.Temp)
+		self.peaks_check.pack(side = "left", anchor = "nw")
+
+		self.int_hist_check=tk.Checkbutton(self.frame00000001, text="Intensity Histogram", variable=self.plot_var["Intensity Histogram"], command=self.Temp)
+		self.int_hist_check.pack(side = "left", anchor = "nw")
+
+		self.dot_plot_check=tk.Checkbutton(self.frame00000001, text="Dot Plot", variable=self.plot_var["Dot Plot"], command=self.Temp)
+		self.dot_plot_check.pack(side = "left", anchor = "nw")
+
+		self.gp_plot_check=tk.Checkbutton(self.frame00000001, text="GP Plot", variable=self.plot_var["GP Plot"], command=self.Temp)
+		self.gp_plot_check.pack(side = "left", anchor = "nw")
+
+		self.gp_fit_check=tk.Checkbutton(self.frame00000001, text="GP Fit", variable=self.plot_var["GP Fit"], command=self.Temp)
+		self.gp_fit_check.pack(side = "left", anchor = "nw")
 
 		self.channel_pairs = []
 
@@ -1500,3 +1568,6 @@ class Threshold_window:
 
 	def Temp(self):
 		print("Temp function called")
+
+		for key in self.plot_var.keys():
+			print(key, self.plot_var[key].get())

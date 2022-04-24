@@ -72,7 +72,7 @@ from fluct_prof import fcs_importer
 class Diffusion_window :
 
 	def Save_plot_data(self):
-		filename = initialdirectory + "\\Plots_diffusion.txt"
+		filename = data_cont.initialdirectory + "\\Plots_diffusion.txt"
 
 		open_file = open(filename, 'w')
 
@@ -491,6 +491,7 @@ class Diffusion_window :
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
+						
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d(x1, *popt))
 
 					if len(popt) == 8:
@@ -918,18 +919,29 @@ class Diffusion_window :
 
 		self.figure5.tight_layout()
 
-		self.Export_plot_button = tk.Button(self.frame000, text="Save plot data", command=self.Save_plot_data)
-		self.Export_plot_button.pack(side = "top", anchor = "nw")
+		self.frame00000001 = tk.Frame(self.frame000)
+		self.frame00000001.pack(side = "top", anchor = "nw")
+
+		self.Export_plot_button = tk.Button(self.frame00000001, text="Save plot data", command=self.Save_plot_data)
+		self.Export_plot_button.pack(side = "left", anchor = "nw")
+
+		self.plot_var = {}
+
+		self.plot_var["Data points"] = tk.IntVar()
+		self.plot_var["Fit"] = tk.IntVar()
 
 
+		for key in self.plot_var.keys():
+			self.plot_var[key].set(1)
 
-		
+		self.traces_check=tk.Checkbutton(self.frame00000001, text="Data points", variable=self.plot_var["Data points"], command=self.Temp)
+		self.traces_check.pack(side = "left", anchor = "nw")
+
+		self.peaks_check=tk.Checkbutton(self.frame00000001, text="Fit", variable=self.plot_var["Fit"], command=self.Temp)
+		self.peaks_check.pack(side = "left", anchor = "nw")
 
 
-
-
-		
-		
+	
 
 		
 

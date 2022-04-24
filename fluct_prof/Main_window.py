@@ -237,9 +237,9 @@ class Left_frame :
 
 		
 
-		self.Plot_this_data(data_list_raw[data_cont.file_index], data_cont.rep_index)
+		self.Plot_this_data(data_cont.data_list_raw[data_cont.file_index], data_cont.rep_index)
 
-		root.update()
+		data_cont.root.update()
 
 
 	def Plot_data(self, event):
