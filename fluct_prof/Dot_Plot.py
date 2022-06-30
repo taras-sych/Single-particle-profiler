@@ -204,6 +204,7 @@ class Dot_Plot_Window:
 
 		self.dot_plot.cla()
 		self.dens_plot.cla()
+		self.colorbar.cla()
 
 
 
@@ -391,6 +392,18 @@ class Dot_Plot_Window:
 		self.dens_plot.set_ylabel(self.string_x)
 		self.dens_plot.set_xlabel(self.string_y)
 
+		
+
+
+
+		line = self.Scale_list.get()
+
+		self.dot_plot.set_xscale (line)
+		self.dot_plot.set_yscale (line)
+
+		self.dens_plot.set_xscale (line)
+		self.dens_plot.set_yscale (line)
+
 		x = np.array(self.thisdict_axis_1[key])
 		y = np.array(self.thisdict_axis_2[key])
 
@@ -398,13 +411,10 @@ class Dot_Plot_Window:
 		nbins_x = np.sqrt(len(x))
 		nbins_y = np.sqrt(len(y))
 
-		k = kde.gaussian_kde([x,y])
-		xi, yi = np.mgrid[x.min():x.max():nbins_x*1j, y.min():y.max():nbins_yСмільниця*1j]
-		zi = k(np.vstack([xi.flatten(), yi.flatten()]))
-		 
-		# Make the plot
-		self.dens_plot.pcolormesh(xi, yi, zi.reshape(xi.shape), shading='auto')
-		#plt.show()
+		sns.kdeplot(x,y, ax = self.dens_plot, shade = True, cmap = "PuBu", cbar = True, cbar_ax = self.colorbar)
+		self.dens_plot.set_facecolor('white')
+
+
 		 
 		# Change color palette
 		#plt.pcolormesh(xi, yi, zi.reshape(xi.shape), shading='auto', cmap=plt.cm.Greens_r)
@@ -487,10 +497,10 @@ class Dot_Plot_Window:
 
 		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
 						
-		gs = self.figure5.add_gridspec(1, 7)
+		gs = self.figure5.add_gridspec(1, 21)
 
 
-		self.dot_plot = self.figure5.add_subplot(gs[0, :3])
+		self.dot_plot = self.figure5.add_subplot(gs[0, :10])
 
 		self.dot_plot.set_title("Dot Plot")
 
@@ -499,7 +509,7 @@ class Dot_Plot_Window:
 		self.dot_plot.set_xlabel('axis 2')
 
 
-		self.dens_plot = self.figure5.add_subplot(gs[0, 3:6])
+		self.dens_plot = self.figure5.add_subplot(gs[0, 10:20])
 
 		self.dens_plot.set_title("Density Plot")
 
@@ -507,7 +517,7 @@ class Dot_Plot_Window:
 		self.dens_plot.set_ylabel('axis 1')
 		self.dens_plot.set_xlabel('axis 2')
 
-		self.colorbar = self.figure5.add_subplot(gs[0, 6])
+		self.colorbar = self.figure5.add_subplot(gs[0, 20])
 
 		#self.hist1.set_title("Intensity histogram")
 
@@ -549,8 +559,18 @@ class Dot_Plot_Window:
 
 		self.Axis_y_label__choice.grid(row = 1, column = 1)
 
+		self.Scale_label = tk.Label(self.frame001, text = "Scale: ")
+		self.Scale_label.grid(row = 2, column = 0, sticky = 'ew')
+
+		self.Scale_list = ttk.Combobox(self.frame001,values = ["linear", "log"],  width = 18 )
+		self.Scale_list.config(state = "readonly")
+
+		self.Scale_list.grid(row = 2, column = 1)
+
 		self.Plot_button = tk.Button(self.frame001, text="Plot", command=self.Plot_dataset)
-		self.Plot_button.grid(row = 2, column = 0, columnspan = 2, sticky = 'ew')
+		self.Plot_button.grid(row = 3, column = 0, columnspan = 2, sticky = 'ew')
+
+
 
 
 		
