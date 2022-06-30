@@ -11,6 +11,6 @@ What can it do:
 Reads files (.fcs, .SIN)
 
 Manual is available here: https://www.youtube.com/watch?v=NAwmWDSHEV8
+
 More information here: [linkfor paper - tbd]
-GP histogram plot can be fitted with 1 to three Gaussians
  
