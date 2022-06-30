@@ -10,6 +10,9 @@ What can it do:
 
 Reads files (.fcs, .SIN)
 
+#Compiled product here:
+https://github.com/taras-sych/Single-particle-profiler/tree/Multiple-files/Standalone%20distributions
+
 Manual is available here: https://www.youtube.com/watch?v=NAwmWDSHEV8
 
 More information here: [linkfor paper - tbd]
