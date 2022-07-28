@@ -81,9 +81,6 @@ from fluct_prof import Data_container as data_c
 def Message_generator():
 	messages = [
     'You shall not pass!',  
-    'Danger!',
-    'She is dead, Jim!',
-    'My life for the horde!' 
 	] 
 	index = random.randint(0, len(messages)-1)
 	return messages[index]

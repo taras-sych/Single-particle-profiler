@@ -402,23 +402,29 @@ class Threshold_window:
 
 		data_cont.change_normal = False
 
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 1:
 
-
-
-		self.Channel_pair__choice.config(values = self.channel_pairs)
-		self.Channel_pair__choice.set(self.channel_pairs[0])
-
-
-
-		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
-			data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
+			data_cont.data_list_raw[data_cont.file_index].threshold_list[0] = float(self.ch1_th.get())
+		else:
 
 
 
 
 
-		data_cont.data_list_raw[data_cont.file_index].threshold_list[0] = float(self.ch1_th.get())
-		data_cont.data_list_raw[data_cont.file_index].threshold_list[1] = float(self.ch2_th.get())
+			self.Channel_pair__choice.config(values = self.channel_pairs)
+			self.Channel_pair__choice.set(self.channel_pairs[0])
+
+
+
+			if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
+				data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
+
+
+
+
+
+			data_cont.data_list_raw[data_cont.file_index].threshold_list[0] = float(self.ch1_th.get())
+			data_cont.data_list_raw[data_cont.file_index].threshold_list[1] = float(self.ch2_th.get())
 
 
 
@@ -452,6 +458,171 @@ class Threshold_window:
 
 
 		
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 1:
+
+			ch1_ind = 0
+
+			main_xlim = self.peaks.get_xlim()
+			main_ylim = self.peaks.get_ylim()
+
+			int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
+
+			x1 = []
+			
+			y1 = []
+			
+			y1_raw = []
+
+			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
+							
+				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
+
+					
+
+
+					if len(x1) == 0:
+						x_min = 0
+					else:
+						x_min = max(x1) + x1[1] - x1[0]
+
+					x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x]
+
+					x1.extend(x_temp_1)
+					#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+					y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.y)
+
+			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[ch1_ind]
+
+			if th1 == None:
+
+				if self.normalization_index == "z-score":
+
+					th1 = 2
+					
+
+				if self.normalization_index == "manual":
+
+
+					th1 = 2
+					
+
+			self.ch1_th.delete(0,"end")
+			self.ch1_th.insert(0,str(th1))
+
+
+			if self.normalization_index == "z-score":
+				y1 = stats.zscore(y1_raw)
+		
+
+			if self.normalization_index == "manual":
+
+
+				y1 = y1_raw/np.mean(y1_raw)
+
+			
+
+			yh1 = []
+
+
+
+
+			
+			
+
+			for el in y1:
+				if el >= th1:
+					yh1.append(el)
+
+
+
+
+
+			#which_channel = self.Threshold.get()
+
+			
+			peaks, _ = find_peaks(y1, height=th1)
+
+
+
+
+			xp1 = []
+
+			yp1 = []
+
+			yp1_raw = []
+
+			yp1_raw_sep = []
+
+
+
+
+
+			for p in peaks:
+				yp1_raw_sep.append(y1_raw[p])
+
+
+
+
+			for p in peaks:
+				xp1.append(x1[p])
+
+				yp1.append(y1[p])
+
+
+				yp1_raw.append(y1_raw[p])
+
+
+
+
+			
+			
+
+			if self.fit_all_flag == False:
+				self.peaks.cla()
+				self.hist1.cla()
+				self.gp_hist.cla()
+				self.dot_plot.cla()
+
+				self.peaks.set_title("Intensity traces")
+				
+				self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+				self.peaks.set_ylabel('Intensity (a.u.)')
+				self.peaks.set_xlabel('Time (s)')
+
+				self.hist1.set_title("Peak intensity histograms")
+
+				self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+				self.hist1.set_ylabel('Counts')
+				self.hist1.set_xlabel('Intensity (a.u.)')
+
+
+
+
+				self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
+				#self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
+				
+				if (self.var.get() == 1):
+					self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
+
+				bins_1 = int(np.sqrt(len(yh1)))
+				if bins_1 == 0:
+					bins_1 = 1
+				self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
+
+				self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
+				self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
+					
+
+
+
+				self.hist1.legend(loc='upper right')
+
+				self.canvas5.draw_idle()
+
+				self.figure5.tight_layout()
+					
+			
+
 
 
 		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
@@ -636,10 +807,17 @@ class Threshold_window:
 
 			yp2_raw = []
 
+			yp1_raw_sep = []
+			yp2_raw_sep = []
 
 
 
 
+			for p in peaks1:
+				yp1_raw_sep.append(y1_raw[p])
+
+			for p in peaks2:
+				yp2_raw_sep.append(y2_raw[p])
 
 
 			for p in peaks:
@@ -668,7 +846,7 @@ class Threshold_window:
 				self.peaks.set_ylabel('Intensity (a.u.)')
 				self.peaks.set_xlabel('Time (s)')
 
-				self.hist1.set_title("Intensity histograms")
+				self.hist1.set_title("Peak intensity histograms")
 
 				self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 				self.hist1.set_ylabel('Counts')
@@ -686,7 +864,7 @@ class Threshold_window:
 					bins_1 = int(np.sqrt(len(yh1)))
 					if bins_1 == 0:
 						bins_1 = 1
-					self.hist1.hist(yh1, bins = bins_1)
+					self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
 
 					self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
 					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
@@ -703,7 +881,7 @@ class Threshold_window:
 					bins_2 = int(np.sqrt(len(yh2)))
 					if bins_2 == 0:
 						bins_2 = 1
-					self.hist1.hist(yh2, bins = bins_2)
+					self.hist1.hist(yp2_raw_sep, bins = bins_2, label = "total: " + str(len(yp2_raw_sep)))
 
 					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
 					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
@@ -712,7 +890,7 @@ class Threshold_window:
 														self.peaks.set_xlim(main_xlim)
 														self.peaks.set_ylim(main_ylim)"""
 
-			
+				self.hist1.legend(loc='upper right')
 
 			gp_list_temp = []
 			axis_y_temp = []
@@ -1269,7 +1447,7 @@ class Threshold_window:
 
 		self.hist1 = self.figure5.add_subplot(gs[1, 0])
 
-		self.hist1.set_title("Intensity histogram")
+		self.hist1.set_title("Peak intensity histogram")
 
 		self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.hist1.set_ylabel('Counts')
@@ -1326,7 +1504,7 @@ class Threshold_window:
 		self.peaks_check=tk.Checkbutton(self.frame00000001, text="Peaks", variable=self.plot_var["Peaks"], command=self.Temp)
 		self.peaks_check.pack(side = "left", anchor = "nw")
 
-		self.int_hist_check=tk.Checkbutton(self.frame00000001, text="Intensity Histogram", variable=self.plot_var["Intensity Histogram"], command=self.Temp)
+		self.int_hist_check=tk.Checkbutton(self.frame00000001, text="Peak intensity Histogram", variable=self.plot_var["Intensity Histogram"], command=self.Temp)
 		self.int_hist_check.pack(side = "left", anchor = "nw")
 
 		self.dot_plot_check=tk.Checkbutton(self.frame00000001, text="Dot Plot", variable=self.plot_var["Dot Plot"], command=self.Temp)

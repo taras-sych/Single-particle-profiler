@@ -17,7 +17,7 @@ def Create_root():
 	global data_frame
 
 	root = tk.Tk()
-	root.title("FCS all inclusive")
+	root.title("Single Particle Profiler")
 
 	screen_width = root.winfo_screenwidth()
 	screen_height = root.winfo_screenheight()
@@ -54,8 +54,8 @@ def Create_root():
 
 
 
-	tabs.add(frame0, text = "Point FCS")
-	tabs.add(frame1, text = "Scanning FCS")
+	tabs.add(frame0, text = "SPP")
+	#tabs.add(frame1, text = "Scanning FCS")
 
 	tabs_number = 2;
 
