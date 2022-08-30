@@ -376,6 +376,10 @@ class Left_frame :
 	def __init__ (self, frame0, win_width, win_height, dpi_all):
 
 
+
+		pixel = tk.PhotoImage(width=1, height=1)
+
+
 		
 
 		self.frame01 = tk.Frame(frame0)
