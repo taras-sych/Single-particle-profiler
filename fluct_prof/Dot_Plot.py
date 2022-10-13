@@ -168,6 +168,8 @@ class Dot_Plot_Window:
 				
 				str1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name
 				self.axis_choice.append(str1)
+				self.axis_choice.append("prom_" + str1)
+				self.axis_choice.append("width_" + str1)
 
 
 		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
@@ -348,27 +350,81 @@ class Dot_Plot_Window:
 
 
 			if self.string_x.__contains__("GP") == False and self.string_x.__contains__("Diff") == False:
-				str1, str2 = self.string_x.split(" ")
-				channel_number = int(str2) - 1
 
 
-				if output_file_name in self.thisdict_axis_1.keys():
-					self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
-				else:
-					self.thisdict_axis_1[output_file_name] = []
-					self.thisdict_axis_1[output_file_name]= self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+				if self.string_x.__contains__("prom") == False and self.string_x.__contains__("width") == False:
+					str1, str2 = self.string_x.split(" ")
+					channel_number = int(str2) - 1
+
+				
+
+					if output_file_name in self.thisdict_axis_1.keys():
+						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+					else:
+						self.thisdict_axis_1[output_file_name] = []
+						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+
+				if self.string_x.__contains__("prom") == True:
+					str1, str2 = self.string_x.split(" ")
+					channel_number = int(str2) - 1
+
+					print (channel_number)
+
+					if output_file_name in self.thisdict_axis_1.keys():
+						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peak_prominences[rep1, channel_number]
+					else:
+						self.thisdict_axis_1[output_file_name] = []
+						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peak_prominences[rep1, channel_number]
+
+				if self.string_x.__contains__("width") == True:
+					str1, str2 = self.string_x.split(" ")
+					channel_number = int(str2) - 1
+
+				
+
+					if output_file_name in self.thisdict_axis_1.keys():
+						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peak_widths[rep1, channel_number]
+					else:
+						self.thisdict_axis_1[output_file_name] = []
+						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peak_wisths[rep1, channel_number]
 
 			if self.string_y.__contains__("GP") == False and self.string_y.__contains__("Diff") == False:
-				str1, str2 = self.string_y.split(" ")
-				channel_number = int(str2) - 1
 
-			
+				if self.string_y.__contains__("prom") == False and self.string_y.__contains__("width") == False:
+					str1, str2 = self.string_y.split(" ")
+					channel_number = int(str2) - 1
 
-				if output_file_name in self.thisdict_axis_2.keys():
-					self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
-				else:
-					self.thisdict_axis_2[output_file_name] = []
-					self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+				
+
+					if output_file_name in self.thisdict_axis_2.keys():
+						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+					else:
+						self.thisdict_axis_2[output_file_name] = []
+						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
+
+				if self.string_y.__contains__("prom") == True:
+					str1, str2 = self.string_y.split(" ")
+					channel_number = int(str2) - 1
+
+					print (channel_number)
+
+					if output_file_name in self.thisdict_axis_2.keys():
+						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peak_prominences[rep1, channel_number]
+					else:
+						self.thisdict_axis_2[output_file_name] = []
+						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peak_prominences[rep1, channel_number]
+
+				if self.string_y.__contains__("width") == True:
+					str1, str2 = self.string_y.split(" ")
+					channel_number = int(str2) - 1
+
+				
+
+					if output_file_name in self.thisdict_axis_2.keys():
+						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peak_widths[rep1, channel_number]
+					else:
+						self.thisdict_axis_2[output_file_name] = []
+						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peak_wisths[rep1, channel_number]
 
 
 

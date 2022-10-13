@@ -37,7 +37,7 @@ import copy
 
 import numpy as np
 
-from scipy.signal import find_peaks
+from scipy.signal import find_peaks, peak_widths, peak_prominences
 
 from scipy.optimize import curve_fit
 import random
@@ -609,8 +609,8 @@ class Threshold_window:
 					bins_1 = 1
 				self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
 
-				self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
-				self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
+				self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1_raw)
+				self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1_raw)
 					
 
 
@@ -782,6 +782,8 @@ class Threshold_window:
 
 
 
+
+
 			if which_channel == "channel 1":
 
 				peaks = peaks1
@@ -797,6 +799,14 @@ class Threshold_window:
 			if which_channel == "both or":
 
 				peaks = list(set(peaks1).union(set(peaks2)))
+
+			widths1 = peak_widths(y1, peaks, rel_height=0.5)
+
+			widths2 = peak_widths(y2, peaks, rel_height=0.5)
+
+			prominences1 = peak_prominences(y1, peaks)[0]
+
+			prominences2 = peak_prominences(y2, peaks)[0]
 
 			xp1 = []
 			xp2 = []
@@ -864,10 +874,28 @@ class Threshold_window:
 					bins_1 = int(np.sqrt(len(yh1)))
 					if bins_1 == 0:
 						bins_1 = 1
-					self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
 
-					self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1)
-					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1)
+
+					if self.Normalization_for_plot.get() == "Peak Intensity": 
+
+						self.hist1.set_title("Peak intensity histograms")
+
+						self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
+
+					if self.Normalization_for_plot.get() == "Peak Prominence":
+
+						self.hist1.set_title("Peak prominence histograms")
+
+						self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
+
+					if self.Normalization_for_plot.get() == "Peak width at half max":
+
+						self.hist1.set_title("Peak width histograms")
+
+						self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
+
+					self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1_raw)
+					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1_raw)
 					
 
 				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
@@ -881,7 +909,27 @@ class Threshold_window:
 					bins_2 = int(np.sqrt(len(yh2)))
 					if bins_2 == 0:
 						bins_2 = 1
-					self.hist1.hist(yp2_raw_sep, bins = bins_2, label = "total: " + str(len(yp2_raw_sep)))
+					
+
+					if self.Normalization_for_plot.get() == "Peak Intensity":
+
+						self.hist1.set_title("Peak intensity histograms")
+
+						self.hist1.hist(yp2_raw_sep, bins = bins_2, label = "total: " + str(len(yp2_raw_sep)))
+
+					if self.Normalization_for_plot.get() == "Peak Prominence":
+
+						self.hist1.set_title("Peak prominence histograms")
+
+						self.hist1.hist(prominences2, bins = bins_2, label = "total: " + str(len(prominences2)))
+
+					if self.Normalization_for_plot.get() == "Peak width at half max":
+
+						self.hist1.set_title("Peak width histograms")
+
+						self.hist1.hist(widths2, bins = bins_2, label = "total: " + str(len(widths2)))
+
+
 
 					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
 					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
@@ -893,8 +941,10 @@ class Threshold_window:
 				self.hist1.legend(loc='upper right')
 
 			gp_list_temp = []
-			axis_y_temp = []
-			axis_x_temp = []
+			peaks_y_temp = []
+			peaks_x_temp = []
+
+
 
 			
 
@@ -902,8 +952,8 @@ class Threshold_window:
 			for k in range (len(yp1_raw)):
 				gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
 
-				axis_x_temp.append(yp1_raw[k])
-				axis_y_temp.append(yp2_raw[k])
+				peaks_x_temp.append(yp1_raw[k])
+				peaks_y_temp.append(yp2_raw[k])
 
 
 				if abs(gp_1) < 1:
@@ -912,8 +962,30 @@ class Threshold_window:
 
 
 
-			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch1_ind] = axis_x_temp
-			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch2_ind] = axis_y_temp
+			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch1_ind] = peaks_x_temp
+			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch2_ind] = peaks_y_temp
+
+			data_cont.data_list_raw[data_cont.file_index].peak_prominences[data_cont.rep_index, ch1_ind] = prominences1
+			data_cont.data_list_raw[data_cont.file_index].peak_prominences[data_cont.rep_index, ch2_ind] = prominences2
+
+			data_cont.data_list_raw[data_cont.file_index].peak_widths[data_cont.rep_index, ch1_ind] = widths1
+			data_cont.data_list_raw[data_cont.file_index].peak_widths[data_cont.rep_index, ch2_ind] = widths2
+
+			if self.Normalization_for_plot.get() == "Peak Intensity":
+
+				axis_x_temp = peaks_x_temp
+				axis_y_temp = peaks_y_temp
+
+
+			if self.Normalization_for_plot.get() == "Peak Prominence":
+
+				axis_x_temp = prominences1
+				axis_y_temp = prominences2
+
+			if self.Normalization_for_plot.get() == "Peak width at half max":
+
+				axis_x_temp = widths1
+				axis_y_temp = widths2
 
 
 			
@@ -1229,6 +1301,8 @@ class Threshold_window:
 	def Normalize_for_plot_index(self, event):
 		
 		self.normalization_index_for_plot = self.Normalization_for_plot.get()
+
+		self.Peaks()
 		
 
 	def Choose_components (self, event):
@@ -1543,15 +1617,15 @@ class Threshold_window:
 		self.Binning_choice.bind("<<ComboboxSelected>>", self.Binning)
 
 
-		self.Norm_label = tk.Label(self.frame001, text="Use for plot: ")
+		self.Norm_label = tk.Label(self.frame001, text="Plot histogram: ")
 		self.Norm_label.grid(row = 2, column = 0, sticky = 'ew')
 
-		self.Normalization_for_plot = ttk.Combobox(self.frame001,values = ["raw", "normalized"], width = 9 )
+		self.Normalization_for_plot = ttk.Combobox(self.frame001,values = ["Peak Intensity", "Peak Prominence", "Peak width at half max"], width = 9 )
 		self.Normalization_for_plot.config(state = "readonly")
 		
 		self.Normalization_for_plot.grid(row = 2, column = 1, sticky = 'ew')
 
-		self.Normalization_for_plot.set("raw")
+		self.Normalization_for_plot.set("Peak Intensity")
 
 		self.Normalization_for_plot.bind("<<ComboboxSelected>>", self.Normalize_for_plot_index)
 

@@ -73,6 +73,8 @@ class Full_dataset_fcs:
         
         self.binning = 1
         self.peaks = {}
+        self.peak_prominences = {}
+        self.peak_widths = {}
         self.gp_fitting = [None] * repetitions_arg
         self.diff_fitting = {}
         self.N = {}
