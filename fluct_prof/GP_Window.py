@@ -880,7 +880,7 @@ class Threshold_window:
 
 						self.hist1.set_title("Peak intensity histograms")
 
-						self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
+						self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
 
 					if self.Normalization_for_plot.get() == "Peak Prominence":
 
@@ -915,7 +915,7 @@ class Threshold_window:
 
 						self.hist1.set_title("Peak intensity histograms")
 
-						self.hist1.hist(yp2_raw_sep, bins = bins_2, label = "total: " + str(len(yp2_raw_sep)))
+						self.hist1.hist(yp2_raw, bins = bins_2, label = "total: " + str(len(yp2_raw)))
 
 					if self.Normalization_for_plot.get() == "Peak Prominence":
 
