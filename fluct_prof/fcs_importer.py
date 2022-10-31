@@ -123,6 +123,29 @@ def Fill_datasets_fcs( list_file):
 
     while i < len(list_file):
 
+
+
+    if list_file[i].__contains__("CarrierRows"):
+
+        str1 , str2 = list_file[i].split(' = ')
+        CarrierRows = int(str2)
+
+        str1 , str2 = list_file[i+1].split(' = ')
+        CarrierColumns = int(str2)
+
+        positions = CarrierRows*CarrierColumns
+
+
+        break
+
+    i +=1
+
+
+
+    position = 0
+
+    while i < len(list_file):
+
         
         if list_file[i].__contains__("Repetition"):
 
@@ -144,7 +167,11 @@ def Fill_datasets_fcs( list_file):
             if repetition == -1:
                 dataset_list.append(Dataset_fcs(len(channels_fluct_list), len(channels_cross_list), channels_fluct_list, channels_cross_list))
                 
-                break
+
+                if position == positions -1:
+                    break
+
+                continue
 
 
             str1 , long_name = list_file[i+1].split(' = ')
@@ -257,11 +284,3 @@ def Fill_datasets_fcs( list_file):
 
 
     return Full_dataset_fcs(repetitions, dataset_list)
-
-
-
-
-
-
-
-

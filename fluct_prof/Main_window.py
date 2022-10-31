@@ -140,9 +140,51 @@ class Left_frame :
 
 		
 		
-		
+	def Continue_Import(self):
+		print("Continuing import")
+		self.dataset = fcs_importer.Fill_datasets_fcs(self.lines)
+		"""		treetree = d_tree.Data_tree (self.tree, self.name, self.dataset.repetitions)
+				self.tree.selection_set(treetree.child_id)
+				data_cont.tree_list.append(treetree)
+
+				data_cont.tree_list_name.append(self.name)
+
+				data_cont.binning_list.append(1)
 
 
+				data_cont.data_list_raw.append(self.dataset)
+
+
+				#data_list_current.append(dataset1)
+
+
+				data_cont.total_channels_list.append(self.dataset.datasets_list[0].channels_number + self.dataset.datasets_list[0].cross_number)
+				data_cont.repetitions_list.append(self.dataset.repetitions)
+
+				data_cont.peaks_list.append([None] * self.dataset.repetitions)
+
+				data_cont.list_of_channel_pairs.append([None])"""
+
+	def check_positions(self):
+
+		for key in self.checklist.keys():
+			if self.checklist[key].get() == 1:
+				flag = 1
+			else:
+				flag = 0
+
+			break
+
+
+		if flag == 1:
+
+			for key in self.checklist.keys():
+				self.checklist[key].set(0)
+
+		if flag == 0:
+
+			for key in self.checklist.keys():
+				self.checklist[key].set(1)
 
 
 	def Import(self):
@@ -187,42 +229,84 @@ class Left_frame :
 				#progress_window.grab_set()
 
 
-				name = os.path.basename(filename)
+				self.name = os.path.basename(filename)
 
 				file = codecs.open (filename, encoding='latin')
 
-				lines = file.readlines()
+				self.lines = file.readlines()
 
 				if filename.endswith('.fcs'):
-					dataset = fcs_importer.Fill_datasets_fcs(lines)
+
+					i = 0;
+
+					while i < len(self.lines):
+
+
+
+						if self.lines[i].__contains__("CarrierRows"):
+
+							str1 , str2 = self.lines[i].split(' = ')
+							CarrierRows = int(str2)
+
+							str1 , str2 = self.lines[i+1].split(' = ')
+							CarrierColumns = int(str2)
+
+							print(CarrierRows, CarrierColumns)
+
+							break
+
+						i +=1
+
+					self.checklist = {}
+
+					check_button_list = {}
+
+					labels_rows = [None] * CarrierRows
+					labels_columns = [None] * CarrierColumns
+
+
+					if CarrierColumns+CarrierRows > 2:
+
+						self.win_check = tk.Toplevel()
+
+						Label1 = tk.Label(self.win_check, text="Select cells to open: ")
+						Label1.grid(row = 0, column = 0, columnspan = CarrierColumns+1, sticky='ew')
+
+						for c in range (0,CarrierColumns):
+							labels_columns[c] = tk.Label(self.win_check, text=str(c+1))
+							labels_columns[c].grid(row = 1, column = c + 1, sticky='ew')
+
+						for r in range (0,CarrierRows):
+							labels_rows[r] = tk.Label(self.win_check, text=chr(r + 65))
+							labels_rows[r].grid(row = r + 2, column = 0, sticky='ew')
+
+
+
+						for r in range (0,CarrierRows):
+							for c in range (0, CarrierColumns):
+								self.checklist[r,c] = tk.IntVar(value = 1)
+
+								check_button_list[r,c] = (tk.Checkbutton(self.win_check, variable=self.checklist[r,c]))
+								check_button_list[r,c].grid(row = r + 2, column = c + 1, sticky='ew')
+									
+
+						
+						Button_check_all = tk.Button(self.win_check, text="Check/uncheck all", command=self.check_positions)
+						Button_check_all.grid(row = CarrierRows + 2, column = 0, columnspan = CarrierColumns+1, sticky='ew')
+
+						Button_ok = tk.Button(self.win_check, text="OK", command=self.Continue_Import)
+						Button_ok.grid(row = CarrierRows + 3, column = 0, columnspan = CarrierColumns+1, sticky='ew')
+					
+					else:self.Continue_Import()
+
 
 				if filename.endswith('.SIN'): 
-					dataset = fcs_importer.Fill_datasets_sin(lines)
+					self.dataset = fcs_importer.Fill_datasets_sin(lines)
 
 				#dataset1 = copy.deepcopy(dataset)
 
 
-				treetree = d_tree.Data_tree (self.tree, name, dataset.repetitions)
-				self.tree.selection_set(treetree.child_id)
-				data_cont.tree_list.append(treetree)
-
-				data_cont.tree_list_name.append(name)
-
-				data_cont.binning_list.append(1)
-
-
-				data_cont.data_list_raw.append(dataset)
-
-
-				#data_list_current.append(dataset1)
-
-
-				data_cont.total_channels_list.append(dataset.datasets_list[0].channels_number + dataset.datasets_list[0].cross_number)
-				data_cont.repetitions_list.append(dataset.repetitions)
-
-				data_cont.peaks_list.append([None] * dataset.repetitions)
-
-				data_cont.list_of_channel_pairs.append([None])
+				
 
 				#root.update() 
 
