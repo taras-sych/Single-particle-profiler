@@ -67,6 +67,10 @@ class Full_dataset_fcs:
     def __init__ (self, repetitions_arg, dataset_list_arg):
 
 
+
+        self.position = ''
+
+
         self.repetitions = repetitions_arg
         self.datasets_list = dataset_list_arg
         self.threshold_list = [None] * self.datasets_list[0].channels_number
@@ -144,6 +148,7 @@ def Fill_datasets_fcs( list_file):
 
 
     position = 0
+    i = 0
 
     while i < len(list_file):
 
@@ -159,36 +164,155 @@ def Fill_datasets_fcs( list_file):
 
             if repetition > current_repetition and repetition != -1:
 
+                flag = 0
+
 
                 dataset_list.append(Dataset_fcs(len(channels_fluct_list), len(channels_cross_list), channels_fluct_list, channels_cross_list))
                 current_repetition = repetition
                 channels_fluct_list = []
                 channels_cross_list = []
 
-                print("postion: ", str(position))
-                print("repetition: ", str(repetition))
+            if repetition == current_repetition and repetition != -1:
 
-            if repetition == -1:
-                dataset_list.append(Dataset_fcs(len(channels_fluct_list), len(channels_cross_list), channels_fluct_list, channels_cross_list))
+                str1 , position = list_file[i-2].split(' = ')
+                position = int(position)
 
-                print("postion: ", str(position))
-                print("repetition: ", str(repetition))
+                str1 , long_name = list_file[i+1].split(' = ')
+
+
                 
 
-                if position == positions -1:
+                
+                
 
 
-                    repetitions = current_repetition+1
+                if list_file[i+1].__contains__("versus"):
 
-                    current_repetition = 0
+                    str1, str2 = long_name.split(" versus ")
+                    str3, str4 = str1.split("Meta")
+                    str5, str6 = str2.split("Meta")
+                    
+                    short_name = "channel " + str4 + " vs " + str(int(str6))
+
+                    str1 , str2 = list_file[i+7].split(' = ')
+                    corr_array_size = int(str2)
+                    array_corr = list_file[i+9:i+9+corr_array_size]
+
+                    x = []
+                    y = []
+
+                    for j in range(len(array_corr)):
+                        str1, str2 = array_corr[j].split()
+                        x.append(float(str1))
+                        y.append(float(str2))
+
+                    array_corr = XY_plot(x,y)
+
+                    channel = fcs_cross(long_name,  array_corr, short_name)
+
+                    channels_cross_list.append(channel)
+
+                    i = i+9+corr_array_size
+
+                    #print (long_name, corr_array_size)
 
 
-                    for item1 in dataset_list:
-                        for item2 in item1.channels_list:
-                            del item2.fluct_arr.x[array_size_min-1 : -1]
-                            del item2.fluct_arr.y[array_size_min-1 : -1]
 
-                    full_dataset_list.append(Full_dataset_fcs(repetitions, dataset_list))
+                else:
+
+                    str1, str2 = long_name.split("Meta")
+                
+                    short_name = "channel " + str(int(str2))
+                    
+
+                    str1 , str2 = list_file[i+5].split(' = ')
+                    array_size = int(str2)
+
+                    if array_size < array_size_min or array_size_min == -1:
+                        array_size_min = array_size
+
+                    array_fluct =list_file[i+7:i+7+array_size]
+
+                    
+                   
+
+                    str1 , str2 = list_file[i+7+array_size].split(' = ')
+                    corr_array_size = int(str2)
+                    
+
+                    #print (long_name, array_size, corr_array_size)
+
+                    array_corr = list_file[i+7+array_size+2:i+7+array_size+2+corr_array_size]
+
+                    x = []
+                    y = []
+
+                    for j in range(len(array_fluct)):
+                        str1, str2 = array_fluct[j].split()
+                        x.append(float(str1))
+                        y.append(float(str2))
+
+                    array_fluct = XY_plot(x,y)
+
+                    x = []
+                    y = []
+
+                    for j in range(len(array_corr)):
+                        str1, str2 = array_corr[j].split()
+                        x.append(float(str1))
+                        y.append(float(str2))
+
+                    array_corr = XY_plot(x,y)
+
+                    channel = fcs_channel(long_name, array_fluct, array_corr, short_name)
+
+                    channels_fluct_list.append(channel)
+
+                    i = i+7+array_size+2+corr_array_size
+
+                
+
+
+
+                i+=1
+
+            if repetition == -1 and flag != 1:
+
+                flag = 1
+                dataset_list.append(Dataset_fcs(len(channels_fluct_list), len(channels_cross_list), channels_fluct_list, channels_cross_list))
+
+                repetitions = current_repetition+1
+
+                current_repetition = 0
+
+
+
+
+                for item1 in dataset_list:
+                    for item2 in item1.channels_list:
+                        del item2.fluct_arr.x[array_size_min-1 : -1]
+                        del item2.fluct_arr.y[array_size_min-1 : -1]
+
+                full_dataset = Full_dataset_fcs(repetitions, dataset_list)
+
+
+                full_dataset.position = str(chr((position)//6 + 65)) + "/" + str((position)%6 + 1)
+
+                full_dataset_list.append(full_dataset)
+
+                print("position imported: ", full_dataset.position)
+
+
+
+                channels_fluct_list = []
+                channels_cross_list = []
+
+                dataset_list = []
+                
+
+                if position == positions -1:           
+
+                    
                     
                     break
 
@@ -196,106 +320,6 @@ def Fill_datasets_fcs( list_file):
                 i+=1
 
                 continue
-
-            str1 , position = list_file[i-2].split(' = ')
-            position = int(position)
-
-            str1 , long_name = list_file[i+1].split(' = ')
-
-
-            
-
-            
-            
-
-
-            if list_file[i+1].__contains__("versus"):
-
-                str1, str2 = long_name.split(" versus ")
-                str3, str4 = str1.split("Meta")
-                str5, str6 = str2.split("Meta")
-                
-                short_name = "channel " + str4 + " vs " + str(int(str6))
-
-                str1 , str2 = list_file[i+7].split(' = ')
-                corr_array_size = int(str2)
-                array_corr = list_file[i+9:i+9+corr_array_size]
-
-                x = []
-                y = []
-
-                for j in range(len(array_corr)):
-                    str1, str2 = array_corr[j].split()
-                    x.append(float(str1))
-                    y.append(float(str2))
-
-                array_corr = XY_plot(x,y)
-
-                channel = fcs_cross(long_name,  array_corr, short_name)
-
-                channels_cross_list.append(channel)
-
-                i = i+9+corr_array_size
-
-                #print (long_name, corr_array_size)
-
-
-
-            else:
-
-                str1, str2 = long_name.split("Meta")
-            
-                short_name = "channel " + str(int(str2))
-                
-
-                str1 , str2 = list_file[i+5].split(' = ')
-                array_size = int(str2)
-
-                if array_size < array_size_min or array_size_min == -1:
-                    array_size_min = array_size
-
-                array_fluct =list_file[i+7:i+7+array_size]
-
-                
-               
-
-                str1 , str2 = list_file[i+7+array_size].split(' = ')
-                corr_array_size = int(str2)
-                
-
-                #print (long_name, array_size, corr_array_size)
-
-                array_corr = list_file[i+7+array_size+2:i+7+array_size+2+corr_array_size]
-
-                x = []
-                y = []
-
-                for j in range(len(array_fluct)):
-                    str1, str2 = array_fluct[j].split()
-                    x.append(float(str1))
-                    y.append(float(str2))
-
-                array_fluct = XY_plot(x,y)
-
-                x = []
-                y = []
-
-                for j in range(len(array_corr)):
-                    str1, str2 = array_corr[j].split()
-                    x.append(float(str1))
-                    y.append(float(str2))
-
-                array_corr = XY_plot(x,y)
-
-                channel = fcs_channel(long_name, array_fluct, array_corr, short_name)
-
-                channels_fluct_list.append(channel)
-
-                i = i+7+array_size+2+corr_array_size
-
-            
-
-
 
         i+=1
 

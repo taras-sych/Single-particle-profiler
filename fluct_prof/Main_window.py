@@ -142,28 +142,34 @@ class Left_frame :
 		
 	def Continue_Import(self):
 		print("Continuing import")
-		self.dataset = fcs_importer.Fill_datasets_fcs(self.lines)[2]
-		treetree = d_tree.Data_tree (self.tree, self.name, self.dataset.repetitions)
-		self.tree.selection_set(treetree.child_id)
-		data_cont.tree_list.append(treetree)
-
-		data_cont.tree_list_name.append(self.name)
-
-		data_cont.binning_list.append(1)
+		self.dataset_list = fcs_importer.Fill_datasets_fcs(self.lines)
 
 
-		data_cont.data_list_raw.append(self.dataset)
+		for self.dataset in self.dataset_list:
+
+			self.name1 = self.dataset.position + "__" + self.name 
+
+			treetree = d_tree.Data_tree (self.tree, self.name1, self.dataset.repetitions)
+			self.tree.selection_set(treetree.child_id)
+			data_cont.tree_list.append(treetree)
+
+			data_cont.tree_list_name.append(self.name1)
+
+			data_cont.binning_list.append(1)
 
 
-		#data_list_current.append(dataset1)
+			data_cont.data_list_raw.append(self.dataset)
 
 
-		data_cont.total_channels_list.append(self.dataset.datasets_list[0].channels_number + self.dataset.datasets_list[0].cross_number)
-		data_cont.repetitions_list.append(self.dataset.repetitions)
+			#data_list_current.append(dataset1)
 
-		data_cont.peaks_list.append([None] * self.dataset.repetitions)
 
-		data_cont.list_of_channel_pairs.append([None])
+			data_cont.total_channels_list.append(self.dataset.datasets_list[0].channels_number + self.dataset.datasets_list[0].cross_number)
+			data_cont.repetitions_list.append(self.dataset.repetitions)
+
+			data_cont.peaks_list.append([None] * self.dataset.repetitions)
+
+			data_cont.list_of_channel_pairs.append([None])
 
 	def check_positions(self):
 
