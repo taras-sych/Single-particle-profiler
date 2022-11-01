@@ -118,6 +118,7 @@ def Fill_datasets_fcs( list_file):
     channels_fluct_list = []
     channels_cross_list = []
     dataset_list=[]
+    full_dataset_list=[]
 
     array_size_min = -1
 
@@ -125,20 +126,20 @@ def Fill_datasets_fcs( list_file):
 
 
 
-    if list_file[i].__contains__("CarrierRows"):
+        if list_file[i].__contains__("CarrierRows"):
 
-        str1 , str2 = list_file[i].split(' = ')
-        CarrierRows = int(str2)
+            str1 , str2 = list_file[i].split(' = ')
+            CarrierRows = int(str2)
 
-        str1 , str2 = list_file[i+1].split(' = ')
-        CarrierColumns = int(str2)
+            str1 , str2 = list_file[i+1].split(' = ')
+            CarrierColumns = int(str2)
 
-        positions = CarrierRows*CarrierColumns
+            positions = CarrierRows*CarrierColumns
 
 
-        break
+            break
 
-    i +=1
+        i +=1
 
 
 
@@ -164,15 +165,40 @@ def Fill_datasets_fcs( list_file):
                 channels_fluct_list = []
                 channels_cross_list = []
 
+                print("postion: ", str(position))
+                print("repetition: ", str(repetition))
+
             if repetition == -1:
                 dataset_list.append(Dataset_fcs(len(channels_fluct_list), len(channels_cross_list), channels_fluct_list, channels_cross_list))
+
+                print("postion: ", str(position))
+                print("repetition: ", str(repetition))
                 
 
                 if position == positions -1:
+
+
+                    repetitions = current_repetition+1
+
+                    current_repetition = 0
+
+
+                    for item1 in dataset_list:
+                        for item2 in item1.channels_list:
+                            del item2.fluct_arr.x[array_size_min-1 : -1]
+                            del item2.fluct_arr.y[array_size_min-1 : -1]
+
+                    full_dataset_list.append(Full_dataset_fcs(repetitions, dataset_list))
+                    
                     break
+
+
+                i+=1
 
                 continue
 
+            str1 , position = list_file[i-2].split(' = ')
+            position = int(position)
 
             str1 , long_name = list_file[i+1].split(' = ')
 
@@ -274,13 +300,7 @@ def Fill_datasets_fcs( list_file):
         i+=1
 
 
-    repetitions = current_repetition+1
 
 
-    for item1 in dataset_list:
-        for item2 in item1.channels_list:
-            del item2.fluct_arr.x[array_size_min-1 : -1]
-            del item2.fluct_arr.y[array_size_min-1 : -1]
 
-
-    return Full_dataset_fcs(repetitions, dataset_list)
+    return full_dataset_list
