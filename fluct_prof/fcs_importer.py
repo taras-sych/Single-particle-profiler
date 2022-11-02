@@ -296,7 +296,7 @@ def Fill_datasets_fcs( list_file):
                 full_dataset = Full_dataset_fcs(repetitions, dataset_list)
 
 
-                full_dataset.position = str(chr((position)//6 + 65)) + "/" + str((position)%6 + 1)
+                full_dataset.position = str(chr((position)//6 + 65)) + "_" + str((position)%6 + 1)
 
                 full_dataset_list.append(full_dataset)
 

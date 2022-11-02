@@ -83,6 +83,8 @@ class Threshold_window:
 
 	def Save_plot_data(self):
 
+		print(self.save_plot_dict.keys())
+
 
 
 		name = data_cont.tree_list_name[data_cont.file_index]
@@ -100,13 +102,30 @@ class Threshold_window:
 				for i in range(len(self.save_plot_dict[key].x)):
 					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
 
+				open_file.write("\n")
+				open_file.write("\n")
+
+
 
 			if key.__contains__("channel") == True and key.__contains__("peaks") == True and self.plot_var["Peaks"].get() == 1:
 
-				open_file.write(str(key) + "\n")
+				str1, str2 = key.split("p")
+				key1 = str1 + "prominences"
+
+				print (key1)
+
+				str1, str2 = key.split("p")
+				key2 = str1 + "widths"
+
+				print (key2)
+
+				open_file.write(str(key) + "\t" + str(key1) + "\t" + str(key2))
 
 				for i in range(len(self.save_plot_dict[key].x)):
-					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) +  "\t" + str(self.save_plot_dict[key1].y[i]) +  "\t" + str(self.save_plot_dict[key2].y[i]) + "\n")
+
+				open_file.write("\n")
+				open_file.write("\n")
 
 
 			if key.__contains__("gp") == True and self.plot_var["GP Plot"].get() == 1:
@@ -116,6 +135,8 @@ class Threshold_window:
 				for i in range(len(self.save_plot_dict[key].x)):
 					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
 
+				open_file.write("\n")
+				open_file.write("\n")
 
 			if key.__contains__("sum") == True and self.plot_var["GP Fit"].get() == 1:
 
@@ -124,12 +145,44 @@ class Threshold_window:
 				for i in range(len(self.save_plot_dict[key].x)):
 					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
 
+				open_file.write("\n")
+				open_file.write("\n")
+
+
 			if key.__contains__("component") == True and self.plot_var["GP Fit"].get() == 1:
 
 				open_file.write(str(key) + "\n")
 
 				for i in range(len(self.save_plot_dict[key].x)):
 					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+				open_file.write("\n")
+				open_file.write("\n")
+
+
+			if key.__contains__("dot plot") == True:
+
+				open_file.write(str(key) + "\n")
+
+				for i in range(len(self.save_plot_dict[key].x)):
+					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+				open_file.write("\n")
+				open_file.write("\n")
+
+			if key.__contains__("channel") == True and key.__contains__("hist") == True:
+
+				open_file.write(str(key) + "\n")
+
+				for i in range(len(self.save_plot_dict[key].x)):
+					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+
+				open_file.write("\n")
+				open_file.write("\n")
+
+
+
+
 
 		open_file.close()
 
@@ -880,22 +933,30 @@ class Threshold_window:
 
 						self.hist1.set_title("Peak intensity histograms")
 
-						self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
+						self.n, bins, patches = self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
 
 					if self.Normalization_for_plot.get() == "Peak Prominence":
 
 						self.hist1.set_title("Peak prominence histograms")
 
-						self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
+						self.n, bins, patches = self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
 
 					if self.Normalization_for_plot.get() == "Peak width at half max":
 
 						self.hist1.set_title("Peak width histograms")
 
-						self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
+						self.n, bins, patches = self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
 
 					self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1_raw)
 					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1_raw)
+					self.save_plot_dict["channel 1 prominences"] = fcs_importer.XY_plot(xp1, prominences1)
+					self.save_plot_dict["channel 1 widths"] = fcs_importer.XY_plot(xp1, widths1)
+
+					self.x_bins=[]
+					for ii in range (len(bins)-1):
+						self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
+
+					self.save_plot_dict["channel 1 hist"] = fcs_importer.XY_plot(self.x_bins, self.n)
 					
 
 				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
@@ -915,24 +976,32 @@ class Threshold_window:
 
 						self.hist1.set_title("Peak intensity histograms")
 
-						self.hist1.hist(yp2_raw, bins = bins_2, label = "total: " + str(len(yp2_raw)))
+						self.n, bins, patches = self.hist1.hist(yp2_raw, bins = bins_2, label = "total: " + str(len(yp2_raw)))
 
 					if self.Normalization_for_plot.get() == "Peak Prominence":
 
 						self.hist1.set_title("Peak prominence histograms")
 
-						self.hist1.hist(prominences2, bins = bins_2, label = "total: " + str(len(prominences2)))
+						self.n, bins, patches = self.hist1.hist(prominences2, bins = bins_2, label = "total: " + str(len(prominences2)))
 
 					if self.Normalization_for_plot.get() == "Peak width at half max":
 
 						self.hist1.set_title("Peak width histograms")
 
-						self.hist1.hist(widths2, bins = bins_2, label = "total: " + str(len(widths2)))
+						self.n, bins, patches = self.hist1.hist(widths2, bins = bins_2, label = "total: " + str(len(widths2)))
 
 
 
 					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
 					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
+					self.save_plot_dict["channel 2 prominences"] = fcs_importer.XY_plot(xp2, prominences2)
+					self.save_plot_dict["channel 2 widths"] = fcs_importer.XY_plot(xp2, widths2)
+
+					self.x_bins=[]
+					for ii in range (len(bins)-1):
+						self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
+
+					self.save_plot_dict["channel 2 hist"] = fcs_importer.XY_plot(self.x_bins, self.n)
 
 				"""if data_cont.change_normal == False:
 														self.peaks.set_xlim(main_xlim)
@@ -994,6 +1063,9 @@ class Threshold_window:
 			self.dot_plot.scatter(axis_x_temp, axis_y_temp)
 			self.dot_plot.ticklabel_format(axis = "x", style="sci", scilimits = (0,0))
 			self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+
+
+			self.save_plot_dict["dot plot"] = fcs_importer.XY_plot(axis_x_temp, axis_y_temp)
 
 				
 			

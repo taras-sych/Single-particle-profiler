@@ -646,6 +646,9 @@ def Which_tab():
 
 def Threshold_fun():
 
+	print(data_c.initialdirectory)
+
+
 	if len(data_c.tree_list_name) > 0:
 
 		th_win = gp_win.Threshold_window(data_c.win_width, data_c.win_height, data_c.dpi_all)
