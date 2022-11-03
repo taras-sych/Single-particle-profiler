@@ -113,11 +113,15 @@ class Threshold_window:
 				key1 = str1 + "prominences"
 
 				print (key1)
+				print(len(self.save_plot_dict[key1].y))
 
 				str1, str2 = key.split("p")
 				key2 = str1 + "widths"
 
 				print (key2)
+
+				print(len(self.save_plot_dict[key2].y))
+
 
 				open_file.write(str(key) + "\t" + str(key1) + "\t" + str(key2))
 
@@ -853,11 +857,17 @@ class Threshold_window:
 
 				peaks = list(set(peaks1).union(set(peaks2)))
 
-			widths1 = peak_widths(y1, peaks, rel_height=0.5)
+			
 
-			widths2 = peak_widths(y2, peaks, rel_height=0.5)
+			widths1 = peak_widths(y1, peaks, rel_height=0.5)[0]
+
+
+
+			widths2 = peak_widths(y2, peaks, rel_height=0.5)[0]
 
 			prominences1 = peak_prominences(y1, peaks)[0]
+
+
 
 			prominences2 = peak_prominences(y2, peaks)[0]
 
@@ -951,6 +961,8 @@ class Threshold_window:
 					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1_raw)
 					self.save_plot_dict["channel 1 prominences"] = fcs_importer.XY_plot(xp1, prominences1)
 					self.save_plot_dict["channel 1 widths"] = fcs_importer.XY_plot(xp1, widths1)
+
+
 
 					self.x_bins=[]
 					for ii in range (len(bins)-1):
