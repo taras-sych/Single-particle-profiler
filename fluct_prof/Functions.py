@@ -12,6 +12,8 @@ import lmfit
 
 import time
 
+import pandas as pd
+
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
@@ -911,3 +913,50 @@ def Export_function():
 
 
 		open_file.close()
+
+
+	filename = directory + os.path.sep + "Summary.xlsx"
+
+	df_gp = pd.DataFrame ()
+
+	df_sigma = pd.DataFrame ()
+
+	df_diff_coeff = pd.DataFrame ()
+
+	df_diff_time = pd.DataFrame ()
+
+	df_cpm = pd.DataFrame ()
+
+	df_N = pd.DataFrame ()
+
+	for file1 in data_c.output_numbers_dict.keys():
+		heading_line = str(data_c.tree_list_name[file1])
+
+		list_gp_mean = []
+		list_gp_sigma = []
+
+		for el in data_c.data_list_raw[file1].gp_fitting:
+			list_gp_mean.append(el["Mean"])
+			list_gp_sigma.append(el["Sigma"])
+
+
+
+		df1_gp = pd.DataFrame({heading_line: list_gp_mean})
+		df_gp = pd.concat([df_gp, df1_gp], axis=1)
+
+		df1_sigma = pd.DataFrame({heading_line: list_gp_sigma})
+		df_sigma = pd.concat([df_sigma, df1_sigma], axis=1)
+		
+
+
+
+
+
+	writer = pd.ExcelWriter(filename, engine='xlsxwriter')
+
+	df_gp.to_excel(writer, sheet_name='GP_Mean')
+	df_sigma.to_excel(writer, sheet_name='GP_Sigma')
+
+	writer.save()
+
+

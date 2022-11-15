@@ -6,6 +6,8 @@ from tkinter import ttk
 from tkinter import font as tkFont
 import matplotlib.pyplot as plt
 
+import pandas as pd
+
 import csv
 
 import lmfit
@@ -83,31 +85,46 @@ class Threshold_window:
 
 	def Save_plot_data(self):
 
+
+
+
 		print(self.save_plot_dict.keys())
 
 
 
 		name = data_cont.tree_list_name[data_cont.file_index]
-		filename = data_cont.initialdirectory + "\\" +  name + "_Plots_gp.txt"
+		filename = data_cont.initialdirectory + "\\" +  name + "_Plots_gp.xlsx"
 
 		open_file = open(filename, 'w')
+
+		dict_of_dfs = {}
 
 		for key in self.save_plot_dict.keys():
 
 			if key.__contains__("channel") == True and key.__contains__("fluct") == True and self.plot_var["Traces"].get() == 1:
 
-			#print(key)
-				open_file.write(str(key) + "\n")
+				if 'Traces' in dict_of_dfs.keys():
+					pass
+				else:
+					dict_of_dfs ["Traces"] = pd.DataFrame()
 
-				for i in range(len(self.save_plot_dict[key].x)):
-					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+				df1 = pd.DataFrame({"time": self.save_plot_dict[key].x})
+				df2 = pd.DataFrame({key: self.save_plot_dict[key].y})					
+				
+				
+				dict_of_dfs ["Traces"] = pd.concat([dict_of_dfs ["Traces"], df1], axis = 1)
+				dict_of_dfs ["Traces"] = pd.concat([dict_of_dfs ["Traces"], df2], axis = 1)
 
-				open_file.write("\n")
-				open_file.write("\n")
+			
 
 
 
 			if key.__contains__("channel") == True and key.__contains__("peaks") == True and self.plot_var["Peaks"].get() == 1:
+
+				if 'Peaks' in dict_of_dfs.keys():
+					pass
+				else:
+					dict_of_dfs ["Peaks"] = pd.DataFrame()
 
 				str1, str2 = key.split("p")
 				key1 = str1 + "prominences"
@@ -122,73 +139,75 @@ class Threshold_window:
 
 				print(len(self.save_plot_dict[key2].y))
 
+				df1 = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
-				open_file.write(str(key) + "\t" + str(key1) + "\t" + str(key2))
+				df1 = pd.concat([df1, pd.DataFrame({key1: self.save_plot_dict[key1].y})], axis = 1)
 
-				for i in range(len(self.save_plot_dict[key].x)):
-					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) +  "\t" + str(self.save_plot_dict[key1].y[i]) +  "\t" + str(self.save_plot_dict[key2].y[i]) + "\n")
+				df1 = pd.concat([df1, pd.DataFrame({key2: self.save_plot_dict[key2].y})], axis = 1)
 
-				open_file.write("\n")
-				open_file.write("\n")
+				dict_of_dfs ["Peaks"] = pd.concat([dict_of_dfs ["Peaks"], df1], axis = 1)
+				
 
 
 			if key.__contains__("gp") == True and self.plot_var["GP Plot"].get() == 1:
 
-				open_file.write(str(key) + "\n")
+				df = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
-				for i in range(len(self.save_plot_dict[key].x)):
-					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+				dict_of_dfs ["GP plot"] = df
 
-				open_file.write("\n")
-				open_file.write("\n")
 
 			if key.__contains__("sum") == True and self.plot_var["GP Fit"].get() == 1:
 
-				open_file.write(str(key) + "\n")
+				df = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
-				for i in range(len(self.save_plot_dict[key].x)):
-					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+				dict_of_dfs ["GP plot"] = pd.concat([dict_of_dfs ["GP plot"], df], axis = 1)
 
-				open_file.write("\n")
-				open_file.write("\n")
 
 
 			if key.__contains__("component") == True and self.plot_var["GP Fit"].get() == 1:
 
-				open_file.write(str(key) + "\n")
+				df = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
-				for i in range(len(self.save_plot_dict[key].x)):
-					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+				dict_of_dfs ["GP plot"] = pd.concat([dict_of_dfs ["GP plot"], df], axis = 1)
 
-				open_file.write("\n")
-				open_file.write("\n")
+
 
 
 			if key.__contains__("dot plot") == True:
 
-				open_file.write(str(key) + "\n")
+				if 'Dot plot' in dict_of_dfs.keys():
+					pass
+				else:
+					dict_of_dfs ["Dot plot"] = pd.DataFrame()
 
-				for i in range(len(self.save_plot_dict[key].x)):
-					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+				df = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
-				open_file.write("\n")
-				open_file.write("\n")
+				dict_of_dfs ["Dot plot"] = pd.concat([dict_of_dfs ["Dot plot"], df], axis = 1)
 
 			if key.__contains__("channel") == True and key.__contains__("hist") == True:
 
-				open_file.write(str(key) + "\n")
+				if 'Channel Histograms' in dict_of_dfs.keys():
+					pass
+				else:
+					dict_of_dfs ["Channel Histograms"] = pd.DataFrame()
 
-				for i in range(len(self.save_plot_dict[key].x)):
-					open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+					df = pd.concat([pd.DataFrame({"x": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
-				open_file.write("\n")
-				open_file.write("\n")
-
-
-
+				dict_of_dfs ["Channel Histograms"] = pd.concat([dict_of_dfs ["Channel Histograms"], df], axis = 1)
 
 
-		open_file.close()
+
+		writer = pd.ExcelWriter(filename, engine='xlsxwriter')
+
+		for key in dict_of_dfs.keys():
+			dict_of_dfs[key].to_excel(writer, sheet_name=key)
+
+		writer.save()
+
+
+
+
+
 
 	def Apply_to_all(self):
 
@@ -786,8 +805,8 @@ class Threshold_window:
 				if self.normalization_index == "manual":
 
 
-					th1 = 2
-					th2 = 2
+					th1 = 2*np.mean(y1_raw)
+					th2 = 2*np.mean(y2_raw)
 
 			self.ch1_th.delete(0,"end")
 			self.ch1_th.insert(0,str(th1))
@@ -808,8 +827,8 @@ class Threshold_window:
 			if self.normalization_index == "manual":
 
 
-				y1 = y1_raw/np.mean(y1_raw)
-				y2 = y2_raw/np.mean(y2_raw)
+				y1 = y1_raw
+				y2 = y2_raw
 			
 
 			yh1 = []
@@ -934,7 +953,7 @@ class Threshold_window:
 					if (self.var.get() == 1):
 						self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
 
-					bins_1 = int(np.sqrt(len(yh1)))
+					bins_1 = int(np.sqrt(len(yp1_raw)))
 					if bins_1 == 0:
 						bins_1 = 1
 
@@ -979,7 +998,7 @@ class Threshold_window:
 					if (self.var.get() == 1):
 						self.peaks.plot(xp2, yp2_raw, "x", color = 'green', zorder = 3)
 
-					bins_2 = int(np.sqrt(len(yh2)))
+					bins_2 = int(np.sqrt(len(yp2_raw)))
 					if bins_2 == 0:
 						bins_2 = 1
 					
