@@ -516,6 +516,9 @@ class Threshold_window:
 
 	def Peaks (self):
 
+		self.ch1_th.delete(0,"end")
+		self.ch2_th.delete(0,"end")
+
 		self.save_plot_dict = {}
 
 
@@ -579,7 +582,7 @@ class Threshold_window:
 				if self.normalization_index == "manual":
 
 
-					th1 = 2
+					th1 = int(2*np.mean(y1_raw))
 					
 
 			self.ch1_th.delete(0,"end")
@@ -593,7 +596,7 @@ class Threshold_window:
 			if self.normalization_index == "manual":
 
 
-				y1 = y1_raw/np.mean(y1_raw)
+				y1 = y1_raw
 
 			
 
@@ -805,8 +808,8 @@ class Threshold_window:
 				if self.normalization_index == "manual":
 
 
-					th1 = 2*np.mean(y1_raw)
-					th2 = 2*np.mean(y2_raw)
+					th1 = int(2*np.mean(y1_raw))
+					th2 = int(2*np.mean(y2_raw))
 
 			self.ch1_th.delete(0,"end")
 			self.ch1_th.insert(0,str(th1))
@@ -1369,28 +1372,12 @@ class Threshold_window:
 		self.normalization_index = self.Normalization.get()
 
 
-		if self.normalization_index == "z-score":
-			
-
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(3))
-			
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(3))
-
-
-
-		if self.normalization_index == "manual":
-
-
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(1))
-			
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(1))
 
 		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
 			data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
+
+		for th in data_cont.data_list_raw[data_cont.file_index].threshold_list:
+			th = None
 		
 		self.Peaks()
 
