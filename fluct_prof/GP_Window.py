@@ -1026,8 +1026,8 @@ class Threshold_window:
 
 
 
-					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2)
-					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2)
+					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2_raw)
+					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2_raw)
 					self.save_plot_dict["channel 2 prominences"] = fcs_importer.XY_plot(xp2, prominences2)
 					self.save_plot_dict["channel 2 widths"] = fcs_importer.XY_plot(xp2, widths2)
 
