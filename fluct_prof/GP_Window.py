@@ -129,21 +129,26 @@ class Threshold_window:
 				str1, str2 = key.split("p")
 				key1 = str1 + "prominences"
 
-				print (key1)
-				print(len(self.save_plot_dict[key1].y))
+				#print (key1)
+				#print(len(self.save_plot_dict[key1].y))
 
 				str1, str2 = key.split("p")
 				key2 = str1 + "widths"
 
-				print (key2)
+				#print (key2)
 
-				print(len(self.save_plot_dict[key2].y))
+				#print(len(self.save_plot_dict[key2].y))
+
+				str1, str2 = key.split("p")
+				key3 = str1 + "norm"
 
 				df1 = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
 				df1 = pd.concat([df1, pd.DataFrame({key1: self.save_plot_dict[key1].y})], axis = 1)
 
 				df1 = pd.concat([df1, pd.DataFrame({key2: self.save_plot_dict[key2].y})], axis = 1)
+
+				df1 = pd.concat([df1, pd.DataFrame({key3: self.save_plot_dict[key3].y})], axis = 1)
 
 				dict_of_dfs ["Peaks"] = pd.concat([dict_of_dfs ["Peaks"], df1], axis = 1)
 				
@@ -893,6 +898,8 @@ class Threshold_window:
 
 			prominences2 = peak_prominences(y2, peaks)[0]
 
+
+
 			xp1 = []
 			xp2 = []
 			yp1 = []
@@ -925,7 +932,8 @@ class Threshold_window:
 				yp2_raw.append(y2_raw[p])
 
 
-
+			intensities_norm_1 = np.divide(yp1_raw, widths1)
+			intensities_norm_2 = np.divide(yp2_raw, widths2)
 			
 			
 
@@ -983,6 +991,7 @@ class Threshold_window:
 					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1_raw)
 					self.save_plot_dict["channel 1 prominences"] = fcs_importer.XY_plot(xp1, prominences1)
 					self.save_plot_dict["channel 1 widths"] = fcs_importer.XY_plot(xp1, widths1)
+					self.save_plot_dict["channel 1 norm"] = fcs_importer.XY_plot(xp1, intensities_norm_1)
 
 
 
@@ -1030,6 +1039,7 @@ class Threshold_window:
 					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2_raw)
 					self.save_plot_dict["channel 2 prominences"] = fcs_importer.XY_plot(xp2, prominences2)
 					self.save_plot_dict["channel 2 widths"] = fcs_importer.XY_plot(xp2, widths2)
+					self.save_plot_dict["channel 2 norm"] = fcs_importer.XY_plot(xp1, intensities_norm_2)
 
 					self.x_bins=[]
 					for ii in range (len(bins)-1):
