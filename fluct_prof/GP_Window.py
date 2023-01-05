@@ -540,7 +540,10 @@ class Threshold_window:
 
 		
 
-
+		#------------------------------------------------------------------------------------------------------
+		#--------------   Processing for one channel data   ---------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
 		
 		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 1:
 
@@ -637,6 +640,14 @@ class Threshold_window:
 
 			yp1_raw_sep = []
 
+			widths1 = peak_widths(y1_raw, peaks, rel_height=0.5)[0]
+
+			prominences1 = peak_prominences(y1_raw, peaks)[0]
+
+
+
+
+
 
 
 
@@ -658,7 +669,7 @@ class Threshold_window:
 
 
 
-			
+			intensities_norm_1 = np.divide(yp1_raw, widths1)
 			
 
 			if self.fit_all_flag == False:
@@ -691,10 +702,39 @@ class Threshold_window:
 				bins_1 = int(np.sqrt(len(yh1)))
 				if bins_1 == 0:
 					bins_1 = 1
-				self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
+				#self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
+
+				if self.Normalization_for_plot.get() == "Peak Intensity": 
+
+					self.hist1.set_title("Peak intensity histograms")
+
+					self.n, bins, patches = self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
+
+				if self.Normalization_for_plot.get() == "Peak Prominence":
+
+					self.hist1.set_title("Peak prominence histograms")
+
+					self.n, bins, patches = self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
+
+				if self.Normalization_for_plot.get() == "Peak width at half max":
+
+					self.hist1.set_title("Peak width histograms")
+
+					self.n, bins, patches = self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
 
 				self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1_raw)
 				self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1_raw)
+
+
+				self.save_plot_dict["channel 1 prominences"] = fcs_importer.XY_plot(xp1, prominences1)
+				self.save_plot_dict["channel 1 widths"] = fcs_importer.XY_plot(xp1, widths1)
+				self.save_plot_dict["channel 1 norm"] = fcs_importer.XY_plot(xp1, intensities_norm_1)
+
+				self.x_bins=[]
+				for ii in range (len(bins)-1):
+					self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
+
+				self.save_plot_dict["channel 1 hist"] = fcs_importer.XY_plot(self.x_bins, self.n)
 					
 
 
@@ -707,7 +747,10 @@ class Threshold_window:
 					
 			
 
-
+		#------------------------------------------------------------------------------------------------------
+		#--------------   Processing for multiple channels data   ---------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
 
 		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
 
@@ -886,17 +929,17 @@ class Threshold_window:
 
 			
 
-			widths1 = peak_widths(y1, peaks, rel_height=0.5)[0]
+			widths1 = peak_widths(y1_raw, peaks, rel_height=0.5)[0]
 
 
 
-			widths2 = peak_widths(y2, peaks, rel_height=0.5)[0]
+			widths2 = peak_widths(y2_raw, peaks, rel_height=0.5)[0]
 
-			prominences1 = peak_prominences(y1, peaks)[0]
+			prominences1 = peak_prominences(y1_raw, peaks)[0]
 
 
 
-			prominences2 = peak_prominences(y2, peaks)[0]
+			prominences2 = peak_prominences(y2_raw, peaks)[0]
 
 
 
