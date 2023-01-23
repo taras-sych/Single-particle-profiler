@@ -1,0 +1,213 @@
+A_1__LDL
+Diffusion data: 
+channel 1
+name	
+Repetition 1	None	None	None	
+Repetition 2	None	None	None	
+Repetition 3	None	None	None	
+Repetition 4	None	None	None	
+Repetition 5	None	None	None	
+Repetition 6	None	None	None	
+Repetition 7	None	None	None	
+Repetition 8	None	None	None	
+Repetition 9	None	None	None	
+Repetition 10	None	None	None	
+Repetition 11	None	None	None	
+Repetition 12	None	None	None	
+Repetition 13	None	None	None	
+Repetition 14	None	None	None	
+Repetition 15	None	None	None	
+Repetition 16	None	None	None	
+Repetition 17	None	None	None	
+Repetition 18	None	None	None	
+Repetition 19	None	None	None	
+Repetition 20	None	None	None	
+Repetition 21	None	None	None	
+Repetition 22	None	None	None	
+Repetition 23	None	None	None	
+Repetition 24	None	None	None	
+Repetition 25	None	None	None	
+Repetition 26	None	None	None	
+Repetition 27	None	None	None	
+Repetition 28	None	None	None	
+Repetition 29	None	None	None	
+Repetition 30	None	None	None	
+Repetition 31	None	None	None	
+Repetition 32	None	None	None	
+Repetition 33	None	None	None	
+Repetition 34	None	None	None	
+Repetition 35	None	None	None	
+Repetition 36	None	None	None	
+Repetition 37	None	None	None	
+Repetition 38	None	None	None	
+Repetition 39	None	None	None	
+Repetition 40	None	None	None	
+channel 2
+name	
+Repetition 1	None	None	None	
+Repetition 2	None	None	None	
+Repetition 3	None	None	None	
+Repetition 4	None	None	None	
+Repetition 5	None	None	None	
+Repetition 6	None	None	None	
+Repetition 7	None	None	None	
+Repetition 8	None	None	None	
+Repetition 9	None	None	None	
+Repetition 10	None	None	None	
+Repetition 11	None	None	None	
+Repetition 12	None	None	None	
+Repetition 13	None	None	None	
+Repetition 14	None	None	None	
+Repetition 15	None	None	None	
+Repetition 16	None	None	None	
+Repetition 17	None	None	None	
+Repetition 18	None	None	None	
+Repetition 19	None	None	None	
+Repetition 20	None	None	None	
+Repetition 21	None	None	None	
+Repetition 22	None	None	None	
+Repetition 23	None	None	None	
+Repetition 24	None	None	None	
+Repetition 25	None	None	None	
+Repetition 26	None	None	None	
+Repetition 27	None	None	None	
+Repetition 28	None	None	None	
+Repetition 29	None	None	None	
+Repetition 30	None	None	None	
+Repetition 31	None	None	None	
+Repetition 32	None	None	None	
+Repetition 33	None	None	None	
+Repetition 34	None	None	None	
+Repetition 35	None	None	None	
+Repetition 36	None	None	None	
+Repetition 37	None	None	None	
+Repetition 38	None	None	None	
+Repetition 39	None	None	None	
+Repetition 40	None	None	None	
+channel 2 vs 1
+name	
+Repetition 1	None	
+Repetition 2	None	
+Repetition 3	None	
+Repetition 4	None	
+Repetition 5	None	
+Repetition 6	None	
+Repetition 7	None	
+Repetition 8	None	
+Repetition 9	None	
+Repetition 10	None	
+Repetition 11	None	
+Repetition 12	None	
+Repetition 13	None	
+Repetition 14	None	
+Repetition 15	None	
+Repetition 16	None	
+Repetition 17	None	
+Repetition 18	None	
+Repetition 19	None	
+Repetition 20	None	
+Repetition 21	None	
+Repetition 22	None	
+Repetition 23	None	
+Repetition 24	None	
+Repetition 25	None	
+Repetition 26	None	
+Repetition 27	None	
+Repetition 28	None	
+Repetition 29	None	
+Repetition 30	None	
+Repetition 31	None	
+Repetition 32	None	
+Repetition 33	None	
+Repetition 34	None	
+Repetition 35	None	
+Repetition 36	None	
+Repetition 37	None	
+Repetition 38	None	
+Repetition 39	None	
+Repetition 40	None	
+channel 1 vs 2
+name	
+Repetition 1	None	
+Repetition 2	None	
+Repetition 3	None	
+Repetition 4	None	
+Repetition 5	None	
+Repetition 6	None	
+Repetition 7	None	
+Repetition 8	None	
+Repetition 9	None	
+Repetition 10	None	
+Repetition 11	None	
+Repetition 12	None	
+Repetition 13	None	
+Repetition 14	None	
+Repetition 15	None	
+Repetition 16	None	
+Repetition 17	None	
+Repetition 18	None	
+Repetition 19	None	
+Repetition 20	None	
+Repetition 21	None	
+Repetition 22	None	
+Repetition 23	None	
+Repetition 24	None	
+Repetition 25	None	
+Repetition 26	None	
+Repetition 27	None	
+Repetition 28	None	
+Repetition 29	None	
+Repetition 30	None	
+Repetition 31	None	
+Repetition 32	None	
+Repetition 33	None	
+Repetition 34	None	
+Repetition 35	None	
+Repetition 36	None	
+Repetition 37	None	
+Repetition 38	None	
+Repetition 39	None	
+Repetition 40	None	
+
+GP data: 
+name	A	Mean	Sigma	total peaks	
+Repetition 1	32.90221014193351	-0.036129675774731806	0.07584365670689452	140	
+Repetition 2	26.342113454648207	-0.015317665872551567	0.08759060094654258	129	
+Repetition 3	23.677590105235513	-0.007600831370980554	0.07824910835150733	129	
+Repetition 4	39.52972423961532	-0.017255046528989793	0.07996539028844962	136	
+Repetition 5	27.60775593426079	-0.02779517028194478	0.08789048726199189	148	
+Repetition 6	21.848763314374352	-0.03567710956839176	0.08394941123405886	144	
+Repetition 7	34.7777846423819	-0.030684699015490535	0.07624410147942373	145	
+Repetition 8	33.08922905400691	-0.01814205071039876	0.06829320479756396	140	
+Repetition 9	26.601771641877605	-0.023017738486891037	0.07319869260553125	138	
+Repetition 10	31.91118905329915	-0.026173107710768972	0.07236039264364913	142	
+Repetition 11	26.970852724346184	-0.03266714385095748	0.07625584477871827	130	
+Repetition 12	33.3290109258233	-0.020513285091640077	0.055612551419812695	109	
+Repetition 13	7.669717844135393	0.0036084578258857025	0.09453625342538663	26	
+Repetition 14	30.96614242501572	-0.011578298288383304	0.08228819063843207	117	
+Repetition 15	22.025259751361492	-0.03348722148834371	0.081059616018204	131	
+Repetition 16	34.76437097421514	-0.017619558545304614	0.07314039471635936	149	
+Repetition 17	28.358971269361042	-0.03167294226252093	0.0888326359810816	127	
+Repetition 18	20.17273457776303	-0.004736068059447485	0.08299260282440768	124	
+Repetition 19	31.40326868905752	-0.02540544913254794	0.07457963516295996	135	
+Repetition 20	37.737995243896094	-0.011978206745989262	0.06635772849651711	139	
+Repetition 21	27.224350871571936	-0.026314435868321606	-0.08062896659502217	159	
+Repetition 22	28.823351548967203	0.0020598621888203716	0.07691521227748654	119	
+Repetition 23	29.75739354262208	0.005916012212839661	-0.0683974530741811	123	
+Repetition 24	25.78838163404096	-0.014500684471679515	-0.08975411191639149	130	
+Repetition 25	24.034968737661757	-0.019459211182431657	0.08950734808596694	117	
+Repetition 26	20.47397882665225	-0.032821722164293354	0.1011739641596392	122	
+Repetition 27	22.937384364266066	-0.017165736859910297	0.09587531521855341	134	
+Repetition 28	36.66598672742383	-0.0045099812176605525	0.07150674641049792	146	
+Repetition 29	25.881990998225525	-0.049037835506447025	0.09043314937466618	137	
+Repetition 30	25.39217987693021	-0.020961661590381375	0.08625271283212754	125	
+Repetition 31	25.93482030796901	-0.018013011697985526	-0.09409760839127435	117	
+Repetition 32	19.05785392016357	-0.0010081621150409559	0.0903040565254194	105	
+Repetition 33	33.55842326388636	-0.023409210983852735	0.06697360780645822	126	
+Repetition 34	15.329069307186138	-0.0009299442185867202	0.09347842085381286	71	
+Repetition 35	34.072199710619145	-0.036016669658895384	0.06743223755151018	144	
+Repetition 36	26.572241329043678	-0.02233733347625233	0.08115401299437774	133	
+Repetition 37	28.19973483919047	-0.010338954233950481	0.08623618216995532	126	
+Repetition 38	30.00093295768391	-0.020333851745683584	0.0699578162293637	148	
+Repetition 39	24.255489932644146	-0.026165273249974974	0.0860708756180586	135	
+Repetition 40	29.987422661876817	0.006621738983238146	0.06378017761032773	114	

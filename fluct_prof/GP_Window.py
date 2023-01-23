@@ -178,6 +178,8 @@ class Threshold_window:
 
 
 
+
+
 			if key.__contains__("dot plot") == True:
 
 				if 'Dot plot' in dict_of_dfs.keys():
@@ -417,15 +419,10 @@ class Threshold_window:
 			self.full_dict[param]["Init"].insert(0,str(round(params[param].value,3)))
 			popt.append(np.float64(params[param].value))
 			output_dict[param] = np.float64(params[param].value)
+		output_dict["Total peaks"] = self.n_peaks
 
 
 		data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = output_dict
-
-		
-
-
-			
-
 
 
 
@@ -977,6 +974,9 @@ class Threshold_window:
 
 			intensities_norm_1 = np.divide(yp1_raw, widths1)
 			intensities_norm_2 = np.divide(yp2_raw, widths2)
+
+			self.n_peaks = len(yp1_raw)
+
 			
 			
 
@@ -1711,6 +1711,7 @@ class Threshold_window:
 		self.plot_var["Dot Plot"] = tk.IntVar()
 		self.plot_var["GP Plot"] = tk.IntVar()
 		self.plot_var["GP Fit"] = tk.IntVar()
+	
 
 		for key in self.plot_var.keys():
 			self.plot_var[key].set(1)
@@ -1732,6 +1733,8 @@ class Threshold_window:
 
 		self.gp_fit_check=tk.Checkbutton(self.frame00000001, text="GP Fit", variable=self.plot_var["GP Fit"], command=self.Temp)
 		self.gp_fit_check.pack(side = "left", anchor = "nw")
+
+		
 
 		self.channel_pairs = []
 

@@ -921,6 +921,8 @@ def Export_function():
 
 	df_sigma = pd.DataFrame ()
 
+	df_totals = pd.DataFrame ()
+
 	df_diff_coeff = pd.DataFrame ()
 
 	df_diff_time = pd.DataFrame ()
@@ -934,10 +936,12 @@ def Export_function():
 
 		list_gp_mean = []
 		list_gp_sigma = []
+		list_gp_totals = []
 
 		for el in data_c.data_list_raw[file1].gp_fitting:
 			list_gp_mean.append(el["Mean"])
 			list_gp_sigma.append(el["Sigma"])
+			list_gp_totals.append(el["Total peaks"])
 
 
 
@@ -946,6 +950,9 @@ def Export_function():
 
 		df1_sigma = pd.DataFrame({heading_line: list_gp_sigma})
 		df_sigma = pd.concat([df_sigma, df1_sigma], axis=1)
+
+		df1_totals = pd.DataFrame({heading_line: list_gp_totals})
+		df_totals = pd.concat([df_totals, df1_totals], axis=1)
 		
 
 
@@ -956,6 +963,7 @@ def Export_function():
 
 	df_gp.to_excel(writer, sheet_name='GP_Mean')
 	df_sigma.to_excel(writer, sheet_name='GP_Sigma')
+	df_totals.to_excel(writer, sheet_name='Total peaks')
 
 	writer.save()
 
