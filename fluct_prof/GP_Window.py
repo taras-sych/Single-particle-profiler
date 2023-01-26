@@ -1002,7 +1002,11 @@ class Threshold_window:
 
 				if which_channel == "channel 1" or which_channel == "both or" or which_channel == "both and":
 					self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
-					#self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
+					if self.normalization_index == "z-score": 
+						th1_line = np.mean(y1_raw) + th1 * np.std(y1_raw)
+					if self.normalization_index == "manual":
+						th1_line = th1
+					self.peaks.hlines(th1_line, min(x1), max(x1), color = 'magenta', zorder=2, linestyle = "--")
 					
 					if (self.var.get() == 1):
 						self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
@@ -1048,7 +1052,11 @@ class Threshold_window:
 				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
 					
 					self.peaks.plot(x2, y2_raw, '#ff7f0e', zorder=1)
-					#self.peaks.hlines(th2, min(x2), max(x2), color = 'green', zorder=2)
+					if self.normalization_index == "z-score": 
+						th2_line = np.mean(y2_raw) + th2 * np.std(y2_raw)
+					if self.normalization_index == "manual":
+						th2_line = th2
+					self.peaks.hlines(th2_line, min(x2), max(x2), color = 'green', zorder=2, linestyle = "--")
 
 					if (self.var.get() == 1):
 						self.peaks.plot(xp2, yp2_raw, "x", color = 'green', zorder = 3)
@@ -1180,7 +1188,9 @@ class Threshold_window:
 					for param in data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys():
 				
 
-						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index][param]))
+						
+						if param != "Total peaks":
+							popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index][param]))
 
 
 
@@ -1339,6 +1349,8 @@ class Threshold_window:
 
 	def Put_default(self):
 
+		self.normalization_index = self.Normalization.get()
+
 		if self.normalization_index == "z-score":
 			self.ch1_th.delete(0,"end")
 			self.ch1_th.insert(0,str(2))
@@ -1349,14 +1361,59 @@ class Threshold_window:
 
 		if self.normalization_index == "manual":
 
+			str1 = self.Channel_pair__choice.get()
+
+			str7, str2 = str1.split('/')
+
+			str3, str4 = str7.split(' ')
+
+			str5, str6 = str2.split(' ')
+
+			ch1_ind = int(str4) - 1
+
+			ch2_ind = int(str6) - 1
+
+			x1 = []
+			x2 = []
+			y1 = []
+			y2 = []
+			y1_raw = []
+			y2_raw = []
+
+			int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
+
+			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
+							
+				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
+
+					
+
+
+					if len(x1) == 0:
+						x_min = 0
+					else:
+						x_min = max(x1) + x1[1] - x1[0]
+
+					x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x]
+					x_temp_2 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.x]
+
+
+					x1.extend(x_temp_1)
+					#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+					y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.y)
+
+					x2.extend(x_temp_2)
+					#y2.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
+					y2_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.y)
+
 
 
 			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(round(np.mean(y1),2)))
+			self.ch1_th.insert(0,str(round(np.mean(y1_raw),2)))
 
 			
 			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(round(np.mean(y2),2)))
+			self.ch2_th.insert(0,str(round(np.mean(y2_raw),2)))
 
 		self.Update_thresholds_button.invoke()
 
@@ -1422,7 +1479,15 @@ class Threshold_window:
 
 	def Normalize_index(self, event):
 
-		self.normalization_index = self.Normalization.get()
+
+
+		self.Put_default()
+
+
+
+
+
+		"""		self.normalization_index = self.Normalization.get()
 
 
 
@@ -1436,7 +1501,7 @@ class Threshold_window:
 
 
 
-		self.Fitting_frame()
+		self.Fitting_frame()"""
 
 
 	
