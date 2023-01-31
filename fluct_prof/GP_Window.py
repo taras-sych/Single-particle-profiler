@@ -847,8 +847,8 @@ class Threshold_window:
 
 				if self.normalization_index == "z-score":
 
-					th1 = 2
-					th2 = 2
+					th1 = 1
+					th2 = 1
 
 				if self.normalization_index == "manual":
 
@@ -918,7 +918,20 @@ class Threshold_window:
 
 			if which_channel == "both and":
 
-				peaks = list(set(peaks1).intersection(set(peaks2)))
+				peaks1_temp = []
+				for peak in peaks1:
+					if y2[peak] > th2:
+						peaks1_temp.append(peak)
+
+				peaks2_temp = []
+				for peak in peaks2:
+					if y1[peak] > th1:
+						peaks2_temp.append(peak)
+
+				peaks = list(set(peaks1_temp).union(set(peaks2_temp)))
+
+
+				#peaks = list(set(peaks1).intersection(set(peaks2)))
 
 			if which_channel == "both or":
 
@@ -1353,11 +1366,11 @@ class Threshold_window:
 
 		if self.normalization_index == "z-score":
 			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(2))
+			self.ch1_th.insert(0,str(1))
 
 			
 			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(2))
+			self.ch2_th.insert(0,str(1))
 
 		if self.normalization_index == "manual":
 
@@ -1893,7 +1906,7 @@ class Threshold_window:
 		self.ch1_th = tk.Entry(self.frame001, width = 9)
 		self.ch1_th.grid(row = 5, column = 1, sticky='ew')
 
-		self.ch1_th.insert("end", str(2))
+		self.ch1_th.insert("end", str(1))
 
 		self.ch2_label = tk.Label(self.frame001, text="channel 2: ")
 		self.ch2_label.grid(row = 6, column = 0, sticky='ew')
@@ -1903,7 +1916,7 @@ class Threshold_window:
 		self.ch2_th = tk.Entry(self.frame001, width = 9)
 		self.ch2_th.grid(row = 6, column = 1, sticky='ew')
 
-		self.ch2_th.insert("end", str(2))
+		self.ch2_th.insert("end", str(1))
 
 
 		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
@@ -1998,11 +2011,11 @@ class Threshold_window:
 
 		if self.normalization_index == "z-score":
 			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(3))
+			self.ch1_th.insert(0,str(1))
 
 			
 			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(3))
+			self.ch2_th.insert(0,str(1))
 
 		if self.normalization_index == "manual":
 
