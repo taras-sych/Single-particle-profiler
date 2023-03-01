@@ -1128,6 +1128,8 @@ class Threshold_window:
 			
 			for k in range (len(yp1_raw)):
 				gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
+				#gp_1 = yp2_raw[k]/yp1_raw[k]
+				#gp_list_temp.append(gp_1)
 
 				peaks_x_temp.append(yp1_raw[k])
 				peaks_y_temp.append(yp2_raw[k])
