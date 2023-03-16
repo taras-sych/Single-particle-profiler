@@ -1124,10 +1124,11 @@ class Threshold_window:
 
 
 			
-
+			norm_mean = np.mean(yp2_raw)
 			
 			for k in range (len(yp1_raw)):
-				gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
+				#gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
+				gp_1 = -(yp1_raw[k] - (yp2_raw[k]-norm_mean))/((yp2_raw[k]-norm_mean) + yp1_raw[k])
 				#gp_1 = yp2_raw[k]/yp1_raw[k]
 				#gp_list_temp.append(gp_1)
 
