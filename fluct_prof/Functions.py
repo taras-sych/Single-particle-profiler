@@ -966,5 +966,3 @@ def Export_function():
 	df_totals.to_excel(writer, sheet_name='Total peaks')
 
 	writer.save()
-
-
