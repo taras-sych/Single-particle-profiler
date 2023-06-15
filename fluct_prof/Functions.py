@@ -938,6 +938,24 @@ def Export_function():
 		list_gp_sigma = []
 		list_gp_totals = []
 
+		list_diff_coeffs = {}
+
+		for el in data_c.data_list_raw[file1].gp_fitting:
+			list_gp_mean.append(el["Mean"])
+			list_gp_sigma.append(el["Sigma"])
+			list_gp_totals.append(el["Total peaks"])
+
+
+
+			#repetitions = data_c.repetitions_list[file1]
+			#data_c.data_list_raw[file1].channels_number
+			data_c.data_list_raw[file1].diff_fitting[rep1, channel][key]
+
+		for rep in range(0, data_c.repetitions_list[file1]):
+			lis_temp = []
+			for chan in range(0, data_c.data_list_raw[file1].channels_number):
+				data_c.data_list_raw[file1].diff_fitting[rep, chan][key]
+
 		for el in data_c.data_list_raw[file1].gp_fitting:
 			list_gp_mean.append(el["Mean"])
 			list_gp_sigma.append(el["Sigma"])
