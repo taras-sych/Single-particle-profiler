@@ -923,13 +923,19 @@ def Export_function():
 
 	df_totals = pd.DataFrame ()
 
-	df_diff_coeff = pd.DataFrame ()
+	df_diff_coeff = {}
 
-	df_diff_time = pd.DataFrame ()
+	df_diff_time = {}
 
-	df_cpm = pd.DataFrame ()
+	df_cpms = {}
 
-	df_N = pd.DataFrame ()
+	df_T = pd.DataFrame ()
+
+	df_diff_time_list = {}
+
+	df_cpm_list = {}
+
+	df_T_list = {}
 
 	for file1 in data_c.output_numbers_dict.keys():
 		heading_line = str(data_c.tree_list_name[file1])
@@ -939,27 +945,48 @@ def Export_function():
 		list_gp_totals = []
 
 		list_diff_coeffs = {}
+		list_diff_times = {}
+		list_cpms = {}
 
 		for el in data_c.data_list_raw[file1].gp_fitting:
-			list_gp_mean.append(el["Mean"])
-			list_gp_sigma.append(el["Sigma"])
-			list_gp_totals.append(el["Total peaks"])
+			try:
+				list_gp_mean.append(el["Mean"])
+				list_gp_sigma.append(el["Sigma"])
+				list_gp_totals.append(el["Total peaks"])
+
+			except:
+				pass
 
 
 
-			#repetitions = data_c.repetitions_list[file1]
-			#data_c.data_list_raw[file1].channels_number
-			data_c.data_list_raw[file1].diff_fitting[rep1, channel][key]
 
-		for rep in range(0, data_c.repetitions_list[file1]):
-			lis_temp = []
-			for chan in range(0, data_c.data_list_raw[file1].channels_number):
-				data_c.data_list_raw[file1].diff_fitting[rep, chan][key]
 
-		for el in data_c.data_list_raw[file1].gp_fitting:
-			list_gp_mean.append(el["Mean"])
-			list_gp_sigma.append(el["Sigma"])
-			list_gp_totals.append(el["Total peaks"])
+		
+		for chan in range(0, data_c.data_list_raw[file1].datasets_list[0].channels_number):
+
+			try:
+
+				list_T_temp = []
+				list_D_temp = []
+				list_C_temp = []
+				for rep in range(0, data_c.repetitions_list[file1]):
+					
+					list_T_temp.append(data_c.data_list_raw[file1].diff_fitting[rep, chan]["txy"])
+					list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan])
+					list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
+
+				list_diff_times [chan] = copy.deepcopy(list_T_temp)
+				list_diff_coeffs [chan] = copy.deepcopy(list_D_temp)
+				list_cpms [chan] = copy.deepcopy(list_C_temp)
+
+
+
+
+			except:
+				pass
+
+
+
 
 
 
@@ -971,6 +998,38 @@ def Export_function():
 
 		df1_totals = pd.DataFrame({heading_line: list_gp_totals})
 		df_totals = pd.concat([df_totals, df1_totals], axis=1)
+
+
+
+		for chan in range(0, data_c.data_list_raw[file1].datasets_list[0].channels_number):
+
+			df1_T = pd.DataFrame({heading_line: list_diff_times[chan]})
+			df1_D = pd.DataFrame({heading_line: list_diff_coeffs[chan]})
+			df1_C = pd.DataFrame({heading_line: list_cpms[chan]})
+
+
+			if chan in df_diff_time:
+				df_diff_time [chan] = pd.concat([df_diff_time [chan], df1_T], axis=1)
+				df_diff_coeff [chan] = pd.concat([df_diff_coeff[chan], df1_D], axis=1)
+				df_cpms [chan] = pd.concat([df_cpms[chan], df1_C], axis=1)
+			
+			else:
+				df_diff_time [chan] = pd.DataFrame ()
+				df_diff_coeff [chan] = pd.DataFrame ()
+				df_cpms [chan] = pd.DataFrame ()
+
+				df_diff_time [chan] = pd.concat([df_diff_time [chan], df1_T], axis=1)
+				df_diff_coeff [chan] = pd.concat([df_diff_coeff[chan], df1_D], axis=1)
+				df_cpms [chan] = pd.concat([df_cpms[chan], df1_C], axis=1)
+
+
+
+
+		
+
+
+			
+
 		
 
 
@@ -982,5 +1041,14 @@ def Export_function():
 	df_gp.to_excel(writer, sheet_name='GP_Mean')
 	df_sigma.to_excel(writer, sheet_name='GP_Sigma')
 	df_totals.to_excel(writer, sheet_name='Total peaks')
+
+	for chan in range(0, data_c.data_list_raw[file1].datasets_list[0].channels_number):
+		legend = 'Diff time channel' + str(chan)
+		df_diff_time [chan].to_excel(writer, sheet_name=legend)
+		legend = 'Diff coeff channel' + str(chan)
+		df_diff_coeff [chan].to_excel(writer, sheet_name=legend)
+		legend = 'CPM channel' + str(chan)
+		df_cpms [chan].to_excel(writer, sheet_name=legend)
+
 
 	writer.save()
