@@ -52,10 +52,20 @@ def Create_root():
 	frame0_r.config(bd=0, width = round(win_width * 0.5), height = win_height)
 	frame0_r.grid_propagate(1)
 
+	frame1_l = tk.LabelFrame(frame1)
+	frame1_l.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
+	frame1_l.config(bd=0, width = round(win_width * 0.5), height = win_height)
+	frame1_l.grid_propagate(1)
+
+	frame1_r = tk.LabelFrame(frame1)
+	frame1_r.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
+	frame1_r.config(bd=0, width = round(win_width * 0.5), height = win_height)
+	frame1_r.grid_propagate(1)
+
 
 
 	tabs.add(frame0, text = "SPP")
-	#tabs.add(frame1, text = "Scanning FCS")
+	tabs.add(frame1, text = "Scanning FCS")
 
 	tabs_number = 2;
 
@@ -64,6 +74,8 @@ def Create_root():
 
 
 	data_frame = main_w.Left_frame(frame0_l, win_width, win_height, dpi_all )
+
+	data_frame_sFCS = main_w.sFCS_frame(frame1_l, win_width, win_height, dpi_all )
 
 binning_list = []
 

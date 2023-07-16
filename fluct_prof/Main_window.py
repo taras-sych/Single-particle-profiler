@@ -12,6 +12,8 @@ import lmfit
 
 import time
 
+import tifffile
+
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
@@ -63,6 +65,8 @@ from fluct_prof import Functions as fun
 from fluct_prof import Data_container as data_cont
 
 from fluct_prof import Data_tree as d_tree
+
+from fluct_prof import Functions_sFCS as func
 
 #--------------------------
 #End of importing own modules
@@ -607,3 +611,302 @@ class Left_frame :
 
 		self.framepb = tk.Frame(frame0)
 		self.framepb.pack(side="top", fill="x")
+
+
+
+class sFCS_frame:
+
+	def Empty_function(self):
+		print("Empty function invoked")
+
+	def Tree_selection(self, event):
+
+		index = self.tree.selection()
+		num1, num = index[0].split('I')
+
+
+		
+
+		num = int(num, 16)-1
+
+		eg= func.File_sFCS(self.dataset_list[num])
+
+		bins = 1
+		slices = 20
+
+		binned_data = eg.intensity_carpet_plot(1, bin_size=bins, n_slices = slices)
+
+		
+		self.image.imshow(binned_data,origin="lower")
+		self.canvas1.draw_idle()
+
+		
+
+		self.figure1.tight_layout()
+        
+
+		#print(self.dataset_list[num])
+
+		
+
+
+
+
+	def Import(self):
+
+		if data_cont.initialdirectory == '':
+			data_cont.initialdirectory = __file__
+
+		ftypes = [('LSM .lsm', '*.lsm'), ('All files', '*'), ]
+		
+
+		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(data_cont.initialdirectory),title = "Select file", filetypes = ftypes)
+
+		for filename_index in range (0, len(filenames)):
+			filename = filenames[filename_index]
+			if filename != "":
+
+				data_cont.initialdirectory = os.path.dirname(filename)
+
+
+				self.name = os.path.basename(filename)
+
+				self.dataset_list.append(filename)
+		
+
+			
+
+				treetree = d_tree.Data_tree (self.tree, self.name, 0)
+				self.tree.selection_set(treetree.child_id)
+			
+
+		
+
+			
+
+	def __init__ (self, frame0, win_width, win_height, dpi_all):
+
+		self.dataset_list = []
+
+
+
+		pixel = tk.PhotoImage(width=1, height=1)
+
+
+		
+
+		self.frame01 = tk.Frame(frame0)
+		self.frame01.pack(side="top", fill="x")
+
+
+		self.Import_Button = tk.Button(self.frame01, text="Import", command=self.Import)
+		self.Import_Button.pack(side = "left", anchor = "nw")
+
+		self.Clear_Button = tk.Button(self.frame01, text="Delete dataset", command=self.Empty_function)
+		self.Clear_Button.pack(side = "left", anchor = "nw")
+
+		self.Clear_all_Button = tk.Button(self.frame01, text="Delete all", command=self.Empty_function)
+		self.Clear_all_Button.pack(side = "left", anchor = "nw")
+
+
+		self.frame02 = tk.Frame(frame0)
+		self.frame02.pack(side="left", fill="x", anchor = "nw")
+
+		self.frame04 = tk.Frame(frame0)
+		self.frame04.pack(side="left", fill="x", anchor = "nw")
+
+
+		self.frame03 = tk.Frame(self.frame02)
+		self.frame03.pack(side="top", fill="x")
+
+
+
+		self.scrollbar = tk.Scrollbar(self.frame03)
+		self.scrollbar.pack(side = "left", fill = "y")
+
+
+		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10)
+		self.Datalist.pack(side = "left", anchor = "nw")
+		
+		
+		
+		self.tree=CheckboxTreeview(self.Datalist)
+		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
+		self.tree.pack()
+
+
+		self.tree.config(yscrollcommand = self.scrollbar.set)
+		self.scrollbar.config(command = self.tree.yview)
+
+		self.tree.bind('<<TreeviewSelect>>', self.Tree_selection)
+
+		self.Datalist.config(width = 100, height = 10)
+
+		self.frame024 = tk.Frame(self.frame02)
+		self.frame024.pack(side = "top", fill = "x", anchor='nw')
+
+		self.frame0003 = tk.Frame(self.frame024)
+		self.frame0003.pack(side = "left", fill = "x")
+
+
+		#self.chkbtn = tk.Checkbutton(self.frame0003, text="ch1", variable=1, command=Norm)
+		#self.chkbtn.grid(row = 0, column = 0, sticky='w')
+
+		self.frame023 = tk.Frame(self.frame02)
+		self.frame023.pack(side="left", fill="x")
+
+
+		self.Extract_button = tk.Button(self.frame023, text="Extract trace", command=self.Empty_function)
+		self.Extract_button.grid(row = 0, column = 0, columnspan = 2, sticky="EW")
+
+		self.Binning_label = tk.Label(self.frame023,  text = "Pixel binning: ")
+		self.Binning_label.grid(row = 1, column = 0, sticky = 'ew')
+
+
+		self.Binning__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
+		self.Binning__choice.config(state = "readonly")
+		self.Binning__choice.grid(row = 1, column = 1, sticky = 'ew')
+		self.Binning__choice.set("3")
+
+		self.Repetitions_label = tk.Label(self.frame023,  text = "Repetitions: ")
+		self.Repetitions_label.grid(row = 2, column = 0, sticky = 'ew')
+
+		self.Repetitions_entry = tk.Entry(self.frame023, width = 9)
+		self.Repetitions_entry.grid(row = 2, column = 1, sticky='ew')
+		self.Repetitions_entry.insert("end", str(1))
+
+		self.Display_label = tk.Label(self.frame023,  text = "Display: ")
+		self.Display_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w')
+
+		self.Rep_Display_label = tk.Label(self.frame023,  text = "Repetition: ")
+		self.Rep_Display_label.grid(row = 4, column = 0, sticky = 'ew')
+
+		self.Rep_Display__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
+		self.Rep_Display__choice.config(state = "readonly")
+		self.Rep_Display__choice.grid(row = 4, column = 1, sticky = 'ew')
+		self.Rep_Display__choice.set("3")
+
+
+		self.Chan_Display_label = tk.Label(self.frame023,  text = "Channel: ")
+		self.Chan_Display_label.grid(row = 5, column = 0, sticky = 'ew')
+
+		self.Chan_Display__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
+		self.Chan_Display__choice.config(state = "readonly")
+		self.Chan_Display__choice.grid(row = 5, column = 1, sticky = 'ew')
+		self.Chan_Display__choice.set("3")
+
+
+
+		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Empty_function)
+		self.Display_button.grid(row = 6, column = 0, columnspan =2, sticky="EW")
+
+		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Empty_function)
+		self.Transfer_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
+
+
+		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
+
+
+
+
+		gs = self.figure1.add_gridspec(3, 1)
+
+
+		self.image = self.figure1.add_subplot(gs[0, 0])
+
+		self.image.set_title("sFCS image")
+
+		self.image.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		
+
+		
+
+
+		self.traces = self.figure1.add_subplot(gs[1, 0])
+
+		self.traces.set_title("Traces")
+
+		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.traces.set_ylabel('intensity (a.u.)')
+		self.traces.set_xlabel('Time (s)')
+		
+
+
+		self.corr = self.figure1.add_subplot(gs[2, 0])
+
+		self.corr.set_title("Correlation curves")
+		self.corr.set_ylabel('Diff. Coeff.')
+		self.corr.set_ylabel('G (tau)')
+		self.corr.set_xlabel('Delay time')
+
+
+
+
+
+		self.canvas1 = FigureCanvasTkAgg(self.figure1, self.frame04)
+		self.canvas1.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas1, self.frame04)
+		self.toolbar.update()
+		self.canvas1.get_tk_widget().pack()
+
+		self.figure1.tight_layout()
+
+		self.framepb = tk.Frame(frame0)
+		self.framepb.pack(side="top", fill="x")
+
+
+class Sidecut_sFCS:
+    def __init__(self,lsm_file_name):
+        self.lsm_file_name = lsm_file_name
+        self.array =  tifffile.imread(self.lsm_file_name, key = 0)
+   
+    def isolate_channel(self,channel_no):
+        if len(self.array.shape) == 2:
+            return self.array
+        else:
+            return self.array[channel_no-1]
+        
+    def isolate_maxima(self, channel_no):
+        self.maxima = []
+        for i in self.array[channel_no]: #this line when more then 1 channel
+        #for i in self.array: #this line when 1 channel
+            #print(i.shape)
+            self.maxima.append(max(i))
+        self.maxima = np.array(self.maxima)
+        return self.maxima
+    
+    def maxs_single_autoc_plot(self, channel_no, rep_no, number_of_reps, timestep):
+        list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
+        y = list_of_reps[rep_no-1]
+        time, scorr = corr_py.correlate_full (timestep, y, y)
+        plt.xscale("log")
+        plt.plot (time, scorr)
+        plt.tight_layout()
+        plt.show()
+        
+    def maxs_autoc_plots(self, channel_no, number_of_reps, timestep):
+        #plot correlation of each repetition,
+        list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
+        for i in list_of_reps:
+            y = i
+            time, scorr = corr_py.correlate_full (timestep, y, y)
+            plt.xscale("log")
+            plt.plot (time, scorr)
+            plt.tight_layout()
+            plt.show()
+            
+        return time, scorr
+            
+    def maxs_autoc_carpet_plot(self, channel_no, timestep, number_of_reps, plot_title =''):
+        list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
+        autocorrelation_by_rows = []
+        for i in range(len(list_of_reps)):
+            y = list_of_reps[i]
+            time, scorr = corr_py.correlate_full (timestep, y, y)
+            autocorrelation_by_rows.append(scorr)
+        fig, ax = plt.subplots(figsize=(100,10))
+        im = ax.imshow(autocorrelation_by_rows,origin="lower",cmap='bwr')
+        #cbar = ax.figure.colorbar(im, ax=ax,shrink=0.5,location='right', pad =0.003)
+        ax.set_title(plot_title)
+        plt.show()
