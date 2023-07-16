@@ -616,8 +616,186 @@ class Left_frame :
 
 class sFCS_frame:
 
+	def Plot_this_file(self):
+		name = self.dataset_names [self.file_number]
+		if name in self.dictionary_of_extracted:
+			rep = int(self.Rep_Display__choice.get())
+			channel = self.Chan_Display__choice.get()
+
+			dataset = self.dictionary_of_extracted [name] 
+
+			if channel == 'all':
+
+				for i in range (0, dataset[rep].channels_number): 
+
+					self.traces.plot(dataset[rep].channels_list[i].fluct_arr.x, dataset[rep].channels_list[i].fluct_arr.y, label = '')
+
+					self.corr.plot(dataset[rep].channels_list[i].auto_corr_arr.x, dataset[rep].channels_list[i].auto_corr_arr.y, label = '')
+
+
+
+		
+		self.traces.set_title("Intensity traces")
+		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.traces.set_ylabel('Counts (Hz)')
+		self.traces.set_xlabel('Time (s)')
+		#self.traces.legend(loc='upper right')
+
+
+
+
+		self.corr.set_title("Correlation curves")
+		self.corr.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.corr.set_ylabel('G(tau)')
+		self.corr.set_xlabel('Delay time')
+		self.corr.set_xscale ('log')
+		#self.corr.legend(loc='upper right')
+
+		self.canvas1.draw_idle()
+
+		
+
+		self.figure1.tight_layout()
+		
+
 	def Empty_function(self):
 		print("Empty function invoked")
+
+	def Extract_trace(self):
+
+		name = self.dataset_names [self.file_number]
+		sedec = Sidecut_sFCS(self.dataset_list[self.file_number])
+		if len(sedec.array.shape) == 3:
+			channels_number = sedec.array.shape[0]
+		else:
+			channels_number = 1
+
+		repetitions = int(self.Repetitions_entry.get())
+		self.reps_to_display = []
+		for i in range (0, repetitions):
+			self.reps_to_display.append(i+1)
+
+		bins = int(self.Binning__choice.get())
+		timestep = float(self.Timestep_entry.get())
+
+		list_of_y = []
+
+		x = np.linspace(0, sedec.array.shape[1]*timestep, num=sedec.array.shape[1])
+
+		self.channels_to_display = []
+		for channel_no in range(0, channels_number):
+
+			self.channels_to_display.append(str(channel_no))
+
+			y = sedec.isolate_maxima(channel_no, bins)
+
+			list_of_y.append(y)
+
+			#self.traces.plot(x, y, label = "channel " + str(channel_no))
+
+			#self.canvas1.draw_idle()
+
+		
+
+			#self.figure1.tight_layout()
+
+
+		self.channels_to_display.append('all')
+		self.Chan_Display__choice.config(values = self.channels_to_display)
+		self.Rep_Display__choice.config(values = self.reps_to_display)
+
+		length_rep = int (sedec.array.shape[1]/repetitions)
+		
+
+		
+		dataset_list_arg = []
+		for rep_index_i in range (repetitions):
+
+
+			channels_list_arg = []
+
+			for channel in range (channels_number):
+
+				end = length_rep*(rep_index_i + 1)
+				start = end - length_rep
+
+				if rep_index_i == repetitions-1:
+
+					if end != len (x) - 1:
+
+						end = len (x) - 1
+
+				
+
+				x = x[start : end]
+				y = list_of_y[channel][start : end]
+
+				min1 = min(x)
+
+				x1 = [a - min1 for a in x]
+
+				x = x1
+
+				
+
+				Tr = fcs_importer.XY_plot(x,y)
+
+				timestep = x[1] - x[0]
+
+				x1, y1 = corr_py.correlate_full (timestep, np.array(Tr.y), np.array(Tr.y))
+
+				AutoCorr = fcs_importer.XY_plot(x1,y1)
+
+				long_name = name
+
+				short_name = name
+
+				Ch_dataset = fcs_importer.fcs_channel (long_name, Tr, AutoCorr, short_name)
+
+				channels_list_arg.append(Ch_dataset)
+
+			FCS_Dataset =  fcs_importer.Dataset_fcs(channels_number, 0, channels_list_arg, [] )
+
+			dataset_list_arg.append(FCS_Dataset)
+
+
+
+		
+		dataset = 	fcs_importer.Full_dataset_fcs(repetitions, dataset_list_arg)
+
+		self.dictionary_of_extracted [name] = dataset
+
+		self.Plot_this_file()
+
+		#name = data_cont.tree_list_name[data_cont.file_index] + " " + str(repetitions_new)
+
+		#treetree = d_tree.Data_tree (self.tree, name, dataset.repetitions)
+
+		#treetree = d_tree.Data_tree (data_cont.data_frame.tree, name, dataset.repetitions)
+
+		#data_cont.tree_list.append(treetree)
+
+		#data_cont.tree_list_name.append(name)
+
+		#data_cont.binning_list.append(1)
+
+
+		#data_cont.data_list_raw.append(dataset)
+
+
+		#data_list_current.append(dataset1)
+
+
+		#data_cont.total_channels_list.append(dataset.datasets_list[0].channels_number + dataset.datasets_list[0].cross_number)
+		#data_cont.repetitions_list.append(dataset.repetitions)
+
+		#data_cont.peaks_list.append([None] * dataset.repetitions)
+
+		#data_cont.list_of_channel_pairs.append([None])
+
+
+
+		
 
 	def Tree_selection(self, event):
 
@@ -629,10 +807,12 @@ class sFCS_frame:
 
 		num = int(num, 16)-1
 
-		eg= func.File_sFCS(self.dataset_list[num])
+		self.file_number = num
+
+		eg= func.File_sFCS(self.dataset_list[self.file_number])
 
 		bins = 1
-		slices = 20
+		slices = 10
 
 		binned_data = eg.intensity_carpet_plot(1, bin_size=bins, n_slices = slices)
 
@@ -643,6 +823,8 @@ class sFCS_frame:
 		
 
 		self.figure1.tight_layout()
+
+		self.Plot_this_file()
         
 
 		#print(self.dataset_list[num])
@@ -672,6 +854,8 @@ class sFCS_frame:
 				self.name = os.path.basename(filename)
 
 				self.dataset_list.append(filename)
+
+				self.dataset_names.append(self.name)
 		
 
 			
@@ -686,7 +870,11 @@ class sFCS_frame:
 
 	def __init__ (self, frame0, win_width, win_height, dpi_all):
 
+		self.dictionary_of_extracted = {}
+
 		self.dataset_list = []
+		self.dataset_names = []
+		self.file_number = 0
 
 
 
@@ -756,7 +944,7 @@ class sFCS_frame:
 		self.frame023.pack(side="left", fill="x")
 
 
-		self.Extract_button = tk.Button(self.frame023, text="Extract trace", command=self.Empty_function)
+		self.Extract_button = tk.Button(self.frame023, text="Extract trace", command=self.Extract_trace)
 		self.Extract_button.grid(row = 0, column = 0, columnspan = 2, sticky="EW")
 
 		self.Binning_label = tk.Label(self.frame023,  text = "Pixel binning: ")
@@ -775,33 +963,42 @@ class sFCS_frame:
 		self.Repetitions_entry.grid(row = 2, column = 1, sticky='ew')
 		self.Repetitions_entry.insert("end", str(1))
 
+		self.Timestep_label = tk.Label(self.frame023,  text = "Timestep: ")
+		self.Timestep_label.grid(row = 3, column = 0, sticky = 'ew')
+
+		self.Timestep_entry = tk.Entry(self.frame023, width = 9)
+		self.Timestep_entry.grid(row = 3, column = 1, sticky='ew')
+		self.Timestep_entry.insert("end", str(0.001))
+
 		self.Display_label = tk.Label(self.frame023,  text = "Display: ")
-		self.Display_label.grid(row = 3, column = 0, columnspan = 2, sticky = 'w')
+		self.Display_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
 
 		self.Rep_Display_label = tk.Label(self.frame023,  text = "Repetition: ")
-		self.Rep_Display_label.grid(row = 4, column = 0, sticky = 'ew')
+		self.Rep_Display_label.grid(row = 5, column = 0, sticky = 'ew')
 
 		self.Rep_Display__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
 		self.Rep_Display__choice.config(state = "readonly")
-		self.Rep_Display__choice.grid(row = 4, column = 1, sticky = 'ew')
-		self.Rep_Display__choice.set("3")
+		self.Rep_Display__choice.grid(row = 5, column = 1, sticky = 'ew')
+		self.Rep_Display__choice.set("1")
 
 
 		self.Chan_Display_label = tk.Label(self.frame023,  text = "Channel: ")
-		self.Chan_Display_label.grid(row = 5, column = 0, sticky = 'ew')
+		self.Chan_Display_label.grid(row = 6, column = 0, sticky = 'ew')
 
-		self.Chan_Display__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
+		self.channels_to_display = ['1']
+
+		self.Chan_Display__choice = ttk.Combobox(self.frame023,values = self.channels_to_display,  width = 18 )
 		self.Chan_Display__choice.config(state = "readonly")
-		self.Chan_Display__choice.grid(row = 5, column = 1, sticky = 'ew')
-		self.Chan_Display__choice.set("3")
+		self.Chan_Display__choice.grid(row = 6, column = 1, sticky = 'ew')
+		self.Chan_Display__choice.set("1")
 
 
 
 		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Empty_function)
-		self.Display_button.grid(row = 6, column = 0, columnspan =2, sticky="EW")
+		self.Display_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
 
 		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Empty_function)
-		self.Transfer_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
+		self.Transfer_button.grid(row = 8, column = 0, columnspan =2, sticky="EW")
 
 
 		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
@@ -857,56 +1054,65 @@ class sFCS_frame:
 
 
 class Sidecut_sFCS:
-    def __init__(self,lsm_file_name):
-        self.lsm_file_name = lsm_file_name
-        self.array =  tifffile.imread(self.lsm_file_name, key = 0)
+	def __init__(self,lsm_file_name):
+		self.lsm_file_name = lsm_file_name
+		self.array =  tifffile.imread(self.lsm_file_name, key = 0)
    
-    def isolate_channel(self,channel_no):
-        if len(self.array.shape) == 2:
-            return self.array
-        else:
-            return self.array[channel_no-1]
+	def isolate_channel(self,channel_no):
+		if len(self.array.shape) == 2:
+			return self.array
+		else:
+			return self.array[channel_no-1]
         
-    def isolate_maxima(self, channel_no):
-        self.maxima = []
-        for i in self.array[channel_no]: #this line when more then 1 channel
+	def isolate_maxima(self, channel_no, bins):
+		self.maxima = []
+		for i in self.array[channel_no]: #this line when more then 1 channel
         #for i in self.array: #this line when 1 channel
-            #print(i.shape)
-            self.maxima.append(max(i))
-        self.maxima = np.array(self.maxima)
-        return self.maxima
+			max_value = 0
+			max_index = 0
+			for j in range(0,len(i)):
+				if i[j] > max_value:
+					max_value = i[j]
+					max_index = j
+
+			for j in range (0, bins-1):
+				max_value += i[max_index - j] + i[max_index + j]
+
+			self.maxima.append(max_value)
+		self.maxima = np.array(self.maxima)
+		return self.maxima
     
-    def maxs_single_autoc_plot(self, channel_no, rep_no, number_of_reps, timestep):
-        list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
-        y = list_of_reps[rep_no-1]
-        time, scorr = corr_py.correlate_full (timestep, y, y)
-        plt.xscale("log")
-        plt.plot (time, scorr)
-        plt.tight_layout()
-        plt.show()
+	def maxs_single_autoc_plot(self, channel_no, rep_no, number_of_reps, timestep):
+		list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
+		y = list_of_reps[rep_no-1]
+		time, scorr = corr_py.correlate_full (timestep, y, y)
+		plt.xscale("log")
+		plt.plot (time, scorr)
+		plt.tight_layout()
+		plt.show()
         
-    def maxs_autoc_plots(self, channel_no, number_of_reps, timestep):
-        #plot correlation of each repetition,
-        list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
-        for i in list_of_reps:
-            y = i
-            time, scorr = corr_py.correlate_full (timestep, y, y)
-            plt.xscale("log")
-            plt.plot (time, scorr)
-            plt.tight_layout()
-            plt.show()
+	def maxs_autoc_plots(self, channel_no, number_of_reps, timestep):
+		#plot correlation of each repetition,
+		list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
+		for i in list_of_reps:
+			y = i
+			time, scorr = corr_py.correlate_full (timestep, y, y)
+			plt.xscale("log")
+			plt.plot (time, scorr)
+			plt.tight_layout()
+			plt.show()
             
-        return time, scorr
+		return time, scorr
             
-    def maxs_autoc_carpet_plot(self, channel_no, timestep, number_of_reps, plot_title =''):
-        list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
-        autocorrelation_by_rows = []
-        for i in range(len(list_of_reps)):
-            y = list_of_reps[i]
-            time, scorr = corr_py.correlate_full (timestep, y, y)
-            autocorrelation_by_rows.append(scorr)
-        fig, ax = plt.subplots(figsize=(100,10))
-        im = ax.imshow(autocorrelation_by_rows,origin="lower",cmap='bwr')
-        #cbar = ax.figure.colorbar(im, ax=ax,shrink=0.5,location='right', pad =0.003)
-        ax.set_title(plot_title)
-        plt.show()
+	def maxs_autoc_carpet_plot(self, channel_no, timestep, number_of_reps, plot_title =''):
+		list_of_reps = np.array_split(self.isolate_maxima(channel_no), number_of_reps)
+		autocorrelation_by_rows = []
+		for i in range(len(list_of_reps)):
+			y = list_of_reps[i]
+			time, scorr = corr_py.correlate_full (timestep, y, y)
+			autocorrelation_by_rows.append(scorr)
+		fig, ax = plt.subplots(figsize=(100,10))
+		im = ax.imshow(autocorrelation_by_rows,origin="lower",cmap='bwr')
+		#cbar = ax.figure.colorbar(im, ax=ax,shrink=0.5,location='right', pad =0.003)
+		ax.set_title(plot_title)
+		plt.show()
