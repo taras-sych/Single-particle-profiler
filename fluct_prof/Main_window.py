@@ -619,18 +619,22 @@ class sFCS_frame:
 	def Plot_this_file(self):
 		name = self.dataset_names [self.file_number]
 		if name in self.dictionary_of_extracted:
-			rep = int(self.Rep_Display__choice.get())
+			rep = int(self.Rep_Display__choice.get()) - 1
 			channel = self.Chan_Display__choice.get()
 
 			dataset = self.dictionary_of_extracted [name] 
 
-			if channel == 'all':
+			if channel == '1':
 
-				for i in range (0, dataset[rep].channels_number): 
+				print(len(dataset.datasets_list))
 
-					self.traces.plot(dataset[rep].channels_list[i].fluct_arr.x, dataset[rep].channels_list[i].fluct_arr.y, label = '')
+				for i in range (0, dataset.datasets_list[rep].channels_number): 
 
-					self.corr.plot(dataset[rep].channels_list[i].auto_corr_arr.x, dataset[rep].channels_list[i].auto_corr_arr.y, label = '')
+					print(len(dataset.datasets_list[rep].channels_list[i].fluct_arr.x))
+
+					self.traces.plot(dataset.datasets_list[rep].channels_list[i].fluct_arr.x, dataset.datasets_list[rep].channels_list[i].fluct_arr.y, label = '')
+
+					self.corr.plot(dataset.datasets_list[rep].channels_list[i].auto_corr_arr.x, dataset.datasets_list[rep].channels_list[i].auto_corr_arr.y, label = '')
 
 
 
