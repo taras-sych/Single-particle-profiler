@@ -617,6 +617,12 @@ class Left_frame :
 class sFCS_frame:
 
 	def Plot_this_file(self):
+
+		self.traces.cla()
+
+		self.corr.cla()
+
+
 		name = self.dataset_names [self.file_number]
 		if name in self.dictionary_of_extracted:
 			rep = int(self.Rep_Display__choice.get()) - 1
@@ -624,7 +630,7 @@ class sFCS_frame:
 
 			dataset = self.dictionary_of_extracted [name] 
 
-			if channel == '1':
+			if channel == 'all':
 
 				print(len(dataset.datasets_list))
 
@@ -684,16 +690,27 @@ class sFCS_frame:
 
 		list_of_y = []
 
-		x = np.linspace(0, sedec.array.shape[1]*timestep, num=sedec.array.shape[1])
+		x_full = np.linspace(0, sedec.array.shape[1]*timestep, num=sedec.array.shape[1])
 
 		self.channels_to_display = []
+		counter_of_invalid_channels = 0
 		for channel_no in range(0, channels_number):
 
-			self.channels_to_display.append(str(channel_no))
+			try:
 
-			y = sedec.isolate_maxima(channel_no, bins)
+				y = sedec.isolate_maxima(channel_no, bins)
 
-			list_of_y.append(y)
+				list_of_y.append(y)
+
+				self.channels_to_display.append(str(channel_no))
+
+			except:
+
+				print ("channel number ", channel_no, " has not enough signal")
+				counter_of_invalid_channels+=1
+
+
+			channels_number-=counter_of_invalid_channels
 
 			#self.traces.plot(x, y, label = "channel " + str(channel_no))
 
@@ -723,16 +740,20 @@ class sFCS_frame:
 				end = length_rep*(rep_index_i + 1)
 				start = end - length_rep
 
+				print(channel, rep_index_i, start, end)
+
 				if rep_index_i == repetitions-1:
 
-					if end != len (x) - 1:
+					if end != len (x_full) - 1:
 
-						end = len (x) - 1
+						end = len (x_full) - 1
 
 				
 
-				x = x[start : end]
+				x = x_full[start : end]
 				y = list_of_y[channel][start : end]
+
+
 
 				min1 = min(x)
 
@@ -994,11 +1015,11 @@ class sFCS_frame:
 		self.Chan_Display__choice = ttk.Combobox(self.frame023,values = self.channels_to_display,  width = 18 )
 		self.Chan_Display__choice.config(state = "readonly")
 		self.Chan_Display__choice.grid(row = 6, column = 1, sticky = 'ew')
-		self.Chan_Display__choice.set("1")
+		self.Chan_Display__choice.set("all")
 
 
 
-		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Empty_function)
+		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Plot_this_file)
 		self.Display_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
 
 		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Empty_function)
@@ -1078,9 +1099,12 @@ class Sidecut_sFCS:
 				if i[j] > max_value:
 					max_value = i[j]
 					max_index = j
+			try:
+				for j in range (0, bins-1):
+					max_value += i[max_index - j] + i[max_index + j]
 
-			for j in range (0, bins-1):
-				max_value += i[max_index - j] + i[max_index + j]
+			except:
+				max_value = 0
 
 			self.maxima.append(max_value)
 		self.maxima = np.array(self.maxima)
