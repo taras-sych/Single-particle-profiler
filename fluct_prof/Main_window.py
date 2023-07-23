@@ -616,6 +616,35 @@ class Left_frame :
 
 class sFCS_frame:
 
+	def Transfer_extracted(self):
+		name = self.dataset_names [self.file_number]
+		if name in self.dictionary_of_extracted:
+
+			dataset = self.dictionary_of_extracted[name]
+
+			treetree = d_tree.Data_tree (data_cont.data_frame.tree, name, dataset.repetitions)
+			
+			data_cont.tree_list.append(treetree)
+
+			data_cont.tree_list_name.append(name)
+
+			data_cont.binning_list.append(1)
+
+
+			data_cont.data_list_raw.append(dataset)
+
+
+			#data_list_current.append(dataset1)
+
+
+			data_cont.total_channels_list.append(dataset.datasets_list[0].channels_number + dataset.datasets_list[0].cross_number)
+			data_cont.repetitions_list.append(dataset.repetitions)
+
+			data_cont.peaks_list.append([None] * dataset.repetitions)
+
+			data_cont.list_of_channel_pairs.append([None])
+
+
 	def Plot_this_file(self):
 
 		self.traces.cla()
@@ -632,15 +661,19 @@ class sFCS_frame:
 
 			if channel == 'all':
 
-				print(len(dataset.datasets_list))
+				print("Dataset list length", len(dataset.datasets_list))
 
 				for i in range (0, dataset.datasets_list[rep].channels_number): 
 
-					print(len(dataset.datasets_list[rep].channels_list[i].fluct_arr.x))
+					#print(len(dataset.datasets_list[rep].channels_list[i].fluct_arr.x))
 
-					self.traces.plot(dataset.datasets_list[rep].channels_list[i].fluct_arr.x, dataset.datasets_list[rep].channels_list[i].fluct_arr.y, label = '')
+					self.traces.plot(dataset.datasets_list[rep].channels_list[i].fluct_arr.x, dataset.datasets_list[rep].channels_list[i].fluct_arr.y, label = dataset.datasets_list[rep].channels_list[i].short_name)
 
-					self.corr.plot(dataset.datasets_list[rep].channels_list[i].auto_corr_arr.x, dataset.datasets_list[rep].channels_list[i].auto_corr_arr.y, label = '')
+					self.corr.plot(dataset.datasets_list[rep].channels_list[i].auto_corr_arr.x, dataset.datasets_list[rep].channels_list[i].auto_corr_arr.y, label = dataset.datasets_list[rep].channels_list[i].short_name)
+
+				for i in range (0, dataset.datasets_list[rep].cross_number):
+
+					self.corr.plot(dataset.datasets_list[rep].cross_list[i].cross_corr_arr.x, dataset.datasets_list[rep].cross_list[i].cross_corr_arr.y, label = dataset.datasets_list[rep].cross_list[i].short_name)
 
 
 
@@ -649,7 +682,7 @@ class sFCS_frame:
 		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.traces.set_ylabel('Counts (Hz)')
 		self.traces.set_xlabel('Time (s)')
-		#self.traces.legend(loc='upper right')
+		self.traces.legend(loc='upper right')
 
 
 
@@ -659,7 +692,7 @@ class sFCS_frame:
 		self.corr.set_ylabel('G(tau)')
 		self.corr.set_xlabel('Delay time')
 		self.corr.set_xscale ('log')
-		#self.corr.legend(loc='upper right')
+		self.corr.legend(loc='upper right')
 
 		self.canvas1.draw_idle()
 
@@ -680,6 +713,10 @@ class sFCS_frame:
 		else:
 			channels_number = 1
 
+		print("shape ", sedec.array.shape)
+
+		print("channels number ", channels_number)
+
 		repetitions = int(self.Repetitions_entry.get())
 		self.reps_to_display = []
 		for i in range (0, repetitions):
@@ -696,18 +733,18 @@ class sFCS_frame:
 		counter_of_invalid_channels = 0
 		for channel_no in range(0, channels_number):
 
-			try:
+			#try:
 
-				y = sedec.isolate_maxima(channel_no, bins)
+			y = sedec.isolate_maxima(channel_no, bins)
 
-				list_of_y.append(y)
+			list_of_y.append(y)
 
-				self.channels_to_display.append(str(channel_no))
+			self.channels_to_display.append(str(channel_no))
 
-			except:
+			#except:
 
-				print ("channel number ", channel_no, " has not enough signal")
-				counter_of_invalid_channels+=1
+				#print ("channel number ", channel_no, " has not enough signal")
+				#counter_of_invalid_channels+=1
 
 
 			channels_number-=counter_of_invalid_channels
@@ -771,15 +808,109 @@ class sFCS_frame:
 
 				AutoCorr = fcs_importer.XY_plot(x1,y1)
 
-				long_name = name
+				long_name = name + "channel " + str(channel)
 
-				short_name = name
+				short_name = "channel " + str(channel)
 
 				Ch_dataset = fcs_importer.fcs_channel (long_name, Tr, AutoCorr, short_name)
 
 				channels_list_arg.append(Ch_dataset)
 
-			FCS_Dataset =  fcs_importer.Dataset_fcs(channels_number, 0, channels_list_arg, [] )
+			cross_list_arg = []
+
+			if channels_number > 1:
+				channel1 = 0
+				while channel1 < channels_number:
+				#for channel1 in range (0, channels_number):
+					end = length_rep*(rep_index_i + 1)
+					start = end - length_rep
+
+					#print(channel, rep_index_i, start, end)
+
+					if rep_index_i == repetitions-1:
+
+						if end != len (x_full) - 1:
+
+							end = len (x_full) - 1
+
+					
+
+					x = x_full[start : end]
+					y = list_of_y[channel1][start : end]
+
+
+
+					min1 = min(x)
+
+					x1 = [a - min1 for a in x]
+
+					x = x1
+
+					
+
+					Tr1 = fcs_importer.XY_plot(x,y)
+
+					channel2 = channel1 + 1
+					while channel2 < channels_number:
+
+					#for channel2 in range (channel1 +1, channels_number):
+						end = length_rep*(rep_index_i + 1)
+						start = end - length_rep
+
+						#print(channel, rep_index_i, start, end)
+
+						if rep_index_i == repetitions-1:
+
+							if end != len (x_full) - 1:
+
+								end = len (x_full) - 1
+
+						
+
+						x = x_full[start : end]
+						y = list_of_y[channel2][start : end]
+
+
+
+						min1 = min(x)
+
+						x1 = [a - min1 for a in x]
+
+						x = x1
+
+						
+
+						Tr2 = fcs_importer.XY_plot(x,y)
+
+						timestep = Tr1.x[1] - Tr1.x[0]
+
+						x1, y1 = corr_py.correlate_full (timestep, np.array(Tr1.y), np.array(Tr2.y))
+
+						CrossCorr_12 = fcs_importer.XY_plot(x1,y1)
+
+						short_name_12 = "channel " + str(channel1) + " vs " + "channel " + str(channel2)
+
+						x1, y1 = corr_py.correlate_full (timestep, np.array(Tr2.y), np.array(Tr1.y))
+
+						CrossCorr_21 = fcs_importer.XY_plot(x1,y1)
+
+						short_name_21 = "channel " + str(channel2) + " vs " + "channel " + str(channel1)
+
+						Cross_dataset = fcs_importer.fcs_cross (short_name_12, CrossCorr_12, short_name_12)
+						cross_list_arg.append(Cross_dataset)
+						Cross_dataset = fcs_importer.fcs_cross (short_name_21, CrossCorr_21, short_name_21)
+						cross_list_arg.append(Cross_dataset)
+
+						channel2 += 1
+
+					channel1 += 1
+
+
+
+
+
+
+			FCS_Dataset =  fcs_importer.Dataset_fcs(channels_number, len(cross_list_arg), channels_list_arg, cross_list_arg )
 
 			dataset_list_arg.append(FCS_Dataset)
 
@@ -1022,7 +1153,7 @@ class sFCS_frame:
 		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Plot_this_file)
 		self.Display_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
 
-		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Empty_function)
+		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Transfer_extracted)
 		self.Transfer_button.grid(row = 8, column = 0, columnspan =2, sticky="EW")
 
 
@@ -1091,8 +1222,15 @@ class Sidecut_sFCS:
         
 	def isolate_maxima(self, channel_no, bins):
 		self.maxima = []
-		for i in self.array[channel_no]: #this line when more then 1 channel
-        #for i in self.array: #this line when 1 channel
+
+		if len(self.array.shape) == 3:
+			array_to_analyze = self.array[channel_no]
+
+		else:
+			array_to_analyze = self.array
+
+		for i in array_to_analyze: 
+        
 			max_value = 0
 			max_index = 0
 			for j in range(0,len(i)):
