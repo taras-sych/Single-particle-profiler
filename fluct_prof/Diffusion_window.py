@@ -645,10 +645,35 @@ class Diffusion_window :
 
 	def Fitting_frame(self):
 
-		self.frame004.destroy()
+		self.frame00004.destroy()
 
-		self.frame004 = tk.Frame(self.frame002)
-		self.frame004.pack(side = "top", anchor = "nw")
+		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004.pack(side = "top", anchor = "nw")
+
+		self.param_scrollbar  = tk.Scrollbar(self.frame00004)
+		self.param_scrollbar.pack( side = "left", fill = "y" )
+
+		self.frame004 = tk.Listbox(self.frame00004, height = 20, yscrollcommand = self.param_scrollbar.set )
+		self.frame004.pack( side = "left", fill = "x" , expand = 0)
+
+
+
+		
+
+		"""		self.params_canvas = tk.Canvas(self.frame00004)
+		self.params_canvas.pack(side = "top", anchor = "nw", expand = 1)
+
+		self.param_scrollbar = ttk.Scrollbar(self.frame00004, orient = 'vertical', command = self.params_canvas.yview)
+		self.param_scrollbar.pack(side = 'left', fill = 'y')
+
+		self.params_canvas.configure(yscrollcommand=self.param_scrollbar.set)
+		self.params_canvas.bind('<Configure>', lambda e: self.params_canvas.configure(scrollregion = self.params_canvas.bbox('all')))
+
+		self.frame004 = tk.Frame(self.params_canvas)
+		#self.frame004.pack(side = "top", anchor = "nw")
+
+		self.params_canvas.create_window((0,0), window = self.frame004, anchor = "nw")"""
+		
 
 		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 
@@ -674,6 +699,22 @@ class Diffusion_window :
 			self.list_of_inits = ['1', '1', '1', '0.02', '1', '1', '0.005']
 			self.list_of_min = ['0', '0', '0', '0', '0',  '0', '0']
 			self.list_of_max = ['10', '5', '1', '100000', '20', '1', '100']
+
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '2 components' and self.Dimension.get() == "3D" :
+
+			self.list_of_params = ['offset', 'GN0', 'A1', 'A2', 'txy1', 'txy2', 'alpha1', 'alpha2', 'AR1', 'AR2', 'B', 'T_tri' ]
+			self.list_of_inits = ['1', '1', '1', '1', '0.02', '0.02', '1', '1', '5', '5', '1', '0.005']
+			self.list_of_min = ['0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0']
+			self.list_of_max = ['10', '5', '1', '1', '100000', '100000', '20', '20', '20', '20', '1', '100']
+
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '2 components' and self.Dimension.get() == "2D" :
+
+			self.list_of_params = ['offset', 'GN0', 'A1', 'A2', 'txy1', 'txy2', 'alpha1', 'alpha2', 'B', 'T_tri' ]
+			self.list_of_inits = ['1', '1', '1', '1', '0.02', '0.02', '1', '1', '1', '0.005']
+			self.list_of_min = ['0', '0', '0', '0', '0',  '0', '0', '0', '0', '0']
+			self.list_of_max = ['10', '5', '1', '1', '100000', '100000', '20', '20', '1', '100']
+
+
 
 
 
@@ -773,6 +814,8 @@ class Diffusion_window :
 
 		self.D_value = tk.Label(self.frame004, text=str(round(diff_coef,2)))
 		self.D_value.grid(row = row_index, column = 1, sticky = 'w')
+
+		self.param_scrollbar.config( command = self.frame004.yview )
 
 	def Curve_flags(self):
 
@@ -957,7 +1000,7 @@ class Diffusion_window :
 
 		self.Triplet.bind("<<ComboboxSelected>>", self.Update_fitting)
 
-		self.Components = ttk.Combobox(self.frame001,values = ["1 component"], width = 9)
+		self.Components = ttk.Combobox(self.frame001,values = ["1 component", "2 components"], width = 9)
 		self.Components.config(state = "readonly")
 		
 		self.Components.grid(row = 1, column = 1, sticky='ew')
@@ -1033,8 +1076,8 @@ class Diffusion_window :
 
 
 
-		self.frame004 = tk.Frame(self.frame002)
-		self.frame004.pack(side = "top", anchor = "nw")
+		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004.pack(side = "top", anchor = "nw")
 
 		self.Fitting_frame()
 		
