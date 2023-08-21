@@ -111,6 +111,30 @@ def Corr_curve_2d(tc, offset, GN0, A1, txy1, alpha1, B1, tauT1):
 
 	return offset + GN0 * G_Diff * G_T
 
+def Corr_curve_3d_2(tc, offset, GN0, A1, A2, txy1, txy2, alpha1, alpha2, AR1, AR2, B1, tauT1 ):
+
+	txy1 = txy1 / 1000
+
+	tauT1 = tauT1 / 1000
+
+	G_Diff =  (A1*(((1+((tc/txy1)**alpha1))**-1)*(((1+(tc/((AR1**2)*txy1)))**-0.5)))) + (A2*(((1+((tc/txy2)**alpha2))**-1)*(((1+(tc/((AR2**2)*txy2)))**-0.5))))
+
+	G_T = 1 + (B1*np.exp(tc/(-tauT1)))
+
+	return offset + GN0 * G_Diff * G_T
+
+def Corr_curve_2d_2(tc, offset, GN0, A1, A2, txy1, txy2, alpha1, alpha2, B1, tauT1):
+
+	txy1 = txy1 / 1000
+
+	tauT1 = tauT1 / 1000
+
+	G_Diff =  A1*(((1+((tc/txy1)**alpha1))**-1)) + A2*(((1+((tc/txy2)**alpha2))**-1))
+
+	G_T = 1 + (B1*np.exp(tc/(-tauT1)))
+
+	return offset + GN0 * G_Diff * G_T
+
 
 def Gauss(x, a, x0, sigma):
 
@@ -969,15 +993,94 @@ def Export_function():
 				list_T_temp = []
 				list_D_temp = []
 				list_C_temp = []
-				for rep in range(0, data_c.repetitions_list[file1]):
-					
-					list_T_temp.append(data_c.data_list_raw[file1].diff_fitting[rep, chan]["txy"])
-					list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan])
-					list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
 
-				list_diff_times [chan] = copy.deepcopy(list_T_temp)
-				list_diff_coeffs [chan] = copy.deepcopy(list_D_temp)
-				list_cpms [chan] = copy.deepcopy(list_C_temp)
+
+				if "txy" in data_c.data_list_raw[file1].diff_fitting[rep, chan].keys():
+					for rep in range(0, data_c.repetitions_list[file1]):
+
+					
+					
+						list_T_temp.append(data_c.data_list_raw[file1].diff_fitting[rep, chan]["txy"])
+						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan])
+						list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
+
+					key = chan + "txy"
+					list_diff_times [key] = copy.deepcopy(list_T_temp)
+
+					key = chan + "D"
+					list_diff_coeffs [key] = copy.deepcopy(list_D_temp)
+
+					key = chan + "cpm"
+					list_cpms [key] = copy.deepcopy(list_C_temp)
+
+				list_T_temp = []
+				list_D_temp = []
+				list_C_temp = []
+
+				if "txy1" in data_c.data_list_raw[file1].diff_fitting[rep, chan].keys():
+					for rep in range(0, data_c.repetitions_list[file1]):
+
+					
+					
+						list_T_temp.append(data_c.data_list_raw[file1].diff_fitting[rep, chan]["txy1"])
+						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan][0])
+						list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
+
+					key = chan + "txy1"
+					list_diff_times [key] = copy.deepcopy(list_T_temp)
+
+					key = chan + "D"
+					list_diff_coeffs [key] = copy.deepcopy(list_D_temp)
+
+					key = chan + "cpm"
+					list_cpms [key] = copy.deepcopy(list_C_temp)
+
+
+				list_T_temp = []
+				list_D_temp = []
+				list_C_temp = []
+
+
+				if "txy2" in data_c.data_list_raw[file1].diff_fitting[rep, chan].keys():
+					for rep in range(0, data_c.repetitions_list[file1]):
+
+					
+					
+						list_T_temp.append(data_c.data_list_raw[file1].diff_fitting[rep, chan]["txy2"])
+						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan][1])
+						list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
+
+					key = chan + "txy2"
+					list_diff_times [key] = copy.deepcopy(list_T_temp)
+
+					key = chan + "D"
+					list_diff_coeffs [key] = copy.deepcopy(list_D_temp)
+
+					key = chan + "cpm"
+					list_cpms [key] = copy.deepcopy(list_C_temp)
+
+				list_T_temp = []
+				list_D_temp = []
+				list_C_temp = []
+
+
+				if "txy3" in data_c.data_list_raw[file1].diff_fitting[rep, chan].keys():
+					for rep in range(0, data_c.repetitions_list[file1]):
+
+					
+					
+						list_T_temp.append(data_c.data_list_raw[file1].diff_fitting[rep, chan]["txy3"])
+						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan][2])
+						list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
+
+					key = chan + "txy3"
+					list_diff_times [key] = copy.deepcopy(list_T_temp)
+
+					key = chan + "D"
+					list_diff_coeffs [key] = copy.deepcopy(list_D_temp)
+
+					key = chan + "cpm"
+					list_cpms [key] = copy.deepcopy(list_C_temp)
 
 
 
@@ -1001,7 +1104,7 @@ def Export_function():
 
 
 
-		for chan in range(0, data_c.data_list_raw[file1].datasets_list[0].channels_number):
+		"""for chan in range(0, data_c.data_list_raw[file1].datasets_list[0].channels_number):
 
 			df1_T = pd.DataFrame({heading_line: list_diff_times[chan]})
 			df1_D = pd.DataFrame({heading_line: list_diff_coeffs[chan]})
@@ -1020,7 +1123,40 @@ def Export_function():
 
 				df_diff_time [chan] = pd.concat([df_diff_time [chan], df1_T], axis=1)
 				df_diff_coeff [chan] = pd.concat([df_diff_coeff[chan], df1_D], axis=1)
+				df_cpms [chan] = pd.concat([df_cpms[chan], df1_C], axis=1)"""
+
+		for chan in list_diff_times:
+			df1_T = pd.DataFrame({heading_line: list_diff_times[chan]})
+
+			if chan in df_diff_time:
+				df_diff_time [chan] = pd.concat([df_diff_time [chan], df1_T], axis=1)
+
+			else:
+				df_diff_time [chan] = pd.DataFrame ()
+				df_diff_time [chan] = pd.concat([df_diff_time [chan], df1_T], axis=1)
+
+		for chan in list_diff_coeffs:
+
+			df1_D = pd.DataFrame({heading_line: list_diff_coeffs[chan]})
+
+			if chan in df_diff_coeff:
+				df_diff_coeff [chan] = pd.concat([df_diff_coeff[chan], df1_D], axis=1)
+			else:
+				df_diff_coeff [chan] = pd.DataFrame ()
+				df_diff_coeff [chan] = pd.concat([df_diff_coeff[chan], df1_D], axis=1)
+
+		for chan in list_cpms:
+
+			df1_C = pd.DataFrame({heading_line: list_cpms[chan]})
+
+			if chan in df_cpms:
 				df_cpms [chan] = pd.concat([df_cpms[chan], df1_C], axis=1)
+			else:
+				df_cpms [chan] = pd.DataFrame ()
+				df_cpms [chan] = pd.concat([df_cpms[chan], df1_C], axis=1)
+
+
+
 
 
 
@@ -1042,13 +1178,18 @@ def Export_function():
 	df_sigma.to_excel(writer, sheet_name='GP_Sigma')
 	df_totals.to_excel(writer, sheet_name='Total peaks')
 
-	for chan in range(0, data_c.data_list_raw[file1].datasets_list[0].channels_number):
-		legend = 'Diff time channel' + str(chan)
-		df_diff_time [chan].to_excel(writer, sheet_name=legend)
-		legend = 'Diff coeff channel' + str(chan)
-		df_diff_coeff [chan].to_excel(writer, sheet_name=legend)
-		legend = 'CPM channel' + str(chan)
-		df_cpms [chan].to_excel(writer, sheet_name=legend)
+	for key in df_diff_time:
+		legend = key
+		df_diff_time [key].to_excel(writer, sheet_name=legend)
+		print(df_diff_time [key])
+
+	for key in df_diff_coeff:
+		legend = key
+		df_diff_coeff [key].to_excel(writer, sheet_name=legend)
+
+	for key in df_cpms:
+		legend = key
+		df_cpms [key].to_excel(writer, sheet_name=legend)
 
 
 	writer.save()

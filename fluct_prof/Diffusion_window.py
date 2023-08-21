@@ -386,11 +386,20 @@ class Diffusion_window :
 
 		#print(data_list_raw[file_index].diff_fitting)
 
-		data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index] = round(np.float64(self.Txy_entry.get()) * np.float64(self.D_cal_entry.get()) / params["txy"].value,3)
+		temporary_list = []
+
+		for key in params:
+			if key.__contains__("txy"):
+				temporary_list.append(round(np.float64(self.Txy_entry.get()) * np.float64(self.D_cal_entry.get()) / params[key].value,3))
+
+
+		data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index] = temporary_list
 
 		if self.fit_all_flag == False:
 
-			self.D_value.config(text = str(data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index]))
+			for ii in range(0, len(temporary_list)):
+
+				self.D_value[ii].config(text = str(data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index][ii]))
 
 		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 
@@ -438,6 +447,13 @@ class Diffusion_window :
 
 		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D":
 			y_model = fun.Corr_curve_2d(x, *param_list)
+
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '2 components' and self.Dimension.get() == "3D":
+
+			y_model = fun.Corr_curve_3d_2(x, *param_list)
+
+		if self.Triplet.get() == 'triplet' and self.Components.get() == '2 components' and self.Dimension.get() == "2D":
+			y_model = fun.Corr_curve_2d_2(x, *param_list)
 
 
 		return y_model - ydata
@@ -502,6 +518,22 @@ class Diffusion_window :
 
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d(x1, *popt))
 
+					if len(popt) == 10:
+						
+						self.curves.plot(x1, fun.Corr_curve_2d_2(x1, *popt), label = "Fit")
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+
+						
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d_2(x1, *popt))
+
+					if len(popt) == 12:
+						
+						self.curves.plot(x1, fun.Corr_curve_3d_2(x1, *popt), label = "Fit")
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d_2(x1, *popt))
 
 
 
@@ -514,6 +546,8 @@ class Diffusion_window :
 
 				if self.fit_all_flag == False:
 					self.curves.scatter(x1, y1, label = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name)
+
+					self.save_plot_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name] = fcs_importer.XY_plot(x1, y1)
 
 				k = i + len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)
 
@@ -534,6 +568,14 @@ class Diffusion_window :
 					if len(popt) == 8:
 						
 						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
+
+					if len(popt) == 10:
+						
+						self.curves.plot(x1, fun.Corr_curve_2d_2(x1, *popt), label = "Fit")
+
+					if len(popt) == 12:
+						
+						self.curves.plot(x1, fun.Corr_curve_3d_2(x1, *popt), label = "Fit")
 
 
 
@@ -727,7 +769,7 @@ class Diffusion_window :
 
 			diff_coef = data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index]
 		else:
-			diff_coef = 0
+			diff_coef = [0,0]
 
 
 		
@@ -765,7 +807,10 @@ class Diffusion_window :
 		row_index = 2
 
 		self.fixed_list = []
+		diffs_counter = 0
 		for param in self.list_of_params:
+			if param.__contains__("txy"):
+				diffs_counter += 1
 			self.fixed_list.append(tk.IntVar(value = 1))
 			thisdict = {
 						"Name": tk.Label(self.frame004, text=param),
@@ -809,11 +854,23 @@ class Diffusion_window :
 
 			row_index+=2
 
-		self.D_label = tk.Label(self.frame004, text="D: ")
-		self.D_label.grid(row = row_index, column = 0, sticky = 'w')
+		print("diffs counter:", diffs_counter)
 
-		self.D_value = tk.Label(self.frame004, text=str(round(diff_coef,2)))
-		self.D_value.grid(row = row_index, column = 1, sticky = 'w')
+		self.D_label = []
+		self.D_value = []
+
+		for ii in range (0, diffs_counter):
+
+			text1 = "D_" + str(ii) + " :"
+
+			self.D_label.append(tk.Label(self.frame004, text=text1))
+			self.D_label[ii].grid(row = row_index, column = 0, sticky = 'w')
+
+
+			self.D_value.append(tk.Label(self.frame004, text=str(round(diff_coef[ii],2))))
+			self.D_value[ii].grid(row = row_index, column = 1, sticky = 'w')
+
+			row_index += 1
 
 		self.param_scrollbar.config( command = self.frame004.yview )
 

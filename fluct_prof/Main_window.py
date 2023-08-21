@@ -995,7 +995,7 @@ class sFCS_frame:
 		if data_cont.initialdirectory == '':
 			data_cont.initialdirectory = __file__
 
-		ftypes = [('LSM .lsm', '*.lsm'), ('All files', '*'), ]
+		ftypes = [('LSM .lsm', '*.lsm'), ('Tif .tif', '*.tif'), ('All files', '*'), ]
 		
 
 		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(data_cont.initialdirectory),title = "Select file", filetypes = ftypes)
