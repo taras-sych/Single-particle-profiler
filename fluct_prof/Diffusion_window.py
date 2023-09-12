@@ -690,14 +690,30 @@ class Diffusion_window :
 		self.frame00004.destroy()
 
 		self.frame00004 = tk.Frame(self.frame002)
-		self.frame00004.pack(side = "top", anchor = "nw")
 
-		self.param_scrollbar  = tk.Scrollbar(self.frame00004)
-		self.param_scrollbar.pack( side = "left", fill = "y" )
+		self.mycanvas = tk.Canvas(self.frame00004)
+		self.mycanvas.pack(side = "left")
+		
 
-		self.frame004 = tk.Listbox(self.frame00004, height = 20, yscrollcommand = self.param_scrollbar.set )
-		self.frame004.pack( side = "left", fill = "x" , expand = 0)
+		self.param_scrollbar  = tk.Scrollbar(self.frame00004, orient = "vertical", command = self.mycanvas.yview)
+		self.param_scrollbar.pack( side = "right", fill = "y" )
 
+		self.mycanvas.configure (yscrollcommand = self.param_scrollbar.set)
+
+		self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
+
+
+
+		#self.frame004 = tk.Listbox(self.frame00004, height = 20, yscrollcommand = self.param_scrollbar.set )
+		#self.frame004.pack( side = "left", fill = "x" , expand = 0)
+
+		
+
+
+		self.frame004 = tk.Frame(self.mycanvas)
+		self.mycanvas.create_window ((0,0), window=self.frame004, anchor="nw")
+
+		self.frame00004.pack(side = "top", fill = "both", expand = "yes")
 
 
 		
@@ -872,7 +888,7 @@ class Diffusion_window :
 
 			row_index += 1
 
-		self.param_scrollbar.config( command = self.frame004.yview )
+		#self.param_scrollbar.config( command = self.frame004.yview )
 
 	def Curve_flags(self):
 
