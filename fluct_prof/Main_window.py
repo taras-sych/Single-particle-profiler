@@ -710,8 +710,10 @@ class sFCS_frame:
 		sedec = Sidecut_sFCS(self.dataset_list[self.file_number])
 		if len(sedec.array.shape) == 3:
 			channels_number = sedec.array.shape[0]
+			array_length = sedec.array.shape[1]
 		else:
 			channels_number = 1
+			array_length = sedec.array.shape[0]
 
 		print("shape ", sedec.array.shape)
 
@@ -727,7 +729,8 @@ class sFCS_frame:
 
 		list_of_y = []
 
-		x_full = np.linspace(0, sedec.array.shape[1]*timestep, num=sedec.array.shape[1])
+		x_full = np.linspace(0, array_length*timestep, num=array_length)
+		#print(sedec.array.shape[0])
 
 		self.channels_to_display = []
 		counter_of_invalid_channels = 0
@@ -762,7 +765,7 @@ class sFCS_frame:
 		self.Chan_Display__choice.config(values = self.channels_to_display)
 		self.Rep_Display__choice.config(values = self.reps_to_display)
 
-		length_rep = int (sedec.array.shape[1]/repetitions)
+		length_rep = int (array_length/repetitions)
 		
 
 		
@@ -968,7 +971,7 @@ class sFCS_frame:
 		eg= func.File_sFCS(self.dataset_list[self.file_number])
 
 		bins = 1
-		slices = 10
+		slices = 1
 
 		binned_data = eg.intensity_carpet_plot(1, bin_size=bins, n_slices = slices)
 

@@ -12,6 +12,7 @@ class File_sFCS:
     def __init__(self,lsm_file_name):
         self.lsm_file_name = lsm_file_name
         self.array =  tifffile.imread(self.lsm_file_name, key = 0)
+        print(type(self.array), self.array.shape)
         
     def isolate_channel(self,channel_no):
         if len(self.array.shape) == 2:

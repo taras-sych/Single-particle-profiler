@@ -93,7 +93,7 @@ class Threshold_window:
 
 
 		name = data_cont.tree_list_name[data_cont.file_index]
-		filename = data_cont.initialdirectory + "\\" +  name + "_Plots_gp.xlsx"
+		filename = data_cont.initialdirectory + os.sep +  name + "_Plots_gp.xlsx"
 
 		open_file = open(filename, 'w')
 
@@ -154,16 +154,16 @@ class Threshold_window:
 				
 
 
-			if key.__contains__("gp") == True and self.plot_var["GP Plot"].get() == 1:
+			if key.__contains__("gp histogram") == True and self.plot_var["GP Plot"].get() == 1:
 
-				df = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
+				df = pd.concat([pd.DataFrame({"GP_bins": self.save_plot_dict[key].x}), pd.DataFrame({"Counts": self.save_plot_dict[key].y})], axis = 1)
 
 				dict_of_dfs ["GP plot"] = df
 
 
 			if key.__contains__("sum") == True and self.plot_var["GP Fit"].get() == 1:
 
-				df = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
+				df = pd.concat([pd.DataFrame({"GP": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
 				dict_of_dfs ["GP plot"] = pd.concat([dict_of_dfs ["GP plot"], df], axis = 1)
 
@@ -171,7 +171,18 @@ class Threshold_window:
 
 			if key.__contains__("component") == True and self.plot_var["GP Fit"].get() == 1:
 
-				df = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
+				df = pd.concat([pd.DataFrame({"GP": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
+
+				dict_of_dfs ["GP plot"] = pd.concat([dict_of_dfs ["GP plot"], df], axis = 1)
+
+
+			if key.__contains__("Fitting") == True and self.plot_var["GP Fit"].get() == 1:
+				dict_of_dfs ["GP fit params"] = self.save_plot_dict["Fitting Parameters"]
+
+			
+			if key.__contains__("gp list") == True and self.plot_var["GP Plot"].get() == 1:
+
+				df = pd.concat([pd.DataFrame({"GP_list": self.save_plot_dict[key]})], axis = 1)
 
 				dict_of_dfs ["GP plot"] = pd.concat([dict_of_dfs ["GP plot"], df], axis = 1)
 
@@ -187,7 +198,7 @@ class Threshold_window:
 				else:
 					dict_of_dfs ["Dot plot"] = pd.DataFrame()
 
-				df = pd.concat([pd.DataFrame({"time": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
+				df = pd.concat([pd.DataFrame({"Channel 1": self.save_plot_dict[key].x}), pd.DataFrame({"Channel 2": self.save_plot_dict[key].y})], axis = 1)
 
 				dict_of_dfs ["Dot plot"] = pd.concat([dict_of_dfs ["Dot plot"], df], axis = 1)
 
@@ -198,7 +209,7 @@ class Threshold_window:
 				else:
 					dict_of_dfs ["Channel Histograms"] = pd.DataFrame()
 
-					df = pd.concat([pd.DataFrame({"x": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
+				df = pd.concat([pd.DataFrame({"x": self.save_plot_dict[key].x}), pd.DataFrame({key: self.save_plot_dict[key].y})], axis = 1)
 
 				dict_of_dfs ["Channel Histograms"] = pd.concat([dict_of_dfs ["Channel Histograms"], df], axis = 1)
 
@@ -209,7 +220,7 @@ class Threshold_window:
 		for key in dict_of_dfs.keys():
 			dict_of_dfs[key].to_excel(writer, sheet_name=key)
 
-		writer.save()
+		writer.close()
 
 
 
@@ -443,6 +454,20 @@ class Threshold_window:
 				self.gp_hist.plot(x1, fun.Gauss(x1, *popt), 'r-', label='fit')
 				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt))
 
+				data = [
+						    ['A1', popt[0]],
+						    ['Mean1', popt[1]],
+						    ['Sigma1', popt[2]],
+
+						]
+
+						# Define column names
+				columns = ['Parameter', 'Value']
+
+						# Create a pandas DataFrame
+
+				self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
 			if self.Components.get() == '2 components':
 				self.gp_hist.plot(x1, fun.Gauss2(x1, *popt), 'r-', label='fit')
 				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss2(x1, *popt))
@@ -453,6 +478,23 @@ class Threshold_window:
 
 				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
 				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
+
+				data = [
+						    ['A1', popt[0]],
+						    ['Mean1', popt[1]],
+						    ['Sigma1', popt[2]],
+						    ['A2', popt[3]],
+						    ['Mean2', popt[4]],
+						    ['Sigma2', popt[5]],
+
+						]
+
+						# Define column names
+				columns = ['Parameter', 'Value']
+
+						# Create a pandas DataFrame
+
+				self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
 
 			if self.Components.get() == '3 components':
 				self.gp_hist.plot(x1, fun.Gauss3(x1, *popt), 'r-', label='fit')
@@ -467,6 +509,26 @@ class Threshold_window:
 				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
 				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
 				self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt3))
+
+				data = [
+						    ['A1', popt[0]],
+						    ['Mean1', popt[1]],
+						    ['Sigma1', popt[2]],
+						    ['A2', popt[3]],
+						    ['Mean2', popt[4]],
+						    ['Sigma2', popt[5]],
+						    ['A3', popt[6]],
+						    ['Mean3', popt[7]],
+						    ['Sigma3', popt[8]],
+
+						]
+
+						# Define column names
+				columns = ['Parameter', 'Value']
+
+						# Create a pandas DataFrame
+
+				self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
 
 
 
@@ -1186,6 +1248,7 @@ class Threshold_window:
 				self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
 
 			self.save_plot_dict["gp histogram"] = fcs_importer.XY_plot(self.x_bins, self.n)
+			self.save_plot_dict["gp list"] = gp_list_temp
 
 
 			if self.fit_all_flag == False:
@@ -1216,6 +1279,27 @@ class Threshold_window:
 						self.gp_hist.plot(x1, fun.Gauss(x1, *popt), 'r-', label='fit')
 
 						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt))
+
+
+						data = [
+						    ['A1', popt[0]],
+						    ['Mean1', popt[1]],
+						    ['Sigma1', popt[2]],
+
+						]
+
+						# Define column names
+						columns = ['Parameter', 'Value']
+
+						# Create a pandas DataFrame
+
+						self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
+						print("---------------")
+						print("Here")
+						print("---------------")
+
+
 						
 
 					if self.Components.get() == '2 components':
@@ -1232,6 +1316,23 @@ class Threshold_window:
 						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
 						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
 
+						data = [
+						    ['A1', popt[0]],
+						    ['Mean1', popt[1]],
+						    ['Sigma1', popt[2]],
+						    ['A2', popt[3]],
+						    ['Mean2', popt[4]],
+						    ['Sigma2', popt[5]],
+
+						]
+
+						# Define column names
+						columns = ['Parameter', 'Value']
+
+						# Create a pandas DataFrame
+
+						self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
 					if self.Components.get() == '3 components':
 						self.gp_hist.plot(x1, fun.Gauss3(x1, *popt), 'r-', label='fit')
 						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss3(x1, *popt))
@@ -1247,6 +1348,26 @@ class Threshold_window:
 						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
 						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
 						self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt3))
+
+						data = [
+						    ['A1', popt[0]],
+						    ['Mean1', popt[1]],
+						    ['Sigma1', popt[2]],
+						    ['A2', popt[3]],
+						    ['Mean2', popt[4]],
+						    ['Sigma2', popt[5]],
+						    ['A3', popt[6]],
+						    ['Mean3', popt[7]],
+						    ['Sigma3', popt[8]],
+
+						]
+
+						# Define column names
+						columns = ['Parameter', 'Value']
+
+						# Create a pandas DataFrame
+
+						self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
 
 
 
