@@ -502,7 +502,7 @@ class Left_frame :
 
 
 		self.scrollbar = tk.Scrollbar(self.frame03)
-		self.scrollbar.pack(side = "left", fill = "y")
+		self.scrollbar.pack(side = "right", fill = "y")
 
 
 		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10)

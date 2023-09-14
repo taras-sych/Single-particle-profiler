@@ -1820,7 +1820,7 @@ class Threshold_window:
 
 
 		self.scrollbar_t = tk.Scrollbar(self.frame003)
-		self.scrollbar_t.pack(side = "left", fill = "y")
+		self.scrollbar_t.pack(side = "right", fill = "y")
 
 
 		self.Datalist_t = tk.Listbox(self.frame003, width = 100, height = 10)
