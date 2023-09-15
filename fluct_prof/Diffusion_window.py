@@ -960,7 +960,7 @@ class Diffusion_window :
 
 
 		self.scrollbar = tk.Scrollbar(self.frame0002)
-		self.scrollbar.pack(side = "right", fill = "y")
+		self.scrollbar.pack(side = "left", fill = "y")
 
 
 		self.Datalist = tk.Listbox(self.frame0002, width = 100, height = 10)

@@ -204,9 +204,9 @@ class Dot_Plot_Window:
 
 
 
-		self.dot_plot.cla()
-		self.dens_plot.cla()
-		self.colorbar.cla()
+		
+		#self.dens_plot.cla()
+		#self.colorbar.cla()
 
 
 
@@ -270,7 +270,8 @@ class Dot_Plot_Window:
 
 
 
-		
+			self.which_plot = self.Plot_list.get()
+			self.dot_plot[self.which_plot].cla()
 
 			self.string_x = self.Axis_x_label__choice.get()
 			self.string_y = self.Axis_y_label__choice.get()
@@ -436,39 +437,42 @@ class Dot_Plot_Window:
 			
 		for key in self.thisdict_axis_1.keys():
 
-			self.dot_plot.scatter(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key )
-			self.dot_plot.legend(loc='upper right')
+			
 
 
-			self.dens_plot.hist2d(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key)
+			self.dot_plot[self.which_plot].scatter(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key )
+			self.dot_plot[self.which_plot].legend(loc='upper right')
 
-		self.dot_plot.set_ylabel(self.string_x)
-		self.dot_plot.set_xlabel(self.string_y)
 
-		self.dens_plot.set_ylabel(self.string_x)
-		self.dens_plot.set_xlabel(self.string_y)
+			#self.dens_plot.hist2d(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key)
+
+		self.dot_plot[self.which_plot].set_ylabel(self.string_y)
+		self.dot_plot[self.which_plot].set_xlabel(self.string_x)
+
+		#self.dens_plot.set_ylabel(self.string_x)
+		#self.dens_plot.set_xlabel(self.string_y)
 
 		
 
 
 
-		line = self.Scale_list.get()
-
-		self.dot_plot.set_xscale (line)
-		self.dot_plot.set_yscale (line)
-
-		self.dens_plot.set_xscale (line)
-		self.dens_plot.set_yscale (line)
-
-		x = np.array(self.thisdict_axis_1[key])
-		y = np.array(self.thisdict_axis_2[key])
-
-
-		nbins_x = np.sqrt(len(x))
-		nbins_y = np.sqrt(len(y))
-
-		sns.kdeplot(x,y, ax = self.dens_plot, shade = True, cmap = "PuBu", cbar = True, cbar_ax = self.colorbar)
-		self.dens_plot.set_facecolor('white')
+		"""line = self.Scale_list.get()
+						
+								self.dot_plot.set_xscale (line)
+								self.dot_plot.set_yscale (line)
+						
+								self.dens_plot.set_xscale (line)
+								self.dens_plot.set_yscale (line)
+						
+								x = np.array(self.thisdict_axis_1[key])
+								y = np.array(self.thisdict_axis_2[key])
+						
+						
+								nbins_x = np.sqrt(len(x))
+								nbins_y = np.sqrt(len(y))
+						
+								sns.kdeplot(x,y, ax = self.dens_plot, shade = True, cmap = "PuBu", cbar = True, cbar_ax = self.colorbar)
+								self.dens_plot.set_facecolor('white')"""
 
 
 		 
@@ -553,29 +557,43 @@ class Dot_Plot_Window:
 
 		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
 						
-		gs = self.figure5.add_gridspec(1, 21)
+		gs = self.figure5.add_gridspec(2, 2)
 
 
-		self.dot_plot = self.figure5.add_subplot(gs[0, :10])
+		self.dot_plot = {}
 
-		self.dot_plot.set_title("Dot Plot")
+		self.dot_plot["Plot 1"] = self.figure5.add_subplot(gs[0, 0])
 
-
-		self.dot_plot.set_ylabel('axis 1')
-		self.dot_plot.set_xlabel('axis 2')
+		self.dot_plot["Plot 1"].set_title("Dot Plot 1")
 
 
-		self.dens_plot = self.figure5.add_subplot(gs[0, 10:20])
+		self.dot_plot["Plot 1"].set_ylabel('axis 2')
+		self.dot_plot["Plot 1"].set_xlabel('axis 1')
 
-		self.dens_plot.set_title("Density Plot")
+
+		self.dot_plot["Plot 2"] = self.figure5.add_subplot(gs[0, 1])
+
+		self.dot_plot["Plot 2"].set_title("Dot Plot 2")
 
 
-		self.dens_plot.set_ylabel('axis 1')
-		self.dens_plot.set_xlabel('axis 2')
+		self.dot_plot["Plot 2"].set_ylabel('axis 2')
+		self.dot_plot["Plot 2"].set_xlabel('axis 1')
 
-		self.colorbar = self.figure5.add_subplot(gs[0, 20])
+		self.dot_plot["Plot 3"] = self.figure5.add_subplot(gs[1, 0])
 
-		#self.hist1.set_title("Intensity histogram")
+		self.dot_plot["Plot 3"].set_title("Dot Plot 3")
+
+
+		self.dot_plot["Plot 3"].set_ylabel('axis 2')
+		self.dot_plot["Plot 3"].set_xlabel('axis 1')
+
+		self.dot_plot["Plot 4"] = self.figure5.add_subplot(gs[1, 1])
+
+		self.dot_plot["Plot 4"].set_title("Dot Plot 4")
+
+
+		self.dot_plot["Plot 4"].set_ylabel('axis 2')
+		self.dot_plot["Plot 4"].set_xlabel('axis 1')
 
 		
 		
@@ -604,6 +622,7 @@ class Dot_Plot_Window:
 
 		self.Axis_x_label__choice = ttk.Combobox(self.frame001,values = self.axis_choice,  width = 18 )
 		self.Axis_x_label__choice.config(state = "readonly")
+		self.Axis_x_label__choice.set("channel 1")
 
 		self.Axis_x_label__choice.grid(row = 0, column = 1)
 
@@ -612,6 +631,7 @@ class Dot_Plot_Window:
 
 		self.Axis_y_label__choice = ttk.Combobox(self.frame001,values = self.axis_choice,  width = 18 )
 		self.Axis_y_label__choice.config(state = "readonly")
+		self.Axis_y_label__choice.set("channel 2")
 
 		self.Axis_y_label__choice.grid(row = 1, column = 1)
 
@@ -620,11 +640,21 @@ class Dot_Plot_Window:
 
 		self.Scale_list = ttk.Combobox(self.frame001,values = ["linear", "log"],  width = 18 )
 		self.Scale_list.config(state = "readonly")
+		self.Scale_list.set("linear")
 
 		self.Scale_list.grid(row = 2, column = 1)
 
+		self.Plot_label = tk.Label(self.frame001, text = "Plot on: ")
+		self.Plot_label.grid(row = 3, column = 0, sticky = 'ew')
+
+		self.Plot_list = ttk.Combobox(self.frame001,values = ["Plot 1", "Plot 2", "Plot 3", "Plot 4"],  width = 18 )
+		self.Plot_list.config(state = "readonly")
+		self.Plot_list.set("Plot 1")
+
+		self.Plot_list.grid(row = 3, column = 1)
+
 		self.Plot_button = tk.Button(self.frame001, text="Plot", command=self.Plot_dataset)
-		self.Plot_button.grid(row = 3, column = 0, columnspan = 2, sticky = 'ew')
+		self.Plot_button.grid(row = 4, column = 0, columnspan = 2, sticky = 'ew')
 
 
 
