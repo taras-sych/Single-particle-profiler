@@ -296,10 +296,10 @@ class Dot_Plot_Window:
 
 
 				if output_file_name in self.thisdict_axis_1.keys():
-					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_coeffs[rep1, channel_number])
 				else:
 					self.thisdict_axis_1[output_file_name] = []
-					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_coeffs[rep1, channel_number])
 
 
 			if self.string_y.__contains__("Diff") == True:
@@ -324,10 +324,10 @@ class Dot_Plot_Window:
 
 
 				if output_file_name in self.thisdict_axis_2.keys():
-					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_coeffs[rep1, channel_number])
 				else:
 					self.thisdict_axis_2[output_file_name] = []
-					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_fitting[rep1, channel_number]["txy"])
+					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_coeffs[rep1, channel_number])
 
 
 
