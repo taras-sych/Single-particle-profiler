@@ -44,6 +44,8 @@ import random
 
 import seaborn as sns
 
+import pandas as pd
+
 
 #--------------------------
 #End of importing general modules
@@ -72,17 +74,53 @@ from fluct_prof import fcs_importer
 class Diffusion_window :
 
 	def Save_plot_data(self):
-		filename = data_cont.initialdirectory + "\\Plots_diffusion.txt"
+
+
+
+
+
+		#filename = data_cont.initialdirectory + "\\Plots_diffusion.txt"
+
+		#open_file = open(filename, 'w')
+
+		name = data_cont.tree_list_name[data_cont.file_index]
+		filename = data_cont.initialdirectory + os.sep +  name + "_Plots_diffusion.xlsx"
 
 		open_file = open(filename, 'w')
 
+		df = {}
+
 		for key in self.save_plot_dict.keys():
-			open_file.write(str(key) + "\n")
+			df[key] = pd.concat([pd.DataFrame({"Time delay (s)": self.save_plot_dict[key].x}), pd.DataFrame({"G(tau)": self.save_plot_dict[key].y})], axis = 1)
 
-			for i in range(len(self.save_plot_dict[key].x)):
-				open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")
+			
+		writer = pd.ExcelWriter(filename, engine='xlsxwriter')
 
-		open_file.close()
+		for key in df.keys():
+			df[key].to_excel(writer, sheet_name=key)
+
+		"""for key in self.save_plot_dict.keys():
+									open_file.write(str(key) + "\n")
+						
+									for i in range(len(self.save_plot_dict[key].x)):
+										open_file.write(str(self.save_plot_dict[key].x[i]) + "\t" + str(self.save_plot_dict[key].y[i]) + "\n")"""
+
+		list_for_df = []
+		list_of_indeces = []
+		for key in self.save_fitparam_dict.keys():
+			#print(self.save_fitparam_dict[key])
+			list_for_df.append(self.save_fitparam_dict)
+			list_of_indeces.append(key)
+			
+		#df1 = pd.DataFrame(list_for_df, index=list_of_indeces)
+
+		df1 = pd.DataFrame.from_records(list_for_df,index=list_of_indeces)
+
+
+		df1.to_excel(writer, sheet_name="Fitting Parameters")
+		
+
+		writer.close()
 
 	def Apply_to_all(self):
 	
@@ -475,10 +513,11 @@ class Diffusion_window :
 
 		if self.fit_all_flag == False:
 			self.curves.cla()
+			self.residuals.cla()
 
 		
 
-
+		self.save_fitparam_dict = {}
 		num = len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)
 		for i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
@@ -498,12 +537,15 @@ class Diffusion_window :
 
 					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i].keys():
 
+						self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name] = data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i]
+
 						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i][key]))
 
 
 					if len(popt) == 7:
 						
 						self.curves.plot(x1, fun.Corr_curve_2d(x1, *popt), label = "Fit")
+						self.residuals.plot(x1, fun.Corr_curve_2d(x1, *popt)-y1)
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
@@ -513,6 +555,7 @@ class Diffusion_window :
 					if len(popt) == 8:
 						
 						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
+						self.residuals.plot(x1, fun.Corr_curve_3d(x1, *popt)-y1)
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
@@ -521,6 +564,7 @@ class Diffusion_window :
 					if len(popt) == 10:
 						
 						self.curves.plot(x1, fun.Corr_curve_2d_2(x1, *popt), label = "Fit")
+						self.residuals.plot(x1, fun.Corr_curve_2d_2(x1, *popt)-y1)
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
@@ -530,6 +574,7 @@ class Diffusion_window :
 					if len(popt) == 12:
 						
 						self.curves.plot(x1, fun.Corr_curve_3d_2(x1, *popt), label = "Fit")
+						self.residuals.plot(x1, fun.Corr_curve_3d_2(x1, *popt)-y1)
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
@@ -558,24 +603,30 @@ class Diffusion_window :
 
 					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k].keys():
 
+						self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name] = data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k]
+
 						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k][key]))
 
 
 					if len(popt) == 7:
 						
 						self.curves.plot(x1, fun.Corr_curve_2d(x1, *popt), label = "Fit")
+						self.residuals.plot(x1, fun.Corr_curve_2d(x1, *popt)-y1)
 
 					if len(popt) == 8:
 						
 						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
+						self.residuals.plot(x1, fun.Corr_curve_3d(x1, *popt)-y1)
 
 					if len(popt) == 10:
 						
 						self.curves.plot(x1, fun.Corr_curve_2d_2(x1, *popt), label = "Fit")
+						self.residuals.plot(x1, fun.Corr_curve_2d_2(x1, *popt)-y1)
 
 					if len(popt) == 12:
 						
 						self.curves.plot(x1, fun.Corr_curve_3d_2(x1, *popt), label = "Fit")
+						self.residuals.plot(x1, fun.Corr_curve_3d_2(x1, *popt)-y1)
 
 
 
@@ -587,6 +638,12 @@ class Diffusion_window :
 		self.curves.set_ylabel('G(tau)')
 		self.curves.set_xlabel('Delay time')
 		self.curves.set_xscale ('log')
+
+
+		self.residuals.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.residuals.set_ylabel('Residuals')
+		self.residuals.set_xlabel('Delay time')
+		self.residuals.set_xscale ('log')
 
 		
 
@@ -933,7 +990,7 @@ class Diffusion_window :
 
 
 
-
+		self.save_fitparam_dict = {}
 
 		
 		self.channel_index = 0

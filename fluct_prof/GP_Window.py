@@ -1451,7 +1451,7 @@ class Threshold_window:
 							"Max": tk.Entry(self.frame004, width = 5),
 						}
 
-			self.full_dict[param] = thisdict
+			
 
 			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'w')
 			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'w')
@@ -1466,10 +1466,20 @@ class Threshold_window:
 			thisdict["Max"].delete(0,"end")
 			thisdict["Max"].insert(0,self.list_of_max[row_index-1])
 
-			if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None and len(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys()) == len(self.list_of_params) :
+			self.full_dict[param] = thisdict
 
-				thisdict["Init"].delete(0,"end")
-				thisdict["Init"].insert(0,data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index][param])
+
+
+			
+			
+
+			if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
+
+
+				if len(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys()) - 1 == len(self.list_of_params) :
+
+					self.full_dict[param]["Init"].delete(0,"end")
+					self.full_dict[param]["Init"].insert(0,data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index][param])
 
 
 

@@ -343,7 +343,7 @@ def Plot_gp():
 
 		if data_c.data_list_raw[file1].gp_fitting[rep1] != None:
 
-			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 3:
+			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 4:
 
 
 				if data_c.output_file_name in thisdict.keys():
@@ -353,7 +353,7 @@ def Plot_gp():
 					thisdict[data_c.output_file_name] = []
 					thisdict[data_c.output_file_name].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean"])
 
-			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 6:
+			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 7:
 
 				key = data_c.output_file_name + " peak 1"
 
@@ -376,7 +376,7 @@ def Plot_gp():
 					thisdict[key].append(data_c.data_list_raw[file1].gp_fitting[rep1]["Mean2"])
 
 
-			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 9:
+			if len(data_c.data_list_raw[file1].gp_fitting[rep1].keys()) == 10:
 
 				key = data_c.output_file_name + " peak 1"
 
@@ -988,36 +988,38 @@ def Export_function():
 		
 		for chan in range(0, data_c.data_list_raw[file1].datasets_list[0].channels_number):
 
-			try:
+			#try:
 
+			
+
+
+			if data_c.data_list_raw[file1].diff_fitting[0, chan] != None:
 				list_T_temp = []
 				list_D_temp = []
 				list_C_temp = []
-
-
-				if "txy" in data_c.data_list_raw[file1].diff_fitting[rep, chan].keys():
+				if "txy" in data_c.data_list_raw[file1].diff_fitting[0, chan].keys():
 					for rep in range(0, data_c.repetitions_list[file1]):
 
 					
 					
 						list_T_temp.append(data_c.data_list_raw[file1].diff_fitting[rep, chan]["txy"])
-						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan])
+						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan][0])
 						list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
 
-					key = chan + "txy"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "txy"
 					list_diff_times [key] = copy.deepcopy(list_T_temp)
 
-					key = chan + "D"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "D"
 					list_diff_coeffs [key] = copy.deepcopy(list_D_temp)
 
-					key = chan + "cpm"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "cpm"
 					list_cpms [key] = copy.deepcopy(list_C_temp)
 
 				list_T_temp = []
 				list_D_temp = []
 				list_C_temp = []
 
-				if "txy1" in data_c.data_list_raw[file1].diff_fitting[rep, chan].keys():
+				if "txy1" in data_c.data_list_raw[file1].diff_fitting[0, chan].keys():
 					for rep in range(0, data_c.repetitions_list[file1]):
 
 					
@@ -1026,13 +1028,13 @@ def Export_function():
 						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan][0])
 						list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
 
-					key = chan + "txy1"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "txy1"
 					list_diff_times [key] = copy.deepcopy(list_T_temp)
 
-					key = chan + "D"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "D"
 					list_diff_coeffs [key] = copy.deepcopy(list_D_temp)
 
-					key = chan + "cpm"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" +  "cpm"
 					list_cpms [key] = copy.deepcopy(list_C_temp)
 
 
@@ -1041,7 +1043,7 @@ def Export_function():
 				list_C_temp = []
 
 
-				if "txy2" in data_c.data_list_raw[file1].diff_fitting[rep, chan].keys():
+				if "txy2" in data_c.data_list_raw[file1].diff_fitting[0, chan].keys():
 					for rep in range(0, data_c.repetitions_list[file1]):
 
 					
@@ -1050,13 +1052,13 @@ def Export_function():
 						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan][1])
 						list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
 
-					key = chan + "txy2"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "txy2"
 					list_diff_times [key] = copy.deepcopy(list_T_temp)
 
-					key = chan + "D"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "D"
 					list_diff_coeffs [key] = copy.deepcopy(list_D_temp)
 
-					key = chan + "cpm"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "cpm"
 					list_cpms [key] = copy.deepcopy(list_C_temp)
 
 				list_T_temp = []
@@ -1064,7 +1066,7 @@ def Export_function():
 				list_C_temp = []
 
 
-				if "txy3" in data_c.data_list_raw[file1].diff_fitting[rep, chan].keys():
+				if "txy3" in data_c.data_list_raw[file1].diff_fitting[0, chan].keys():
 					for rep in range(0, data_c.repetitions_list[file1]):
 
 					
@@ -1073,20 +1075,20 @@ def Export_function():
 						list_D_temp.append(data_c.data_list_raw[file1].diff_coeffs[rep, chan][2])
 						list_C_temp.append(data_c.data_list_raw[file1].cpm[rep, chan])
 
-					key = chan + "txy3"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "txy3"
 					list_diff_times [key] = copy.deepcopy(list_T_temp)
 
-					key = chan + "D"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "D"
 					list_diff_coeffs [key] = copy.deepcopy(list_D_temp)
 
-					key = chan + "cpm"
+					key = data_c.data_list_raw[file1].datasets_list[rep].channels_list[chan].short_name + "_" + "cpm"
 					list_cpms [key] = copy.deepcopy(list_C_temp)
 
 
 
 
-			except:
-				pass
+			#except:
+				#print("Something went wrong")
 
 
 
@@ -1181,7 +1183,7 @@ def Export_function():
 	for key in df_diff_time:
 		legend = key
 		df_diff_time [key].to_excel(writer, sheet_name=legend)
-		print(df_diff_time [key])
+		#print(df_diff_time [key])
 
 	for key in df_diff_coeff:
 		legend = key
