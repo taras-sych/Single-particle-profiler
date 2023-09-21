@@ -114,7 +114,7 @@ class Diffusion_window :
 			
 		#df1 = pd.DataFrame(list_for_df, index=list_of_indeces)
 
-		df1 = pd.DataFrame.from_records(list_for_df,index=list_of_indeces)
+		df1 = pd.DataFrame.from_records(list_for_df, index=list_of_indeces)
 
 
 		df1.to_excel(writer, sheet_name="Fitting Parameters")
@@ -543,7 +543,7 @@ class Diffusion_window :
 					temp_keys = []
 					for iii in range(0, len(diff_list1)):
 						temp_keys.append("D_" + str(iii+1))
-						
+
 					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name] = data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i]
 					
 					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name].update(dict(zip(temp_keys, diff_list1)))

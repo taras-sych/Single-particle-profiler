@@ -820,13 +820,13 @@ def Export_function():
 
 
 
-		filename = directory + os.path.sep + data_c.output_file_name + ".txt"
+		filename = directory + os.path.sep + data_c.output_file_name + ".xlsx"
 
 		open_file = open (filename, "w")
 
-		open_file.write(data_c.output_file_name + "\n")
+		#open_file.write(data_c.output_file_name + "\n")
 
-		open_file.write("Diffusion data: \n")
+		#open_file.write("Diffusion data: \n")
 
 		chan = {}
 
@@ -847,7 +847,7 @@ def Export_function():
 				chan[data_c.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name] = channel
 
 		
-		for name in chan.keys():
+		"""		for name in chan.keys():
 
 			channel = chan[name]
 			open_file.write(name + "\n")
@@ -867,7 +867,11 @@ def Export_function():
 				line += "D" + "\t"
 
 
-			open_file.write(line + "\n")
+			open_file.write(line + "\n")"""
+
+
+
+		for name in chan.keys(): 
 
 
 
