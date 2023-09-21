@@ -109,12 +109,12 @@ class Diffusion_window :
 		list_of_indeces = []
 		for key in self.save_fitparam_dict.keys():
 			#print(self.save_fitparam_dict[key])
-			list_for_df.append(self.save_fitparam_dict)
+			list_for_df.append(self.save_fitparam_dict[key])
 			list_of_indeces.append(key)
 			
 		#df1 = pd.DataFrame(list_for_df, index=list_of_indeces)
 
-		df1 = pd.DataFrame.from_records(list_for_df,index=list_of_indeces)
+		df1 = pd.DataFrame.from_dict(list_for_df,index=list_of_indeces)
 
 
 		df1.to_excel(writer, sheet_name="Fitting Parameters")
