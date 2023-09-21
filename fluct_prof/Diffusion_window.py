@@ -114,7 +114,7 @@ class Diffusion_window :
 			
 		#df1 = pd.DataFrame(list_for_df, index=list_of_indeces)
 
-		df1 = pd.DataFrame.from_dict(list_for_df,index=list_of_indeces)
+		df1 = pd.DataFrame.from_records(list_for_df,index=list_of_indeces)
 
 
 		df1.to_excel(writer, sheet_name="Fitting Parameters")
@@ -537,9 +537,20 @@ class Diffusion_window :
 
 					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i].keys():
 
-						self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name] = data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i]
-
 						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i][key]))
+
+					diff_list1 = data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, i]
+					temp_keys = []
+					for iii in range(0, len(diff_list1)):
+						temp_keys.append("D_" + str(iii+1))
+						
+					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name] = data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i]
+					
+					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name].update(dict(zip(temp_keys, diff_list1)))
+
+					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name]["N"] = data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, i]
+
+					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name]["cpm"] = data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, i]
 
 
 					if len(popt) == 7:
@@ -603,9 +614,21 @@ class Diffusion_window :
 
 					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k].keys():
 
-						self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name] = data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k]
-
 						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k][key]))
+
+					diff_list1 = data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, k]
+					temp_keys = []
+					for iii in range(0, len(diff_list1)):
+						temp_keys.append("D_" + str(iii+1))
+
+
+					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name] = data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k]
+					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name].update(dict(zip(temp_keys, diff_list1)))
+
+					#self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name]["N"] = data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, k]
+					#self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name]["cpm"] = data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, k]
+
+						
 
 
 					if len(popt) == 7:
@@ -613,20 +636,36 @@ class Diffusion_window :
 						self.curves.plot(x1, fun.Corr_curve_2d(x1, *popt), label = "Fit")
 						self.residuals.plot(x1, fun.Corr_curve_2d(x1, *popt)-y1)
 
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d(x1, *popt))
+
 					if len(popt) == 8:
 						
 						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
 						self.residuals.plot(x1, fun.Corr_curve_3d(x1, *popt)-y1)
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d(x1, *popt))
 
 					if len(popt) == 10:
 						
 						self.curves.plot(x1, fun.Corr_curve_2d_2(x1, *popt), label = "Fit")
 						self.residuals.plot(x1, fun.Corr_curve_2d_2(x1, *popt)-y1)
 
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d_2(x1, *popt))
+
 					if len(popt) == 12:
 						
 						self.curves.plot(x1, fun.Corr_curve_3d_2(x1, *popt), label = "Fit")
 						self.residuals.plot(x1, fun.Corr_curve_3d_2(x1, *popt)-y1)
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d_2(x1, *popt))
 
 
 
