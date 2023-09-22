@@ -15,7 +15,7 @@ def readme():
 setup(name='fluct_prof',
       version='1.0',
       description='Fluctuometry profiler',
-      install_requires=['tk','matplotlib','lmfit', 'ttkwidgets', 'scipy', 'seaborn'],
+      install_requires=['tk','matplotlib','lmfit', 'ttkwidgets', 'scipy', 'seaborn', 'tifffile'],
       long_description = readme(),
       url='',
       packages = find_packages(),
