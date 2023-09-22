@@ -824,6 +824,8 @@ def Export_function():
 
 		open_file = open (filename, "w")
 
+		writer = pd.ExcelWriter(filename, engine='xlsxwriter')
+
 		#open_file.write(data_c.output_file_name + "\n")
 
 		#open_file.write("Diffusion data: \n")
@@ -847,100 +849,137 @@ def Export_function():
 				chan[data_c.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name] = channel
 
 		
-		"""		for name in chan.keys():
-
-			channel = chan[name]
-			open_file.write(name + "\n")
-
-			line = "name\t"
-
-			rep0 = data_c.output_numbers_dict[file1][0]
-
-			if data_c.data_list_raw[file1].diff_fitting[rep0, channel] != None:
-
-				for key in data_c.data_list_raw[file1].diff_fitting[rep0, channel].keys():
-
-					line += key + "\t"
-
-				line += "N" + "\t"
-				line += "cpm" + "\t"
-				line += "D" + "\t"
-
-
-			open_file.write(line + "\n")"""
-
-
-
-		for name in chan.keys(): 
+		"""for name in chan.keys():
+						
+									channel = chan[name]
+									open_file.write(name + "\n")
+						
+									line = "name\t"
+						
+									rep0 = data_c.output_numbers_dict[file1][0]
+						
+									if data_c.data_list_raw[file1].diff_fitting[rep0, channel] != None:
+						
+										for key in data_c.data_list_raw[file1].diff_fitting[rep0, channel].keys():
+						
+											line += key + "\t"
+						
+										line += "N" + "\t"
+										line += "cpm" + "\t"
+										line += "D" + "\t"
+						
+						
+									open_file.write(line + "\n")"""
 
 
 
-			for rep1 in data_c.output_numbers_dict[file1]:
-
-				line = "Repetition " + str(rep1 + 1) + "\t"
-
-				try:
-
-					for key in data_c.data_list_raw[file1].diff_fitting[rep1, channel].keys():
-
-						line += str(data_c.data_list_raw[file1].diff_fitting[rep1, channel][key]) + "\t"
-				except: 
-					pass
-
-				
-				try:
-					line += str(data_c.data_list_raw[file1].N[rep1, channel]) + "\t"
-					line += str(data_c.data_list_raw[file1].cpm[rep1, channel]) + "\t"
-				except:
-					pass
-
-				
-				try:
-					line += str(data_c.data_list_raw[file1].diff_coeffs[rep1, channel]) + "\t"
-				except:
-					pass
-
-
-				open_file.write(line + "\n")
-
-
-		open_file.write("\n")
-		open_file.write("GP data: \n")
-
-		rep0 = data_c.output_numbers_dict[file1][0]
-
-		line = "name\t"
-
-		try:
-
-			for key in data_c.data_list_raw[file1].gp_fitting[rep0].keys():
-				line += key + "\t"
-		except:
-			pass
-
-		open_file.write(line + "\n")
-
-		for rep1 in data_c.output_numbers_dict[file1]:
-
-			line = "Repetition " + str(rep1 + 1) + "\t"
+		for name in chan.keys():
 
 			try:
 
-				for key in data_c.data_list_raw[file1].gp_fitting[rep1].keys():
+				channel = chan[name]
 
-					line += str(data_c.data_list_raw[file1].gp_fitting[rep1][key]) + "\t"
+				dict_temp_list =[]
+				for rep1 in data_c.output_numbers_dict[file1]:
+
+					dict_temp = {}				
+
+					for key in data_c.data_list_raw[file1].diff_fitting[rep1, channel].keys():
+
+
+						dict_temp[key] = data_c.data_list_raw[file1].diff_fitting[rep1, channel][key]
+
+
+					counter = 1
+					
+					for item in data_c.data_list_raw[file1].diff_coeffs[rep1, channel]:
+
+						key = "D_" + str(counter)
+
+						dict_temp[key] = item
+
+						counter+=1
+
+
+					try:
+						dict_temp["N"] = data_c.data_list_raw[file1].N[rep1, channel]
+
+						dict_temp["cpm"] = data_c.data_list_raw[file1].cpm[rep1, channel]
+
+					except:
+						pass
+
+
+					dict_temp_list.append(dict_temp)
+
+
+				df1 = pd.DataFrame.from_records(dict_temp_list)
+
+
+				df1.to_excel(writer, sheet_name=name)
 
 			except:
 				pass
 
 
-			open_file.write(line + "\n")
+
+
+
+		#open_file.write("\n")
+		#open_file.write("GP data: \n")
+
+		#rep0 = data_c.output_numbers_dict[file1][0]
+
+		#line = "name\t"
+
+		try:
+
+			dict_temp_list = []
+
+			for rep1 in data_c.output_numbers_dict[file1]:
+
+				dict_temp = {}
+			
+
+				for key in data_c.data_list_raw[file1].gp_fitting[rep1].keys():
+					
+
+					dict_temp[key] = data_c.data_list_raw[file1].gp_fitting[rep1][key]
+					#line += key + "\t"
+
+				dict_temp_list.append(dict_temp)
+
+			df1 = pd.DataFrame.from_records(dict_temp_list)
+
+
+			df1.to_excel(writer, sheet_name="GP")
+
+		except:
+			pass
+
+		#open_file.write(line + "\n")
+
+		"""for rep1 in data_c.output_numbers_dict[file1]:
+						
+									line = "Repetition " + str(rep1 + 1) + "\t"
+						
+									try:
+						
+										for key in data_c.data_list_raw[file1].gp_fitting[rep1].keys():
+						
+											line += str(data_c.data_list_raw[file1].gp_fitting[rep1][key]) + "\t"
+						
+									except:
+										pass
+						
+						
+									open_file.write(line + "\n")"""
 
 
 
 
 
-		open_file.close()
+		writer.close()
 
 
 	filename = directory + os.path.sep + "Summary.xlsx"
