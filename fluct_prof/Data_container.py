@@ -65,7 +65,7 @@ def Create_root():
 
 
 	tabs.add(frame0, text = "SPP")
-	tabs.add(frame1, text = "Scanning FCS")
+	#tabs.add(frame1, text = "Scanning FCS")
 
 	tabs_number = 2;
 
