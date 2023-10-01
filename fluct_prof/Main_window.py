@@ -312,6 +312,10 @@ class Left_frame :
 				if filename.endswith('.SIN'): 
 					self.dataset = fcs_importer.Fill_datasets_sin(lines)
 
+				if filename.endswith('.csv'):
+
+					print("CSV file")
+
 				#dataset1 = copy.deepcopy(dataset)
 
 
