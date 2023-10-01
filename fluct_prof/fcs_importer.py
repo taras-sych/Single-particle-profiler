@@ -5,6 +5,8 @@ from tkinter import ttk
 
 import copy
 
+from fluct_prof import Correlation as corr_py
+
 
 
 
@@ -326,5 +328,110 @@ def Fill_datasets_fcs( list_file):
 
 
 
+
+    return full_dataset_list
+
+#---------------------------------------------------  
+        
+#---------------------------------------------------
+
+def Fill_datasets_csv( df):
+
+    channels_fluct_list = []
+    channels_cross_list = []
+    dataset_list=[]
+    full_dataset_list=[]
+
+    column_t = df.columns[0]
+
+    for column in df.columns[1:]:
+
+        #print(column)
+
+        str1 , str2 = column.split('S')
+
+        long_name = "Auto-correlation detector Meta" + str2
+        short_name = "channel " + str(int(str2))
+
+        x = df[column_t]
+        y = df[column]
+
+        timestep = (x[1] - x[0])/1000
+
+        x1, y1 = corr_py.correlate_full (timestep, y, y)
+
+        array_corr = XY_plot(x1,y1)
+
+        x_new = []
+        y_new = []
+
+        counter = 1
+        i = 0
+        j = 0
+        sum1 = 0 
+
+        while i < len(x):
+            sum1 += y[i]
+            if x[i] > counter:
+                x_new.append(x[j]/1000)
+                y_new.append(sum1)
+                sum1=0
+                counter += 1
+                j = i+1
+            i+=1
+            
+            
+
+        array_fluct = XY_plot(x_new,y_new)
+
+
+        channel = fcs_channel(long_name, array_fluct, array_corr, short_name)
+
+        channels_fluct_list.append(channel)
+
+    for column1 in df.columns[1:]:
+        for column2 in df.columns[1:]:
+            if column1 != column2:
+
+                str1 , str2 = column1.split('S')
+                str3 , str4 = column2.split('S')
+
+                
+                long_name = "Cross-correlation detector Meta" + str2 + " versus detector Meta" + str4
+
+                str1, str2 = long_name.split(" versus ")
+                str3, str4 = str1.split("Meta")
+                str5, str6 = str2.split("Meta")
+                
+                short_name = "channel " + str4 + " vs " + str(int(str6))
+
+                x = df[column_t]
+                y1 = df[column1]
+                y2 = df[column2]
+
+                timestep = (x[1] - x[0])/1000
+
+                x3, y3 = corr_py.correlate_full (timestep, y1, y2)
+
+                array_corr = XY_plot(x3,y3)
+
+                channel = fcs_cross(long_name,  array_corr, short_name)
+
+                channels_cross_list.append(channel)
+
+    dataset_list.append(Dataset_fcs(len(channels_fluct_list), len(channels_cross_list), channels_fluct_list, channels_cross_list))
+
+    repetitions = 1
+
+    full_dataset = Full_dataset_fcs(repetitions, dataset_list)
+
+    full_dataset_list.append(full_dataset)
+
+    channels_fluct_list = []
+    channels_cross_list = []
+
+    dataset_list = []
+
+    full_dataset.position = ""
 
     return full_dataset_list

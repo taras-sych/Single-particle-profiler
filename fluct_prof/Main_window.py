@@ -14,6 +14,8 @@ import time
 
 import tifffile
 
+import pandas as pd
+
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
@@ -209,7 +211,7 @@ class Left_frame :
 		if data_cont.initialdirectory == '':
 			data_cont.initialdirectory = __file__
 
-		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('All files', '*'), ]
+		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('CSV files', '*.csv'), ('All files', '*'), ]
 		
 
 		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(data_cont.initialdirectory),title = "Select file", filetypes = ftypes)
@@ -314,7 +316,41 @@ class Left_frame :
 
 				if filename.endswith('.csv'):
 
-					print("CSV file")
+					print(filename)
+
+					df = pd.read_csv(filename)
+
+
+					self.dataset_list = fcs_importer.Fill_datasets_csv(df)
+
+
+					for self.dataset in self.dataset_list:
+
+						self.name1 = self.dataset.position + "__" + self.name 
+
+						treetree = d_tree.Data_tree (self.tree, self.name1, self.dataset.repetitions)
+						self.tree.selection_set(treetree.child_id)
+						data_cont.tree_list.append(treetree)
+
+						data_cont.tree_list_name.append(self.name1)
+
+						data_cont.binning_list.append(1)
+
+
+						data_cont.data_list_raw.append(self.dataset)
+
+
+						#data_list_current.append(dataset1)
+
+
+						data_cont.total_channels_list.append(self.dataset.datasets_list[0].channels_number + self.dataset.datasets_list[0].cross_number)
+						data_cont.repetitions_list.append(self.dataset.repetitions)
+
+						data_cont.peaks_list.append([None] * self.dataset.repetitions)
+
+						data_cont.list_of_channel_pairs.append([None])
+
+					#print("CSV file")
 
 				#dataset1 = copy.deepcopy(dataset)
 
