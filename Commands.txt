@@ -1,0 +1,11 @@
+conda create --name py_profiler_env python=3.8
+
+conda activate py_profiler_env
+
+pip install -e "path to main folder"
+
+python "path to Py_Profiler.py"
+
+pip install pyinstaller
+
+pyinstaller --onefile "path to Py_Profiler.py"

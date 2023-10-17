@@ -2,20 +2,27 @@ Metadata-Version: 2.1
 Name: fluct-prof
 Version: 1.0
 Summary: Fluctuometry profiler
-Home-page: UNKNOWN
+Home-page: 
 Author: Taras Sych
 Author-email: taras.sych@ki.se
 License: MIT
-Platform: UNKNOWN
 
-# Fluctuometry profiler
-# Current main version
+# Single particle profiler
+## Software for analysis of the intensity traces obtained by FCS-like microscopy setup.
+
+What can it do:
+
+1. Fitting of correlation curves for FCS
+2. Intensity trace analysis with isolation of peaks in dual color experiment
+3. Nano-flow cytometry adapted for measurements of fluorescence intensity for single particles
+4. Biophysical profiling: characterization of membrane fluidity when used in combination with ratiometric probes
 
 Reads files (.fcs, .SIN)
-Peak detection with manual trexholding and with z-score steps (preferd)
 
-Plots dot plots and GP histograms
-GP histogram plot can be fitted with 1 to three Gaussians
+#Compiled product here:
+https://github.com/taras-sych/Single-particle-profiler/tree/Multiple-files/Standalone%20distributions
+
+Manual is available here: https://www.youtube.com/watch?v=NAwmWDSHEV8
+
+More information here: [linkfor paper - tbd]
  
-
-

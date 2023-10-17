@@ -4,3 +4,4 @@ lmfit
 ttkwidgets
 scipy
 seaborn
+tifffile
