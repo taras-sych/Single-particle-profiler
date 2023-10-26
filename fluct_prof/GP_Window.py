@@ -838,9 +838,6 @@ class Threshold_window:
 
 			int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
 
-			
-
-
 			x1 = []
 			x2 = []
 			y1 = []
@@ -1382,12 +1379,31 @@ class Threshold_window:
 	def Fitting_frame(self):
 
 
-		self.frame004.destroy()
+		self.frame00004.destroy()
 
 
 
-		self.frame004 = tk.Frame(self.frame002)
-		self.frame004.pack(side = "top", anchor = "nw")
+		self.frame00004 = tk.Frame(self.frame002)
+		
+
+
+		self.mycanvas = tk.Canvas(self.frame00004)
+		self.mycanvas.pack(side = "left")
+
+
+		self.param_scrollbar  = tk.Scrollbar(self.frame00004, orient = "vertical", command = self.mycanvas.yview)
+		self.param_scrollbar.pack( side = "right", fill = "y" )
+
+		self.mycanvas.configure (yscrollcommand = self.param_scrollbar.set)
+
+		self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
+
+		self.frame004 = tk.Frame(self.mycanvas)
+		self.mycanvas.create_window ((0,0), window=self.frame004, anchor="nw")
+
+		self.frame00004.pack(side = "top", fill = "both", expand = "yes")
+
+
 
 		if self.Components.get() == '1 component':
 
@@ -2131,8 +2147,8 @@ class Threshold_window:
 		self.Param_label.grid(row = 3, column = 0, sticky='ew', columnspan = 2)
 
 
-		self.frame004 = tk.Frame(self.frame002)
-		self.frame004.pack(side = "top", anchor = "nw")
+		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004.pack(side = "top", anchor = "nw")
 
 		self.Fitting_frame()
 
