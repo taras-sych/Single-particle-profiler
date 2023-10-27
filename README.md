@@ -19,12 +19,12 @@ What can it do:
 
 Reads files (.fcs, .SIN, .xlsx)
 
-##For standalone distributions, see the link below:
+## For standalone distributions, see the link below:
 
 
-##Manual is available here: 
+## Manual is available here: 
 https://www.youtube.com/watch?v=NAwmWDSHEV8
 
-##Paper here (when using, cite):
+## Paper here (when using, cite):
 https://www.nature.com/articles/s41587-023-01825-5
  
