@@ -20,10 +20,10 @@ What can it do:
 Reads files (.fcs, .SIN, .xlsx)
 
 ## For standalone distributions, see the link below:
-
+https://drive.google.com/drive/folders/1g4QfDf5ELMhdDLFAQRrEJdAcNTQbkbjV?usp=sharing
 
 ## Manual is available here: 
-https://www.youtube.com/watch?v=NAwmWDSHEV8
+https://www.youtube.com/watch?v=pgXFNSjlXHk&list=PLvnnxg3kwLpWJjBRsYiTrF1a5CBaAzQK4
 
 ## Paper here (when using, cite):
 https://www.nature.com/articles/s41587-023-01825-5
