@@ -1,5 +1,5 @@
 # Single particle profiler
-## High throughpu analysis of freely diffusing fluorescent particles.
+## High throughput analysis of freely diffusing fluorescent particles.
 
 What can it do:
 
