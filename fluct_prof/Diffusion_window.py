@@ -773,10 +773,12 @@ class Diffusion_window :
 
 
 		rep = rep1-1
-
-		self.Plot_curve()
+		
 		self.Fitting_frame()
-
+		self.Plot_curve()
+		
+		
+		
 	def Update_fitting (self, event):
 
 		self.Fitting_frame()
