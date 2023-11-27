@@ -1379,11 +1379,20 @@ class Threshold_window:
 	def Fitting_frame(self):
 
 
-		self.frame00004.destroy()
+
+		self.frame000041.destroy()
+
+		self.frame000041 = tk.Frame(self.frame002)
+		self.frame000041.pack(side = "top", anchor = "nw")
 
 
 
-		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004 = tk.Frame(self.frame000041)
+
+		#self.t2 = ToggledFrame(self.frame000041, text='Fold', relief="raised", borderwidth=1)
+		
+
+		#self.frame00004 = self.t2.sub_frame
 		
 
 
@@ -1398,10 +1407,17 @@ class Threshold_window:
 
 		self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
 
-		self.frame004 = tk.Frame(self.mycanvas)
-		self.mycanvas.create_window ((0,0), window=self.frame004, anchor="nw")
+		#self.frame004 = tk.Frame(self.mycanvas)
+		self.frame0041 = tk.Frame(self.mycanvas)
+		
+		self.mycanvas.create_window ((0,0), window=self.frame0041, anchor="nw")
 
 		self.frame00004.pack(side = "top", fill = "both", expand = "yes")
+		#self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+
+		self.t2 = ToggledFrame(self.frame0041, text='Fold', relief="raised", borderwidth=1)
+		self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+		self.frame004 = self.t2.sub_frame
 
 
 
@@ -1869,8 +1885,13 @@ class Threshold_window:
 		self.Datalist_t.config(width = 100, height = 10)
 
 
-		self.frame001 = tk.Frame(self.frame002)
-		self.frame001.pack(side = "top", anchor = "nw")
+		#self.frame001 = tk.Frame(self.frame002)
+		#self.frame001.pack(side = "top", anchor = "nw")
+
+		self.t1 = ToggledFrame(self.frame002, text='Fold', relief="raised", borderwidth=1)
+		self.t1.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+
+		self.frame001 = self.t1.sub_frame
 
 
 		self.frame000 = tk.Frame(self.win_threshold)
@@ -2147,8 +2168,8 @@ class Threshold_window:
 		self.Param_label.grid(row = 3, column = 0, sticky='ew', columnspan = 2)
 
 
-		self.frame00004 = tk.Frame(self.frame002)
-		self.frame00004.pack(side = "top", anchor = "nw")
+		self.frame000041 = tk.Frame(self.frame002)
+		self.frame000041.pack(side = "top", anchor = "nw")
 
 		self.Fitting_frame()
 
@@ -2197,3 +2218,38 @@ class Threshold_window:
 
 		for key in self.plot_var.keys():
 			print(key, self.plot_var[key].get())
+
+
+
+
+
+class ToggledFrame(tk.Frame):
+
+    def __init__(self, parent, text="", *args, **options):
+        tk.Frame.__init__(self, parent, *args, **options)
+
+        self.show = tk.IntVar()
+        self.show.set(0)
+
+        self.title_frame = ttk.Frame(self)
+        self.title_frame.pack(fill="x", expand=1)
+
+        ttk.Label(self.title_frame, text=text).pack(side="left", fill="x", expand=1)
+
+        self.toggle_button = ttk.Checkbutton(self.title_frame, width=2, text='+', command=self.toggle,
+                                            variable=self.show, style='Toolbutton')
+        self.toggle_button.pack(side="left")
+
+        self.sub_frame = tk.Frame(self, relief="sunken", borderwidth=1)
+
+    def toggle(self):
+        if bool(self.show.get()):
+            self.sub_frame.pack(fill="x", expand=1)
+            self.toggle_button.configure(text='-')
+        else:
+            self.sub_frame.forget()
+            self.toggle_button.configure(text='+')
+
+
+
+
