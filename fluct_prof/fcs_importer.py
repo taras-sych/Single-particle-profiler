@@ -126,6 +126,8 @@ def Fill_datasets_fcs( list_file):
     dataset_list=[]
     full_dataset_list=[]
 
+    channel_names = {}
+
     array_size_min = -1
 
     while i < len(list_file):
@@ -144,6 +146,22 @@ def Fill_datasets_fcs( list_file):
 
 
             break
+
+        i +=1
+
+    while i < len(list_file):
+
+        if list_file[i].__contains__("Channels"):
+            str1 , str2 = list_file[i].split(' = ')
+            number_of_channels = int(str2)
+
+            for jj in range(0,number_of_channels):
+                str1 , str2 = list_file[i+jj+1].split(' = ')
+                channel_names[str2] = str1
+
+
+            break
+
 
         i +=1
 
@@ -222,9 +240,9 @@ def Fill_datasets_fcs( list_file):
 
                 else:
 
-                    str1, str2 = long_name.split("Meta")
+                    #str1, str2 = long_name.split("Meta")
                 
-                    short_name = "channel " + str(int(str2))
+                    short_name = channel_names[long_name]
                     
 
                     str1 , str2 = list_file[i+5].split(' = ')
