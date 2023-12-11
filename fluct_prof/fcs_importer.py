@@ -157,7 +157,11 @@ def Fill_datasets_fcs( list_file):
 
             for jj in range(0,number_of_channels):
                 str1 , str2 = list_file[i+jj+1].split(' = ')
-                channel_names[str2] = str1
+                #str2_new = str2.replace("\r\n","")
+                
+                str3, str4 = str1.split("l")
+                short_name = str3 + "l " + str4
+                channel_names[str2.strip()] = short_name.strip()
 
 
             break
@@ -197,7 +201,9 @@ def Fill_datasets_fcs( list_file):
                 str1 , position = list_file[i-2].split(' = ')
                 position = int(position)
 
-                str1 , long_name = list_file[i+1].split(' = ')
+                str1 , long_name_temp = list_file[i+1].split(' = ')
+
+                long_name = long_name_temp.strip()
 
 
                 
@@ -208,11 +214,19 @@ def Fill_datasets_fcs( list_file):
 
                 if list_file[i+1].__contains__("versus"):
 
-                    str1, str2 = long_name.split(" versus ")
-                    str3, str4 = str1.split("Meta")
-                    str5, str6 = str2.split("Meta")
+
                     
-                    short_name = "channel " + str4 + " vs " + str(int(str6))
+                    str1, str2 = long_name.split(" versus ")
+                    #str3, str4 = str1.split("Meta")
+                    #str5, str6 = str2.split("Meta")
+
+                    new_str1 = str1.replace('Cross', 'Auto')
+                    new_str2 = 'Auto-correlation ' + str2
+
+                    str3 = channel_names[new_str1]
+                    str4, str5 = channel_names[new_str2].split(" ")
+                    
+                    short_name = str3 + " vs " + str(int(str5))
 
                     str1 , str2 = list_file[i+7].split(' = ')
                     corr_array_size = int(str2)
@@ -240,9 +254,12 @@ def Fill_datasets_fcs( list_file):
 
                 else:
 
+                   
+
                     #str1, str2 = long_name.split("Meta")
                 
                     short_name = channel_names[long_name]
+                   
                     
 
                     str1 , str2 = list_file[i+5].split(' = ')
