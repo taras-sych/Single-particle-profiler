@@ -459,6 +459,8 @@ class Diffusion_window :
 
 		if self.fit_all_flag == False:
 
+			
+
 			self.Plot_curve()
 
 
@@ -506,6 +508,8 @@ class Diffusion_window :
 
 	def Plot_curve(self):
 
+		
+
 		self.save_plot_dict = {}
 
 
@@ -533,11 +537,19 @@ class Diffusion_window :
 
 				if 	data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i] != None:
 
+
+
 					popt = []
 
 					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i].keys():
 
-						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i][key]))
+						
+
+						if key == "cpm" or key == "N" or "D" in key:
+							pass
+						
+						else:
+							popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i][key]))
 
 					diff_list1 = data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, i]
 					temp_keys = []
@@ -695,6 +707,8 @@ class Diffusion_window :
 
 	def Choose_curve(self, event):
 
+		#print(self.fit_all_flag)
+
 
 		#self.curve_index = 0
 
@@ -773,10 +787,12 @@ class Diffusion_window :
 
 
 		rep = rep1-1
-
-		self.Plot_curve()
+		
 		self.Fitting_frame()
-
+		self.Plot_curve()
+		
+		
+		
 	def Update_fitting (self, event):
 
 		self.Fitting_frame()
@@ -966,7 +982,7 @@ class Diffusion_window :
 
 			row_index+=2
 
-		print("diffs counter:", diffs_counter)
+		#print("diffs counter:", diffs_counter)
 
 		self.D_label = []
 		self.D_value = []
