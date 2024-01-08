@@ -595,6 +595,74 @@ class Threshold_window:
 
 			self.figure5.tight_layout()
 
+
+		#------------------------------------------------------------------------------------------------------
+		#--------------   Plot traces   -----------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+
+
+		if self.fit_all_flag == False:
+				
+
+				self.peaks.set_title("Intensity traces")
+				
+				self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+				self.peaks.set_ylabel('Intensity (a.u.)')
+				self.peaks.set_xlabel('Time (s)')
+
+				self.hist1.set_title("Peak intensity histograms")
+
+				self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+				self.hist1.set_ylabel('Counts')
+				self.hist1.set_xlabel('Intensity (a.u.)')
+
+				int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
+
+				flag_counter = 0
+
+				for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
+
+					if self.channels_flags[flag_counter].get() == 1:
+
+					
+
+						x1 = []
+				
+						y1 = []
+				
+						y1_raw = []
+
+						for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
+								
+							if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
+
+
+								if len(x1) == 0:
+									x_min = 0
+								else:
+									x_min = max(x1) + x1[1] - x1[0]
+
+								x_temp_1 = [elem + x_min for elem in item.fluct_arr.x]
+
+								x1.extend(x_temp_1)
+								#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+								y1_raw.extend(item.fluct_arr.y)
+
+
+						self.peaks.plot(x1, y1_raw, zorder=1, label = item.short_name)
+
+					flag_counter += 1
+
+
+				self.peaks.legend(loc='upper right')
+
+				self.canvas5.draw_idle()
+
+				self.figure5.tight_layout()
+
+
+
 		
 
 		
@@ -732,16 +800,9 @@ class Threshold_window:
 			
 
 			if self.fit_all_flag == False:
-				self.peaks.cla()
-				self.hist1.cla()
-				self.gp_hist.cla()
-				self.dot_plot.cla()
-
-				self.peaks.set_title("Intensity traces")
 				
-				self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-				self.peaks.set_ylabel('Intensity (a.u.)')
-				self.peaks.set_xlabel('Time (s)')
+
+
 
 				self.hist1.set_title("Peak intensity histograms")
 
@@ -752,11 +813,11 @@ class Threshold_window:
 
 
 
-				self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
+				#self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
 				#self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
 				
-				if (self.var.get() == 1):
-					self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
+				#if (self.var.get() == 1):
+					#self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
 
 				bins_1 = int(np.sqrt(len(yh1)))
 				if bins_1 == 0:
@@ -811,7 +872,7 @@ class Threshold_window:
 		#------------------------------------------------------------------------------------------------------
 		#------------------------------------------------------------------------------------------------------
 
-		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 2:
 
 
 
@@ -1053,10 +1114,6 @@ class Threshold_window:
 			
 
 			if self.fit_all_flag == False:
-				self.peaks.cla()
-				self.hist1.cla()
-				self.gp_hist.cla()
-				self.dot_plot.cla()
 
 				self.peaks.set_title("Intensity traces")
 				
@@ -1073,15 +1130,15 @@ class Threshold_window:
 
 
 				if which_channel == "channel 1" or which_channel == "both or" or which_channel == "both and":
-					self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
+					#self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
 					if self.normalization_index == "z-score": 
 						th1_line = np.mean(y1_raw) + th1 * np.std(y1_raw)
 					if self.normalization_index == "manual":
 						th1_line = th1
-					self.peaks.hlines(th1_line, min(x1), max(x1), color = 'magenta', zorder=2, linestyle = "--")
+					#self.peaks.hlines(th1_line, min(x1), max(x1), color = 'magenta', zorder=2, linestyle = "--")
 					
-					if (self.var.get() == 1):
-						self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
+					#if (self.var.get() == 1):
+						#self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
 
 					bins_1 = int(np.sqrt(len(yp1_raw)))
 					if bins_1 == 0:
@@ -1123,15 +1180,15 @@ class Threshold_window:
 
 				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
 					
-					self.peaks.plot(x2, y2_raw, '#ff7f0e', zorder=1)
+					#self.peaks.plot(x2, y2_raw, '#ff7f0e', zorder=1)
 					if self.normalization_index == "z-score": 
 						th2_line = np.mean(y2_raw) + th2 * np.std(y2_raw)
 					if self.normalization_index == "manual":
 						th2_line = th2
-					self.peaks.hlines(th2_line, min(x2), max(x2), color = 'green', zorder=2, linestyle = "--")
+					#self.peaks.hlines(th2_line, min(x2), max(x2), color = 'green', zorder=2, linestyle = "--")
 
-					if (self.var.get() == 1):
-						self.peaks.plot(xp2, yp2_raw, "x", color = 'green', zorder = 3)
+					#if (self.var.get() == 1):
+						#self.peaks.plot(xp2, yp2_raw, "x", color = 'green', zorder = 3)
 
 					bins_2 = int(np.sqrt(len(yp2_raw)))
 					if bins_2 == 0:
@@ -1756,6 +1813,8 @@ class Threshold_window:
 		data_cont.file_index = file1-1
 		data_cont.rep_index = rep1-1
 
+		self.Channel_flags()
+
 	
 
 		current_repetitions_number = data_cont.data_list_raw[data_cont.file_index].repetitions
@@ -1826,6 +1885,34 @@ class Threshold_window:
 
 		self.Peaks()
 
+
+	def Channel_flags(self):
+
+		self.frame_checks_2.destroy()
+
+		self.frame_checks_2 = tk.Frame(self.frame_checks_1)
+		self.frame_checks_2.pack(side = "top", anchor = "nw")
+
+		self.flags_dict = {}
+		self.channels_flags = []
+		self.cross_flags = []
+
+		column_counter = 0
+
+		counter = 0
+
+		for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
+			str1, str2 = item.short_name.split(" ")
+			very_short_name = "ch0" + str2
+			self.channels_flags.append(tk.IntVar(value=1))
+			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame_checks_2, text=very_short_name, variable=self.channels_flags[-1], command=self.Peaks)
+			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+			column_counter +=1
+
+
+
+
+
 	def __init__(self, win_width, win_height, dpi_all):
 
 
@@ -1883,6 +1970,12 @@ class Threshold_window:
 		
 
 		self.Datalist_t.config(width = 100, height = 10)
+
+		self.frame_checks_1 = tk.Frame(self.frame002)
+		self.frame_checks_1.pack(side = "top", anchor = "nw")
+
+		self.frame_checks_2 = tk.Frame(self.frame_checks_1)
+		self.frame_checks_2.pack(side = "top", anchor = "nw")
 
 
 		#self.frame001 = tk.Frame(self.frame002)
