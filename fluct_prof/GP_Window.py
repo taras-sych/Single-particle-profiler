@@ -580,8 +580,8 @@ class Threshold_window:
 
 	def Peaks (self):
 
-		self.ch1_th.delete(0,"end")
-		self.ch2_th.delete(0,"end")
+		#self.ch1_th.delete(0,"end")
+		#self.ch2_th.delete(0,"end")
 
 		self.save_plot_dict = {}
 
@@ -621,7 +621,7 @@ class Threshold_window:
 
 				flag_counter = 0
 
-				for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
+				for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
 					if self.channels_flags[flag_counter].get() == 1:
 
@@ -643,14 +643,14 @@ class Threshold_window:
 								else:
 									x_min = max(x1) + x1[1] - x1[0]
 
-								x_temp_1 = [elem + x_min for elem in item.fluct_arr.x]
+								x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.x]
 
 								x1.extend(x_temp_1)
 								#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
-								y1_raw.extend(item.fluct_arr.y)
+								y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.y)
 
 
-						self.peaks.plot(x1, y1_raw, zorder=1, label = item.short_name)
+						self.peaks.plot(x1, y1_raw, zorder=1, label = data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].short_name)
 
 					flag_counter += 1
 
@@ -660,6 +660,14 @@ class Threshold_window:
 				self.canvas5.draw_idle()
 
 				self.figure5.tight_layout()
+
+
+		#------------------------------------------------------------------------------------------------------
+		#--------------   Detect Peaks in all channels   ------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+
+		
 
 
 
@@ -1597,17 +1605,7 @@ class Threshold_window:
 
 		if self.normalization_index == "manual":
 
-			str1 = self.Channel_pair__choice.get()
 
-			str7, str2 = str1.split('/')
-
-			str3, str4 = str7.split(' ')
-
-			str5, str6 = str2.split(' ')
-
-			ch1_ind = int(str4) - 1
-
-			ch2_ind = int(str6) - 1
 
 			x1 = []
 			x2 = []
@@ -1815,6 +1813,8 @@ class Threshold_window:
 
 		self.Channel_flags()
 
+		self.Threshold_entries()
+
 	
 
 		current_repetitions_number = data_cont.data_list_raw[data_cont.file_index].repetitions
@@ -1830,16 +1830,19 @@ class Threshold_window:
 		self.Binning_choice.set(data_cont.data_list_raw[data_cont.file_index].binning)
 
 
-		self.channel_pairs = []
-		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
-			for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
-				for j in range (i+1, data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
-					str1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name + "/" + data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[j].short_name
-					self.channel_pairs.append(str1)
 
 
-			self.Channel_pair__choice.config(values = self.channel_pairs)
-			self.Channel_pair__choice.set(self.channel_pairs[0])
+		self.threshold_detection_list = []
+
+		for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
+			self.threshold_detection_list.append(data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name)
+
+		self.threshold_detection_list.append("all")
+
+		self.Threshold.config(values = self.threshold_detection_list)
+		self.Threshold.set(self.threshold_detection_list[0])
+
+
 
 
 		rep = rep1-1
@@ -1909,6 +1912,36 @@ class Threshold_window:
 			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
 			column_counter +=1
 
+	def Threshold_entries(self):
+
+		self.frame_thresholds_2.destroy()
+
+		self.frame_thresholds_2 = tk.Frame(self.frame_thresholds_1)
+		self.frame_thresholds_2.pack(side = "top", anchor = "nw")
+
+		self.thresholds_entry_dict = {}
+		self.thresholds_label_dict = {}
+		#self.channels_flags = []
+		#self.cross_flags = []
+
+		row_counter = 0
+
+		counter = 0
+
+		for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
+			
+
+			self.thresholds_label_dict[item.short_name] = tk.Label(self.frame_thresholds_2, text=item.short_name)
+			self.thresholds_label_dict[item.short_name].grid(row = row_counter, column = 0, sticky='w')
+
+			self.thresholds_entry_dict[item.short_name] = tk.Entry(self.frame_thresholds_2, width = 9)
+			self.thresholds_entry_dict[item.short_name].grid(row = row_counter, column = 1, sticky='w')
+
+			row_counter += 1
+
+
+
+
 
 
 
@@ -1967,24 +2000,130 @@ class Threshold_window:
 
 		self.tree_t.bind('<<TreeviewSelect>>', self.Plot_trace)
 
+
+
 		
 
 		self.Datalist_t.config(width = 100, height = 10)
 
-		self.frame_checks_1 = tk.Frame(self.frame002)
+
+		#----------------------------------------------------------------------------------------------------
+		#---------------------------------- Display widgets -------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+
+		self.display_frame = ToggledFrame(self.frame002, text='Display', relief="raised", borderwidth=1)
+		self.display_frame.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+
+		self.display_subframe = self.display_frame.sub_frame
+
+		self.frame_checks_1 = tk.Frame(self.display_subframe)
 		self.frame_checks_1.pack(side = "top", anchor = "nw")
 
 		self.frame_checks_2 = tk.Frame(self.frame_checks_1)
 		self.frame_checks_2.pack(side = "top", anchor = "nw")
 
+		self.display_subframe_1 = tk.Frame(self.display_subframe)
+		self.display_subframe_1.pack(side = "top", anchor = "nw")
 
-		#self.frame001 = tk.Frame(self.frame002)
-		#self.frame001.pack(side = "top", anchor = "nw")
+		self.Binning_label = tk.Label(self.display_subframe_1, text="Binning: ")
+		self.Binning_label.grid(row = 1, column = 0, sticky = 'w')
 
-		self.t1 = ToggledFrame(self.frame002, text='Fold', relief="raised", borderwidth=1)
+		divisors = []
+
+
+		self.Binning_choice = ttk.Combobox(self.display_subframe_1,values = divisors, width = 9 )
+		self.Binning_choice.config(state = "readonly")
+		
+		self.Binning_choice.grid(row = 1, column = 1, sticky = 'ew')
+
+		
+
+		self.Binning_choice.bind("<<ComboboxSelected>>", self.Binning)
+
+
+		self.Norm_label = tk.Label(self.display_subframe_1, text="Histogram: ")
+		self.Norm_label.grid(row = 2, column = 0, sticky = 'w')
+
+		self.Normalization_for_plot = ttk.Combobox(self.display_subframe_1,values = ["Peak Intensity", "Peak Prominence", "Peak width at half max"], width = 9 )
+		self.Normalization_for_plot.config(state = "readonly")
+		
+		self.Normalization_for_plot.grid(row = 2, column = 1, sticky = 'ew')
+
+		self.Normalization_for_plot.set("Peak Intensity")
+
+		self.Normalization_for_plot.bind("<<ComboboxSelected>>", self.Normalize_for_plot_index)
+
+		self.var = tk.IntVar()
+
+		self.Peaks_button=tk.Checkbutton(self.display_subframe_1, text="Display peaks", variable=self.var, command=self.Update_thresholds)
+		self.Peaks_button.grid(row = 3, column = 0, columnspan =2, sticky='w')
+
+		#----------------------------------------------------------------------------------------------------
+		#-------------------------------- Peak detection widgets --------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+
+		self.t1 = ToggledFrame(self.frame002, text='Detect Peaks', relief="raised", borderwidth=1)
 		self.t1.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
 
-		self.frame001 = self.t1.sub_frame
+		
+
+		self.frame001 = tk.Frame(self.t1.sub_frame)
+		self.frame001.pack(side = "top", anchor = "nw")
+
+
+
+		self.Type_label = tk.Label(self.frame001, text="Detect: ")
+		self.Type_label.grid(row = 3, column = 0, sticky='w')
+
+		
+		self.threshold_detection_list = []
+
+		self.Threshold = ttk.Combobox(self.frame001,values = self.threshold_detection_list, width = 9 )
+		self.Threshold.config(state = "readonly")
+		self.Threshold.grid(row = 3, column = 1, sticky='ew')
+
+		self.Threshold.set("both and")
+
+		self.Threshold.bind("<<ComboboxSelected>>", self.Threshold_callback)
+
+		
+	
+		
+		self.Norm_label = tk.Label(self.frame001, text="Thresholding: ")
+		self.Norm_label.grid(row = 4, column = 0, sticky='w')
+
+		self.Normalization = ttk.Combobox(self.frame001,values = ["manual", "z-score"], width = 9 )
+		self.Normalization.config(state = "readonly")
+								#Threshold.config(font=helv36)
+		self.Normalization.grid(row = 4, column = 1, sticky = 'w')
+						
+		self.Normalization.set("z-score")
+						
+		self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)
+
+
+		
+		self.frame_thresholds_1 = tk.Frame(self.t1.sub_frame)
+		self.frame_thresholds_1.pack(side = "top", anchor = "nw")
+
+		self.frame_thresholds_2 = tk.Frame(self.frame_thresholds_1)
+		self.frame_thresholds_2.pack(side = "top", anchor = "nw")
+
+
+
+		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
+		self.Update_thresholds_button.grid(row = 7, column = 0, columnspan = 2, sticky='ew')
+
+		self.Put_mean_button = tk.Button(self.frame001, text="Set to default", command=self.Put_default)
+		self.Put_mean_button.grid(row = 8, column = 0, columnspan = 2, sticky='ew')
+
+
+		#----------------------------------------------------------------------------------------------------
+		#-------------------------------- Figures for plots -------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
 
 
 		self.frame000 = tk.Frame(self.win_threshold)
@@ -2077,158 +2216,10 @@ class Threshold_window:
 		self.gp_fit_check.pack(side = "left", anchor = "nw")
 
 		
-
-		self.channel_pairs = []
-
-		self.Channel_pair_label = tk.Label(self.frame001, text = "Channel pair: ")
-		self.Channel_pair_label.grid(row = 0, column = 0, sticky = 'ew')
-
-		self.Channel_pair__choice = ttk.Combobox(self.frame001,values = self.channel_pairs,  width = 18 )
-		self.Channel_pair__choice.config(state = "readonly")
-
-		self.Channel_pair__choice.grid(row = 0, column = 1, columnspan = 2, sticky = 'ew')
-
-
-		self.Binning_label = tk.Label(self.frame001, text="Binning: ")
-		self.Binning_label.grid(row = 1, column = 0, sticky = 'ew')
-
-		divisors = []
-
-
-		self.Binning_choice = ttk.Combobox(self.frame001,values = divisors, width = 9 )
-		self.Binning_choice.config(state = "readonly")
-		
-		self.Binning_choice.grid(row = 1, column = 1, sticky = 'ew')
-
-		
-
-		self.Binning_choice.bind("<<ComboboxSelected>>", self.Binning)
-
-
-		self.Norm_label = tk.Label(self.frame001, text="Plot histogram: ")
-		self.Norm_label.grid(row = 2, column = 0, sticky = 'ew')
-
-		self.Normalization_for_plot = ttk.Combobox(self.frame001,values = ["Peak Intensity", "Peak Prominence", "Peak width at half max"], width = 9 )
-		self.Normalization_for_plot.config(state = "readonly")
-		
-		self.Normalization_for_plot.grid(row = 2, column = 1, sticky = 'ew')
-
-		self.Normalization_for_plot.set("Peak Intensity")
-
-		self.Normalization_for_plot.bind("<<ComboboxSelected>>", self.Normalize_for_plot_index)
-
-		self.var = tk.IntVar()
-
-		self.Peaks_button=tk.Checkbutton(self.frame001, text="Display peaks", variable=self.var, command=self.Update_thresholds)
-		self.Peaks_button.grid(row = 2, column = 2, sticky='ew')
-
-
-
-		
-
-
-
-
-		self.Type_label = tk.Label(self.frame001, text="Detect: ")
-		self.Type_label.grid(row = 3, column = 0, sticky='ew')
-
-	
-
-		self.Threshold = ttk.Combobox(self.frame001,values = ["both and", "both or", "channel 1", "channel 2"], width = 9 )
-		self.Threshold.config(state = "readonly")
-		self.Threshold.grid(row = 3, column = 1, sticky='ew')
-
-		self.Threshold.set("both and")
-
-		self.Threshold.bind("<<ComboboxSelected>>", self.Threshold_callback)
-
-		
-	
-		
-		self.Norm_label = tk.Label(self.frame001, text="Thresholding: ")
-		self.Norm_label.grid(row = 4, column = 0, sticky='ew')
-
-		self.Normalization = ttk.Combobox(self.frame001,values = ["manual", "z-score"], width = 9 )
-		self.Normalization.config(state = "readonly")
-								#Threshold.config(font=helv36)
-		self.Normalization.grid(row = 4, column = 1, sticky = 'ew')
-						
-		self.Normalization.set("z-score")
-						
-		self.Normalization.bind("<<ComboboxSelected>>", self.Normalize_index)
-
-
-		
-
-
-
-
-
-		self.ch1_label = tk.Label(self.frame001, text="channel 1: ")
-		self.ch1_label.grid(row = 5, column = 0, sticky='ew')
-
-		self.ch1_th = tk.Entry(self.frame001, width = 9)
-		self.ch1_th.grid(row = 5, column = 1, sticky='ew')
-
-		self.ch1_th.insert("end", str(1))
-
-		self.ch2_label = tk.Label(self.frame001, text="channel 2: ")
-		self.ch2_label.grid(row = 6, column = 0, sticky='ew')
-
-		
-
-		self.ch2_th = tk.Entry(self.frame001, width = 9)
-		self.ch2_th.grid(row = 6, column = 1, sticky='ew')
-
-		self.ch2_th.insert("end", str(1))
-
-
-		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
-		self.Update_thresholds_button.grid(row = 7, column = 0, columnspan = 2, sticky='ew')
-
-		self.Put_mean_button = tk.Button(self.frame001, text="Set to default", command=self.Put_default)
-		self.Put_mean_button.grid(row = 8, column = 0, columnspan = 2, sticky='ew')
-
-
-
-
-
-
-
-		"""self.ch1_label_zscore = tk.Label(self.frame001, text="channel 1: ")
-								self.ch1_label_zscore.grid(row = 3, column = 3, sticky='w')
-						
-								self.ch1_th_zscore = tk.Entry(self.frame001, width = 9)
-								self.ch1_th_zscore.grid(row = 3, column = 4, sticky='w')
-						
-								self.ch1_th_zscore.insert("end", str(data_list_current[file_index].threshold_ch1))
-						
-								self.ch2_label_zscore = tk.Label(self.frame001, text="channel 2: ")
-								self.ch2_label_zscore.grid(row = 4, column = 3, sticky='w')
-						
-								
-						
-								self.ch2_th_zscore = tk.Entry(self.frame001, width = 9)
-								self.ch2_th_zscore.grid(row = 4, column = 4, sticky='w')
-						
-								self.ch2_th_zscore.insert("end", str(data_list_current[file_index].threshold_ch2))
-						
-						
-								self.Update_thresholds_button_zscore = tk.Button(self.frame001, text="Update thresholds", command=self.Peaks)
-								self.Update_thresholds_button_zscore.grid(row = 5, column = 3, columnspan = 2, sticky='w')
-						
-								self.Put_mean_button_zscore = tk.Button(self.frame001, text="Set to mean", command=self.Put_mean)
-								self.Put_mean_button_zscore.grid(row = 6, column = 3, columnspan = 2, sticky='w')"""
-
-		#ttk.Separator(self.frame001, orient="vertical").grid(column=2, row=2, rowspan=5, sticky='ns')
-
-
-
-		
-
-
-
-
+		#----------------------------------------------------------------------------------------------------
+		#-------------------------------- Fitting -----------------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
 
 		
 
@@ -2271,34 +2262,8 @@ class Threshold_window:
 			name = data_cont.tree_list_name[i]
 			treetree = d_tree.Data_tree (self.tree_t, name, data_cont.data_list_raw[i].repetitions)
 
-		#self.Normalize()
-
-		if self.normalization_index == "z-score":
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(1))
-
-			
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(1))
-
-		if self.normalization_index == "manual":
 
 
-
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(round(np.mean(y1),2)))
-
-			
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(round(np.mean(y2),2)))
-
-
-		self.channel_pairs = []
-		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number > 1:
-			for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
-				for j in range (i+1, data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
-					str1 = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name + "/" + data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[j].short_name
-					self.channel_pairs.append(str1)
 
 		self.tree_t.selection_set(treetree.child_id)
 
