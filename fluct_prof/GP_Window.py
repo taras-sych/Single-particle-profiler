@@ -83,6 +83,8 @@ from fluct_prof import fcs_importer
 
 class Threshold_window:
 
+
+
 	def Save_plot_data(self):
 
 
@@ -1447,7 +1449,7 @@ class Threshold_window:
 
 		self.frame000041.destroy()
 
-		self.frame000041 = tk.Frame(self.frame002)
+		self.frame000041 = tk.Frame(self.fit_toggled.sub_frame)
 		self.frame000041.pack(side = "top", anchor = "nw")
 
 
@@ -1472,17 +1474,17 @@ class Threshold_window:
 
 		self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
 
-		#self.frame004 = tk.Frame(self.mycanvas)
-		self.frame0041 = tk.Frame(self.mycanvas)
+		self.frame004 = tk.Frame(self.mycanvas)
+		#self.frame0041 = tk.Frame(self.mycanvas)
 		
-		self.mycanvas.create_window ((0,0), window=self.frame0041, anchor="nw")
+		self.mycanvas.create_window ((0,0), window=self.frame004, anchor="nw")
 
 		self.frame00004.pack(side = "top", fill = "both", expand = "yes")
 		#self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
 
-		self.t2 = ToggledFrame(self.frame0041, text='Fold', relief="raised", borderwidth=1)
-		self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
-		self.frame004 = self.t2.sub_frame
+		#self.t2 = ToggledFrame(self.frame0041, text='Fold', relief="raised", borderwidth=1)
+		#self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+		#self.frame004 = self.t2.sub_frame
 
 
 
@@ -1836,11 +1838,24 @@ class Threshold_window:
 
 		for i in range (data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number):
 			self.threshold_detection_list.append(data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name)
+			self.channels_gp_list.append(data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[i].short_name)
+
+
 
 		self.threshold_detection_list.append("all")
 
 		self.Threshold.config(values = self.threshold_detection_list)
 		self.Threshold.set(self.threshold_detection_list[0])
+
+		self.blue_combobox.config(values = self.channels_gp_list)
+		self.blue_combobox.set(self.channels_gp_list[0])
+
+		self.red_combobox.config(values = self.channels_gp_list)
+		if len(self.channels_gp_list) > 1:
+			self.red_combobox.set(self.channels_gp_list[1])
+
+		if len(self.channels_gp_list) == 1:
+			self.red_combobox.set(" ")
 
 
 
@@ -2119,6 +2134,87 @@ class Threshold_window:
 		self.Put_mean_button = tk.Button(self.frame001, text="Set to default", command=self.Put_default)
 		self.Put_mean_button.grid(row = 8, column = 0, columnspan = 2, sticky='ew')
 
+		#----------------------------------------------------------------------------------------------------
+		#-------------------------------- GP calculation widgets --------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+
+		self.gp_toggled = ToggledFrame(self.frame002, text='GP calculation', relief="raised", borderwidth=1)
+		self.gp_toggled.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+
+		self.channels_gp_list = []
+
+		self.blue_label = tk.Label(self.gp_toggled.sub_frame, text="Blue channel: ")
+		self.blue_label.grid(row = 0, column = 0, sticky='w')
+
+		self.blue_combobox = ttk.Combobox(self.gp_toggled.sub_frame,values = self.channels_gp_list, width = 9 )
+		self.blue_combobox.config(state = "readonly")
+		self.blue_combobox.grid(row = 0, column = 1, sticky = 'w')
+
+		self.red_label = tk.Label(self.gp_toggled.sub_frame, text="Red channel: ")
+		self.red_label.grid(row = 1, column = 0, sticky='w')
+
+		self.red_combobox = ttk.Combobox(self.gp_toggled.sub_frame,values = self.channels_gp_list, width = 9 )
+		self.red_combobox.config(state = "readonly")
+		self.red_combobox.grid(row = 1, column = 1, sticky = 'w')
+
+		self.var = tk.IntVar()
+
+		self.Peaks_button = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract background", variable=self.var, command=self.Temp)
+		self.Peaks_button.grid(row = 2, column = 0, columnspan =2, sticky='w')
+
+		#----------------------------------------------------------------------------------------------------
+		#-------------------------------- Fitting frame -----------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+
+		self.fit_toggled = ToggledFrame(self.frame002, text='Fitting', relief="raised", borderwidth=1)
+		self.fit_toggled.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+
+
+		self.frame007 = tk.Frame(self.fit_toggled.sub_frame)
+		self.frame007.pack(side = "top", anchor = "nw")
+		
+
+
+
+		self.Fit_button = tk.Button(self.frame007, text="Fit this", command=self.Fit_gaus)
+		self.Fit_button.grid(row = 0, column = 0, sticky='ew')
+
+		self.Fit_all_button = tk.Button(self.frame007, text="Fit this file", command=self.Apply_to_all)
+		self.Fit_all_button.grid(row = 0, column = 1, sticky='ew')
+
+		self.Fit_ticked_button = tk.Button(self.frame007, text="Fit ticked", command=self.Apply_to_all_ticks)
+		self.Fit_ticked_button.grid(row = 1, column = 0, sticky='ew')
+
+		self.Fit_all_all_button = tk.Button(self.frame007, text="Fit all", command=self.Apply_to_all_all)
+		self.Fit_all_all_button.grid(row = 1, column = 1, sticky='ew')
+
+		self.Components = ttk.Combobox(self.frame007,values = ["1 component", "2 components", "3 components"], width = 13 )
+		self.Components.config(state = "readonly")
+		self.Components.grid(row = 2, column = 0, columnspan = 2, sticky='ew')
+		self.Components.set("1 component")
+
+		self.Components.bind("<<ComboboxSelected>>", self.Choose_components)
+
+		self.Param_label = tk.Label(self.frame007, text="Fitting parameters:")
+		self.Param_label.grid(row = 3, column = 0, sticky='ew', columnspan = 2)
+
+
+		self.frame000041 = tk.Frame(self.frame002)
+		self.frame000041.pack(side = "top", anchor = "nw")
+
+		self.Fitting_frame()
+
+
+		for i in range(0, len(data_cont.tree_list_name)):
+			name = data_cont.tree_list_name[i]
+			treetree = d_tree.Data_tree (self.tree_t, name, data_cont.data_list_raw[i].repetitions)
+
+
+
+
+		self.tree_t.selection_set(treetree.child_id)
 
 		#----------------------------------------------------------------------------------------------------
 		#-------------------------------- Figures for plots -------------------------------------------------
@@ -2216,56 +2312,12 @@ class Threshold_window:
 		self.gp_fit_check.pack(side = "left", anchor = "nw")
 
 		
-		#----------------------------------------------------------------------------------------------------
-		#-------------------------------- Fitting -----------------------------------------------------------
-		#----------------------------------------------------------------------------------------------------
-		#----------------------------------------------------------------------------------------------------
+
 
 		
 
 
-		self.frame007 = tk.Frame(self.frame002)
-		self.frame007.pack(side = "top", anchor = "nw")
 
-
-
-		self.Fit_button = tk.Button(self.frame007, text="Fit this", command=self.Fit_gaus)
-		self.Fit_button.grid(row = 0, column = 0, sticky='ew')
-
-		self.Fit_all_button = tk.Button(self.frame007, text="Fit this file", command=self.Apply_to_all)
-		self.Fit_all_button.grid(row = 0, column = 1, sticky='ew')
-
-		self.Fit_ticked_button = tk.Button(self.frame007, text="Fit ticked", command=self.Apply_to_all_ticks)
-		self.Fit_ticked_button.grid(row = 1, column = 0, sticky='ew')
-
-		self.Fit_all_all_button = tk.Button(self.frame007, text="Fit all", command=self.Apply_to_all_all)
-		self.Fit_all_all_button.grid(row = 1, column = 1, sticky='ew')
-
-		self.Components = ttk.Combobox(self.frame007,values = ["1 component", "2 components", "3 components"], width = 13 )
-		self.Components.config(state = "readonly")
-		self.Components.grid(row = 2, column = 0, columnspan = 2, sticky='ew')
-		self.Components.set("1 component")
-
-		self.Components.bind("<<ComboboxSelected>>", self.Choose_components)
-
-		self.Param_label = tk.Label(self.frame007, text="Fitting parameters:")
-		self.Param_label.grid(row = 3, column = 0, sticky='ew', columnspan = 2)
-
-
-		self.frame000041 = tk.Frame(self.frame002)
-		self.frame000041.pack(side = "top", anchor = "nw")
-
-		self.Fitting_frame()
-
-
-		for i in range(0, len(data_cont.tree_list_name)):
-			name = data_cont.tree_list_name[i]
-			treetree = d_tree.Data_tree (self.tree_t, name, data_cont.data_list_raw[i].repetitions)
-
-
-
-
-		self.tree_t.selection_set(treetree.child_id)
 
 		
 
