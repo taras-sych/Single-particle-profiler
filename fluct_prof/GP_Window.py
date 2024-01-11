@@ -544,33 +544,18 @@ class Threshold_window:
 
 		data_cont.change_normal = False
 
-		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 1:
-
-			data_cont.data_list_raw[data_cont.file_index].threshold_list[0] = float(self.ch1_th.get())
-		else:
 
 
+		for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
+			data_cont.data_list_raw[data_cont.file_index].threshold_list[channel] = float(self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel].short_name].get())
 
-
-			self.Channel_pair__choice.config(values = self.channel_pairs)
-			self.Channel_pair__choice.set(self.channel_pairs[0])
-
-
-
-			if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
+		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
 				data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
 
+		
 
 
-
-
-			data_cont.data_list_raw[data_cont.file_index].threshold_list[0] = float(self.ch1_th.get())
-			data_cont.data_list_raw[data_cont.file_index].threshold_list[1] = float(self.ch2_th.get())
-
-
-
-			
 
 
 
@@ -599,7 +584,7 @@ class Threshold_window:
 
 
 		#------------------------------------------------------------------------------------------------------
-		#--------------   Plot traces   -----------------------------------------------------------------------
+		#--------------   Get and plot traces   ---------------------------------------------------------------
 		#------------------------------------------------------------------------------------------------------
 		#------------------------------------------------------------------------------------------------------
 
@@ -607,67 +592,209 @@ class Threshold_window:
 		if self.fit_all_flag == False:
 				
 
-				self.peaks.set_title("Intensity traces")
-				
-				self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-				self.peaks.set_ylabel('Intensity (a.u.)')
-				self.peaks.set_xlabel('Time (s)')
+			self.peaks.set_title("Intensity traces")
+			
+			self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.peaks.set_ylabel('Intensity (a.u.)')
+			self.peaks.set_xlabel('Time (s)')
 
-				self.hist1.set_title("Peak intensity histograms")
+			self.hist1.set_title("Peak intensity histograms")
 
-				self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-				self.hist1.set_ylabel('Counts')
-				self.hist1.set_xlabel('Intensity (a.u.)')
+			self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.hist1.set_ylabel('Counts')
+			self.hist1.set_xlabel('Intensity (a.u.)')
 
-				int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
+		int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
 
-				flag_counter = 0
+		flag_counter = 0
 
-				for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+		x1_list = {}
 
-					if self.channels_flags[flag_counter].get() == 1:
+		y1_raw_list = {}
 
+		for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+
+			
+
+			
+
+			x1 = []
+	
+			y1 = []
+	
+			y1_raw = []
+
+			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
 					
+				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
 
-						x1 = []
+
+					if len(x1) == 0:
+						x_min = 0
+					else:
+						x_min = max(x1) + x1[1] - x1[0]
+
+					x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.x]
+
+					x1.extend(x_temp_1)
+					#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
+					y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.y)
+
 				
-						y1 = []
-				
-						y1_raw = []
 
-						for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
-								
-							if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
+			x1_list [channel] = x1
+			y1_raw_list [channel] = y1_raw
 
+			if self.fit_all_flag == False:
+				if self.channels_flags[flag_counter].get() == 1:
+					self.peaks.plot(x1, y1_raw, zorder=1, label = data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].short_name)
 
-								if len(x1) == 0:
-									x_min = 0
-								else:
-									x_min = max(x1) + x1[1] - x1[0]
+			flag_counter += 1
 
-								x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.x]
+		if self.fit_all_flag == False:
 
-								x1.extend(x_temp_1)
-								#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
-								y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].fluct_arr.y)
+			self.peaks.legend(loc='upper right')
 
+			self.canvas5.draw_idle()
 
-						self.peaks.plot(x1, y1_raw, zorder=1, label = data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].short_name)
-
-					flag_counter += 1
-
-
-				self.peaks.legend(loc='upper right')
-
-				self.canvas5.draw_idle()
-
-				self.figure5.tight_layout()
+			self.figure5.tight_layout()
 
 
 		#------------------------------------------------------------------------------------------------------
 		#--------------   Detect Peaks in all channels   ------------------------------------------------------
 		#------------------------------------------------------------------------------------------------------
 		#------------------------------------------------------------------------------------------------------
+
+
+		#for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+			#pass
+
+		channel = self.Threshold.get()
+
+		str1, str2 = channel.split(' ')
+
+		channel_i = int(str2) - 1
+
+		print (channel, channel_i)
+
+		for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+
+			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
+
+			x1 = x1_list [channel_i]
+			y1_raw = y1_raw_list [channel_i]
+
+			
+			if th1 == None:
+
+				if self.normalization_index == "z-score":
+
+					th1 = 2
+
+				if self.normalization_index == "manual":
+
+
+					th1 = int(2*np.mean(y1_raw))
+
+
+			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].delete(0,"end")
+			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].insert(0,str(th1))
+
+
+		if self.normalization_index == "z-score":
+			y1 = stats.zscore(y1_raw)
+
+		peaks1, _ = find_peaks(y1, height=th1)
+
+
+		xp1_dict = {}
+		yp1_dict = {}
+		yp1_raw_dict = {}
+		width_dict = {}
+		prominence_dict = {}
+
+		for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+
+			key = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name
+
+			x1 = x1_list [channel_i]
+			y1_raw = y1_raw_list [channel_i]
+
+			xp1 = []
+			yp1 = []
+			yp1_raw = []
+
+			for p in peaks1:
+
+				xp1.append(x1[p])
+				
+				yp1.append(y1[p])
+				
+				yp1_raw.append(y1_raw[p])
+
+
+			xp1_dict[key] = xp1
+			yp1_dict[key] = yp1
+			yp1_raw_dict[key] = yp1_raw
+
+
+
+			width_dict[key] = peak_widths(y1_raw, peaks1, rel_height=0.5)[0]			
+
+			prominence_dict[key] = peak_prominences(y1_raw, peaks1)[0]
+
+
+		self.n_peaks = len(peaks1)
+
+
+		if self.fit_all_flag == False:
+
+			bins_1 = int(np.sqrt(len(yp1_raw)))
+			if bins_1 == 0:
+				bins_1 = 1
+
+
+
+			if self.Normalization_for_plot.get() == "Peak Intensity":
+
+				for yp1_raw in yp1_raw_dict:
+
+					self.hist1.set_title("Peak intensity histograms")
+
+					self.n, bins, patches = self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
+
+			if self.Normalization_for_plot.get() == "Peak Prominence":
+
+				for prominences1 in prominence_dict:
+
+					self.hist1.set_title("Peak prominence histograms")
+
+					self.n, bins, patches = self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
+
+			if self.Normalization_for_plot.get() == "Peak width at half max":
+
+				for widths1 in width_dict:
+
+					self.hist1.set_title("Peak width histograms")
+
+					self.n, bins, patches = self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
+
+
+			self.hist1.legend(loc='upper right')
+
+
+
+		
+
+
+
+
+
+
+		
+
+
+
 
 		
 
@@ -887,111 +1014,6 @@ class Threshold_window:
 
 
 
-			str1 = self.Channel_pair__choice.get()
-
-			str7, str2 = str1.split('/')
-
-			str3, str4 = str7.split(' ')
-
-			str5, str6 = str2.split(' ')
-
-			ch1_ind = int(str4) - 1
-
-			ch2_ind = int(str6) - 1
-
-
-
-			main_xlim = self.peaks.get_xlim()
-			main_ylim = self.peaks.get_ylim()
-
-
-
-
-			int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
-
-			x1 = []
-			x2 = []
-			y1 = []
-			y2 = []
-			y1_raw = []
-			y2_raw = []
-
-
-			
-
-
-
-			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
-							
-				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
-
-					
-
-
-					if len(x1) == 0:
-						x_min = 0
-					else:
-						x_min = max(x1) + x1[1] - x1[0]
-
-					x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x]
-					x_temp_2 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.x]
-
-
-					x1.extend(x_temp_1)
-					#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
-					y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.y)
-
-					x2.extend(x_temp_2)
-					#y2.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
-					y2_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.y)
-
-
-
-
-			"""if th1 == 0:
-										self.ch1_th.delete(0,"end")
-										self.ch1_th.insert(0,str(round(np.mean(y1),2)))
-										data_list_current[file_index].threshold_ch1 = round(np.mean(y1),2)
-							
-									if th2 == 0:
-										self.ch2_th.delete(0,"end")
-										self.ch2_th.insert(0,str(round(np.mean(y2),2)))
-										data_list_current[file_index].threshold_ch2 = round(np.mean(y2),2)"""
-
-
-
-			#data_list_raw[file_index].threshold_list[0] = float(self.ch1_th.get())
-
-			#data_list_raw[file_index].threshold_list[1] = float(self.ch2_th.get())
-
-
-			#th1 = data_list_raw[file_index].threshold_list[0]
-			#th2 = data_list_raw[file_index].threshold_list[1]
-
-
-
-			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[ch1_ind]
-			th2 = data_cont.data_list_raw[data_cont.file_index].threshold_list[ch2_ind]
-
-			if th1 == None or th2 == None:
-
-				if self.normalization_index == "z-score":
-
-					th1 = 1
-					th2 = 1
-
-				if self.normalization_index == "manual":
-
-
-					th1 = int(2*np.mean(y1_raw))
-					th2 = int(2*np.mean(y2_raw))
-
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(th1))
-
-				
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(th2))
 
 
 
@@ -1951,6 +1973,9 @@ class Threshold_window:
 
 			self.thresholds_entry_dict[item.short_name] = tk.Entry(self.frame_thresholds_2, width = 9)
 			self.thresholds_entry_dict[item.short_name].grid(row = row_counter, column = 1, sticky='w')
+
+			self.thresholds_entry_dict[item.short_name].delete(0,"end")
+			self.thresholds_entry_dict[item.short_name].insert(0,str(2))
 
 			row_counter += 1
 
