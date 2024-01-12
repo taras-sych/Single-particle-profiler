@@ -651,14 +651,9 @@ class Threshold_window:
 
 			flag_counter += 1
 
-		if self.fit_all_flag == False:
+		
 
-			self.peaks.legend(loc='upper right')
-
-			self.canvas5.draw_idle()
-
-			self.figure5.tight_layout()
-
+			
 
 		#------------------------------------------------------------------------------------------------------
 		#--------------   Detect Peaks in all channels   ------------------------------------------------------
@@ -746,6 +741,38 @@ class Threshold_window:
 
 		self.n_peaks = len(peaks1)
 
+		#------------------------------------------------------------------------------------------------------
+		#--------------   Plot peaks   ------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+
+		if self.fit_all_flag == False:
+			if self.var_show_peaks.get() == 1:
+
+				flag_counter = 0
+
+				for key in xp1_dict.keys():
+					if self.channels_flags[flag_counter].get() == 1:
+						self.peaks.scatter(xp1_dict[key], yp1_raw_dict[key], zorder=1)
+						 
+					flag_counter += 1
+
+
+
+			self.peaks.legend(loc='upper right')
+
+			self.canvas5.draw_idle()
+
+			self.figure5.tight_layout()
+
+				
+
+
+		#------------------------------------------------------------------------------------------------------
+		#--------------   Plot intensity histograms   ---------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+
 
 		if self.fit_all_flag == False:
 
@@ -754,30 +781,43 @@ class Threshold_window:
 				bins_1 = 1
 
 
+			flag_counter = 0
 
 			if self.Normalization_for_plot.get() == "Peak Intensity":
 
 				for yp1_raw in yp1_raw_dict:
 
-					self.hist1.set_title("Peak intensity histograms")
+					if self.channels_flags[flag_counter].get() == 1:
 
-					self.n, bins, patches = self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
+						self.hist1.set_title("Peak intensity histograms")
+
+						self.n, bins, patches = self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
+
+					flag_counter += 1
 
 			if self.Normalization_for_plot.get() == "Peak Prominence":
 
 				for prominences1 in prominence_dict:
 
-					self.hist1.set_title("Peak prominence histograms")
+					if self.channels_flags[flag_counter].get() == 1:
 
-					self.n, bins, patches = self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
+						self.hist1.set_title("Peak prominence histograms")
+
+						self.n, bins, patches = self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
+
+					flag_counter += 1
 
 			if self.Normalization_for_plot.get() == "Peak width at half max":
 
 				for widths1 in width_dict:
 
-					self.hist1.set_title("Peak width histograms")
+					if self.channels_flags[flag_counter].get() == 1:
 
-					self.n, bins, patches = self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
+						self.hist1.set_title("Peak width histograms")
+
+						self.n, bins, patches = self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
+
+					flag_counter += 1
 
 
 			self.hist1.legend(loc='upper right')
@@ -2094,9 +2134,9 @@ class Threshold_window:
 
 		self.Normalization_for_plot.bind("<<ComboboxSelected>>", self.Normalize_for_plot_index)
 
-		self.var = tk.IntVar()
+		self.var_show_peaks = tk.IntVar()
 
-		self.Peaks_button=tk.Checkbutton(self.display_subframe_1, text="Display peaks", variable=self.var, command=self.Update_thresholds)
+		self.Peaks_button=tk.Checkbutton(self.display_subframe_1, text="Display peaks", variable=self.var_show_peaks, command=self.Update_thresholds)
 		self.Peaks_button.grid(row = 3, column = 0, columnspan =2, sticky='w')
 
 		#----------------------------------------------------------------------------------------------------
