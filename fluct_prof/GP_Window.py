@@ -562,6 +562,213 @@ class Threshold_window:
 
 		self.Peaks()
 
+	def Change_channel_for_2D_GP(self, event):
+		self.Update_dot_plot()
+		self.Update_GP()
+
+
+	def Update_dot_plot (self):
+
+		self.dot_plot.cla()
+
+		key1 = self.blue_combobox.get()
+		key2 = self.red_combobox.get()
+
+		if self.Normalization_for_plot.get() == "Peak Intensity":
+
+			axis_x_temp = self.yp1_raw_dict[key1]
+			axis_y_temp = self.yp1_raw_dict[key2]
+
+		if self.Normalization_for_plot.get() == "Peak Prominence":
+
+			axis_x_temp = self.prominence_dict[key1]
+			axis_y_temp = self.prominence_dict[key2]
+
+		if self.Normalization_for_plot.get() == "Peak width at half max":
+
+			axis_x_temp = self.width_dict[key1]
+			axis_y_temp = self.width_dict[key2]
+
+
+
+
+
+
+		self.dot_plot.scatter(axis_x_temp, axis_y_temp)
+		self.dot_plot.ticklabel_format(axis = "x", style="sci", scilimits = (0,0))
+		self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+
+		self.dot_plot.set_ylabel(key1)
+		self.dot_plot.set_xlabel(key2)
+
+		self.canvas5.draw_idle()
+
+		self.figure5.tight_layout()
+
+
+	def Update_GP (self):
+
+		self.gp_hist.cla()
+
+		key1 = self.blue_combobox.get()
+		key2 = self.red_combobox.get()
+
+		yp1_raw = self.yp1_raw_dict[key1]
+		yp2_raw = self.yp1_raw_dict[key2]
+
+		peaks_x_temp = []
+		peaks_y_temp = []
+
+		gp_list_temp = []
+
+		for k in range (len(yp1_raw)):
+			gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
+			#gp_1 = -(yp1_raw[k] - (yp2_raw[k]-norm_mean))/((yp2_raw[k]-norm_mean) + yp1_raw[k])
+			#gp_1 = yp2_raw[k]/yp1_raw[k]
+			#gp_list_temp.append(gp_1)
+
+			peaks_x_temp.append(yp1_raw[k])
+			peaks_y_temp.append(yp2_raw[k])
+
+
+			if abs(gp_1) < 1:
+				gp_list_temp.append(gp_1)
+
+
+		if self.fit_all_flag == False:
+			self.gp_hist.set_title("GP histogram")
+			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.gp_hist.set_ylabel('Counts (Total: ' + str(len(gp_list_temp)) + ')' )
+			self.gp_hist.set_xlabel('GP')
+
+			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
+
+			self.x_bins=[]
+			for ii in range (len(bins)-1):
+				self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
+
+
+			if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
+
+
+				x1 = np.linspace(min(self.x_bins), max(self.x_bins), num=500)
+				popt = []
+
+				for param in data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys():
+			
+
+					
+					if param != "Total peaks":
+						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index][param]))
+
+
+
+
+				if self.Components.get() == '1 component':
+					#print("1 comp")
+					self.gp_hist.plot(x1, fun.Gauss(x1, *popt), 'r-', label='fit')
+
+					self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt))
+
+
+					data = [
+					    ['A1', popt[0]],
+					    ['Mean1', popt[1]],
+					    ['Sigma1', popt[2]],
+
+					]
+
+					# Define column names
+					columns = ['Parameter', 'Value']
+
+					# Create a pandas DataFrame
+
+					self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
+					print("---------------")
+					print("Here")
+					print("---------------")
+
+
+					
+
+				if self.Components.get() == '2 components':
+					#print("2 comp")
+					self.gp_hist.plot(x1, fun.Gauss2(x1, *popt), 'r-', label='fit')
+					self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss2(x1, *popt))
+
+					popt1 = popt[:3]
+					popt2 = popt[3:6]
+					
+					self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
+					self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
+
+					self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
+					self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
+
+					data = [
+					    ['A1', popt[0]],
+					    ['Mean1', popt[1]],
+					    ['Sigma1', popt[2]],
+					    ['A2', popt[3]],
+					    ['Mean2', popt[4]],
+					    ['Sigma2', popt[5]],
+
+					]
+
+					# Define column names
+					columns = ['Parameter', 'Value']
+
+					# Create a pandas DataFrame
+
+					self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
+				if self.Components.get() == '3 components':
+					self.gp_hist.plot(x1, fun.Gauss3(x1, *popt), 'r-', label='fit')
+					self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss3(x1, *popt))
+					#print("3 comp")
+					popt1 = popt[:3]
+					popt2 = popt[3:6]
+					popt3 = popt[6:9]
+					
+					self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
+					self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
+					self.gp_hist.plot(x1, fun.Gauss(x1, *popt3), color = 'yellow', label='fit')
+
+					self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
+					self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
+					self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt3))
+
+					data = [
+					    ['A1', popt[0]],
+					    ['Mean1', popt[1]],
+					    ['Sigma1', popt[2]],
+					    ['A2', popt[3]],
+					    ['Mean2', popt[4]],
+					    ['Sigma2', popt[5]],
+					    ['A3', popt[6]],
+					    ['Mean3', popt[7]],
+					    ['Sigma3', popt[8]],
+
+					]
+
+					# Define column names
+					columns = ['Parameter', 'Value']
+
+					# Create a pandas DataFrame
+
+					self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
+
+
+
+
+				self.canvas5.draw_idle()
+
+				self.figure5.tight_layout()
+
+		
+
 
 
 
@@ -625,8 +832,12 @@ class Threshold_window:
 			y1_raw = []
 
 			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
+
+				
 					
 				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
+
+
 
 
 					if len(x1) == 0:
@@ -670,14 +881,16 @@ class Threshold_window:
 
 		channel_i = int(str2) - 1
 
-		print (channel, channel_i)
+		x1 = x1_list [channel_i]
+		y1_raw = y1_raw_list [channel_i]
+
+		
 
 		for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
 			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
 
-			x1 = x1_list [channel_i]
-			y1_raw = y1_raw_list [channel_i]
+			
 
 			
 			if th1 == None:
@@ -702,11 +915,11 @@ class Threshold_window:
 		peaks1, _ = find_peaks(y1, height=th1)
 
 
-		xp1_dict = {}
-		yp1_dict = {}
-		yp1_raw_dict = {}
-		width_dict = {}
-		prominence_dict = {}
+		self.xp1_dict = {}
+		self.yp1_dict = {}
+		self.yp1_raw_dict = {}
+		self.width_dict = {}
+		self.prominence_dict = {}
 
 		for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
@@ -728,15 +941,15 @@ class Threshold_window:
 				yp1_raw.append(y1_raw[p])
 
 
-			xp1_dict[key] = xp1
-			yp1_dict[key] = yp1
-			yp1_raw_dict[key] = yp1_raw
+			self.xp1_dict[key] = xp1
+			self.yp1_dict[key] = yp1
+			self.yp1_raw_dict[key] = yp1_raw
 
 
 
-			width_dict[key] = peak_widths(y1_raw, peaks1, rel_height=0.5)[0]			
+			self.width_dict[key] = peak_widths(y1_raw, peaks1, rel_height=0.5)[0]			
 
-			prominence_dict[key] = peak_prominences(y1_raw, peaks1)[0]
+			self.prominence_dict[key] = peak_prominences(y1_raw, peaks1)[0]
 
 
 		self.n_peaks = len(peaks1)
@@ -751,9 +964,9 @@ class Threshold_window:
 
 				flag_counter = 0
 
-				for key in xp1_dict.keys():
+				for key in self.xp1_dict.keys():
 					if self.channels_flags[flag_counter].get() == 1:
-						self.peaks.scatter(xp1_dict[key], yp1_raw_dict[key], zorder=1)
+						self.peaks.scatter(self.xp1_dict[key], self.yp1_raw_dict[key], zorder=1)
 						 
 					flag_counter += 1
 
@@ -785,7 +998,9 @@ class Threshold_window:
 
 			if self.Normalization_for_plot.get() == "Peak Intensity":
 
-				for yp1_raw in yp1_raw_dict:
+				for key in self.yp1_raw_dict.keys():
+
+					yp1_raw = self.yp1_raw_dict[key]
 
 					if self.channels_flags[flag_counter].get() == 1:
 
@@ -797,7 +1012,9 @@ class Threshold_window:
 
 			if self.Normalization_for_plot.get() == "Peak Prominence":
 
-				for prominences1 in prominence_dict:
+				for key in self.prominence_dict.keys():
+
+					prominences1 = self.prominence_dict[key]
 
 					if self.channels_flags[flag_counter].get() == 1:
 
@@ -809,7 +1026,9 @@ class Threshold_window:
 
 			if self.Normalization_for_plot.get() == "Peak width at half max":
 
-				for widths1 in width_dict:
+				for key in self.width_dict.keys():
+
+					widths1 = self.width_dict[key]
 
 					if self.channels_flags[flag_counter].get() == 1:
 
@@ -823,26 +1042,22 @@ class Threshold_window:
 			self.hist1.legend(loc='upper right')
 
 
-
-		
-
-
-
-
+		#------------------------------------------------------------------------------------------------------
+		#--------------   Dot plot   --------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
 
 
-		
+		if self.fit_all_flag == False:
+			self.Update_dot_plot()	
 
 
+		#------------------------------------------------------------------------------------------------------
+		#--------------   GP plot   ---------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------	
 
-
-		
-
-
-
-		
-
-		
+		self.Update_GP()
 
 		#------------------------------------------------------------------------------------------------------
 		#--------------   Processing for one channel data   ---------------------------------------------------
@@ -2216,12 +2431,18 @@ class Threshold_window:
 		self.blue_combobox.config(state = "readonly")
 		self.blue_combobox.grid(row = 0, column = 1, sticky = 'w')
 
+		self.blue_combobox.bind("<<ComboboxSelected>>", self.Change_channel_for_2D_GP)
+
+		
+
 		self.red_label = tk.Label(self.gp_toggled.sub_frame, text="Red channel: ")
 		self.red_label.grid(row = 1, column = 0, sticky='w')
 
 		self.red_combobox = ttk.Combobox(self.gp_toggled.sub_frame,values = self.channels_gp_list, width = 9 )
 		self.red_combobox.config(state = "readonly")
 		self.red_combobox.grid(row = 1, column = 1, sticky = 'w')
+
+		self.red_combobox.bind("<<ComboboxSelected>>", self.Change_channel_for_2D_GP)
 
 		self.var = tk.IntVar()
 
