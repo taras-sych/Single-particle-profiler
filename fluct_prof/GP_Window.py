@@ -616,16 +616,48 @@ class Threshold_window:
 		yp1_raw = self.yp1_raw_dict[key1]
 		yp2_raw = self.yp1_raw_dict[key2]
 
+		mean1 = self.means_dict[key1]
+		mean2 = self.means_dict[key2]
+
 		peaks_x_temp = []
 		peaks_y_temp = []
 
 		gp_list_temp = []
 
+		
+
+		
+
+		
+
 		for k in range (len(yp1_raw)):
-			gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
-			#gp_1 = -(yp1_raw[k] - (yp2_raw[k]-norm_mean))/((yp2_raw[k]-norm_mean) + yp1_raw[k])
-			#gp_1 = yp2_raw[k]/yp1_raw[k]
-			#gp_list_temp.append(gp_1)
+			
+
+			
+			
+
+			if self.blue_background_var.get() == 1:
+				#print ("subtract background blue")
+				I1 = yp1_raw[k] - mean1
+			else:
+				I1 = yp1_raw[k]
+
+			if self.red_background_var.get() == 1:
+				#print ("subtract background red")
+				I2 = yp2_raw[k] - mean2
+			else:
+				I2 = yp2_raw[k]
+
+
+			gp_1 = (I1-I2)/(I1+I2)
+
+
+
+
+			if k == 0:
+				print(I1, I2, gp_1)
+			
+			
 
 			peaks_x_temp.append(yp1_raw[k])
 			peaks_y_temp.append(yp2_raw[k])
@@ -685,9 +717,7 @@ class Threshold_window:
 
 					self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
 
-					print("---------------")
-					print("Here")
-					print("---------------")
+
 
 
 					
@@ -875,20 +905,19 @@ class Threshold_window:
 		#for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 			#pass
 
-		channel = self.Threshold.get()
+		
 
-		str1, str2 = channel.split(' ')
 
-		channel_i = int(str2) - 1
-
-		x1 = x1_list [channel_i]
-		y1_raw = y1_raw_list [channel_i]
+		self.means_dict = {}
+		
 
 		
 
 		for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
 			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
+
+			y1_raw = y1_raw_list [channel_i]
 
 			
 
@@ -905,8 +934,21 @@ class Threshold_window:
 					th1 = int(2*np.mean(y1_raw))
 
 
-			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].delete(0,"end")
-			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].insert(0,str(th1))
+				self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].delete(0,"end")
+				self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].insert(0,str(th1))
+
+			self.means_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name] = np.mean(y1_raw)
+
+		channel = self.Threshold.get()
+
+		str1, str2 = channel.split(' ')
+
+		channel_i = int(str2) - 1
+
+		x1 = x1_list [channel_i]
+		y1_raw = y1_raw_list [channel_i]
+
+		print(self.means_dict)
 
 
 		if self.normalization_index == "z-score":
@@ -1264,7 +1306,7 @@ class Threshold_window:
 		#------------------------------------------------------------------------------------------------------
 		#------------------------------------------------------------------------------------------------------
 
-		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 2:
+		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 21:
 
 
 
@@ -2444,10 +2486,14 @@ class Threshold_window:
 
 		self.red_combobox.bind("<<ComboboxSelected>>", self.Change_channel_for_2D_GP)
 
-		self.var = tk.IntVar()
+		self.blue_background_var = tk.IntVar()
+		self.red_background_var = tk.IntVar()
 
-		self.Peaks_button = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract background", variable=self.var, command=self.Temp)
-		self.Peaks_button.grid(row = 2, column = 0, columnspan =2, sticky='w')
+		self.Subtract_background_blue = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract blue background", variable=self.blue_background_var, command=self.Update_GP)
+		self.Subtract_background_blue.grid(row = 2, column = 0, columnspan =2, sticky='w')
+
+		self.Subtract_background_red = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract red background", variable=self.red_background_var, command=self.Update_GP)
+		self.Subtract_background_red.grid(row = 3, column = 0, columnspan =2, sticky='w')
 
 		#----------------------------------------------------------------------------------------------------
 		#-------------------------------- Fitting frame -----------------------------------------------------

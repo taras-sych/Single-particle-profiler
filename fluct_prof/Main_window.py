@@ -592,8 +592,11 @@ class Left_frame :
 		self.Add_to_plot_button = tk.Button(self.frame023, text="Dot Plot", command=fun.Dot_Plot_fun)
 		self.Add_to_plot_button.grid(row = 4, column = 0, sticky="EW")
 
+		self.UMAP_button = tk.Button(self.frame023, text="UMAP", command=fun.UMAP_fun)
+		self.UMAP_button.grid(row = 5, column = 0, sticky="EW")
+
 		self.Output_button = tk.Button(self.frame023, text="Output", command=fun.Export_function)
-		self.Output_button.grid(row = 5, column = 0, sticky="EW")
+		self.Output_button.grid(row = 6, column = 0, sticky="EW")
 
 		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
 

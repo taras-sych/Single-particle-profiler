@@ -70,6 +70,8 @@ from fluct_prof import Restructure_data as restruct_d
 
 from fluct_prof import Data_container as data_c
 
+from fluct_prof import UMAP as umap_file
+
 
 #--------------------------
 #End of importing own modules
@@ -697,6 +699,16 @@ def Dot_Plot_fun():
 	if len(data_c.tree_list_name) > 0:
 
 		dot_plot_win = dot_plot.Dot_Plot_Window(data_c.win_width, data_c.win_height, data_c.dpi_all)
+
+	if len(data_c.tree_list_name) == 0:
+
+		tk.messagebox.showerror(title='Error', message=Message_generator())
+
+
+def UMAP_fun():
+	if len(data_c.tree_list_name) > 0:
+
+		umap_win = umap_file.UMAP_Window(data_c.win_width, data_c.win_height, data_c.dpi_all)
 
 	if len(data_c.tree_list_name) == 0:
 
