@@ -46,6 +46,8 @@ import random
 
 import seaborn as sns
 
+import pandas as pd
+
 
 #--------------------------
 #End of importing general modules
@@ -213,7 +215,7 @@ class UMAP_Window:
 		list1 = self.tree.get_checked()
 
 		
-
+		file2 = -1
 
 
 		self.thisdict_axis_1 = {}
@@ -256,7 +258,7 @@ class UMAP_Window:
 			
 			
 
-			output_file_name = data_cont.tree_list_name[file1-1][:-4]
+			#output_file_name = data_cont.tree_list_name[file1-1][:-4]
 
 
 
@@ -264,17 +266,28 @@ class UMAP_Window:
 			file1 = file1-1
 			rep1 = rep1-1
 
+			if file1 > file2:
 
-			df = data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"]
-
-			name = data_cont.tree_list_name[file1]
+				file2 = file1
 
 
-			try:
-				merged_df = pd.concat([merged_df, df])
+				dimension = data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"].shape[1]
 
-			except:
-				merged_df = df
+				name = data_cont.tree_list_name[file1]
+
+				list1 = [name] * dimension
+
+
+				df = pd.concat([pd.DataFrame({"file": list1}), data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"]])
+
+
+
+
+				try:
+					merged_df = pd.concat([merged_df, df])
+
+				except:
+					merged_df = df
 
 
 		print(merged_df)
