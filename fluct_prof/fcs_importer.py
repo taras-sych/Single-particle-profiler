@@ -87,6 +87,8 @@ class Full_dataset_fcs:
         self.cpm = {}
         self.diff_coeffs = {}
 
+        self.export_dataframe = None
+
         for i in range(self.datasets_list[0].channels_number + self.datasets_list[0].cross_number):
             for j in range(repetitions_arg):
                 self.diff_fitting[j, i] = None

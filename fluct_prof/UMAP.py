@@ -265,167 +265,28 @@ class UMAP_Window:
 			rep1 = rep1-1
 
 
+			df = data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"]
+
+			name = data_cont.tree_list_name[file1]
+
+
+			try:
+				merged_df = pd.concat([merged_df, df])
+
+			except:
+				merged_df = df
+
+
+		print(merged_df)
+
+
+
 			
 
 
 
 
-			self.which_plot = self.Plot_list.get()
-			self.dot_plot[self.which_plot].cla()
-
-			self.string_x = self.Axis_x_label__choice.get()
-			self.string_y = self.Axis_y_label__choice.get()
-
-
-			if self.string_x.__contains__("Diff") == True:
-
-				str1, str2 = self.string_x.split("_")
-
-				if data_cont.data_list_raw[file1].datasets_list[rep1].channels_number > 1:
-					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].channels_number):
-						
-						if str2 == data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[i].short_name:
-							channel_number = i
-
-				if data_cont.data_list_raw[file1].datasets_list[rep1].cross_number > 1:
-					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].cross_number):
-						
-						if str2 == data_cont.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name:
-							channel_number = i + data_cont.data_list_raw[file1].datasets_list[rep1].channels_number
-
-
-
-				if output_file_name in self.thisdict_axis_1.keys():
-					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_coeffs[rep1, channel_number])
-				else:
-					self.thisdict_axis_1[output_file_name] = []
-					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].diff_coeffs[rep1, channel_number])
-
-
-			if self.string_y.__contains__("Diff") == True:
-
-				str1, str2 = self.string_y.split("_")
-
-				if data_cont.data_list_raw[file1].datasets_list[rep1].channels_number > 1:
-					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].channels_number):
-						
-						if str2 == data_cont.data_list_raw[file1].datasets_list[rep1].channels_list[i].short_name:
-							channel_number = i
-
-
-
-				if data_cont.data_list_raw[file1].datasets_list[rep1].cross_number > 1:
-					for i in range (data_cont.data_list_raw[file1].datasets_list[rep1].cross_number):
-						
-						if str2 == data_cont.data_list_raw[file1].datasets_list[rep1].cross_list[i].short_name:
-							channel_number = i + data_cont.data_list_raw[file1].datasets_list[rep1].channels_number
-
-
-
-
-				if output_file_name in self.thisdict_axis_2.keys():
-					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_coeffs[rep1, channel_number])
-				else:
-					self.thisdict_axis_2[output_file_name] = []
-					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].diff_coeffs[rep1, channel_number])
-
-
-
-			if self.string_x.__contains__("GP") == True:
-
-
-				if output_file_name in self.thisdict_axis_1.keys():
-					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
-				else:
-					self.thisdict_axis_1[output_file_name] = []
-					self.thisdict_axis_1[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
-
-			if self.string_y.__contains__("GP") == True:
-
-
-				if output_file_name in self.thisdict_axis_2.keys():
-					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
-				else:
-					self.thisdict_axis_2[output_file_name] = []
-					self.thisdict_axis_2[output_file_name].append(data_cont.data_list_raw[file1].gp_fitting[rep1]["Mean"])
-
-
-			if self.string_x.__contains__("GP") == False and self.string_x.__contains__("Diff") == False:
-
-
-				if self.string_x.__contains__("prom") == False and self.string_x.__contains__("width") == False:
-					str1, str2 = self.string_x.split(" ")
-					channel_number = int(str2) - 1
-
-				
-
-					if output_file_name in self.thisdict_axis_1.keys():
-						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
-					else:
-						self.thisdict_axis_1[output_file_name] = []
-						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
-
-				if self.string_x.__contains__("prom") == True:
-					str1, str2 = self.string_x.split(" ")
-					channel_number = int(str2) - 1
-
-					print (channel_number)
-
-					if output_file_name in self.thisdict_axis_1.keys():
-						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peak_prominences[rep1, channel_number]
-					else:
-						self.thisdict_axis_1[output_file_name] = []
-						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peak_prominences[rep1, channel_number]
-
-				if self.string_x.__contains__("width") == True:
-					str1, str2 = self.string_x.split(" ")
-					channel_number = int(str2) - 1
-
-				
-
-					if output_file_name in self.thisdict_axis_1.keys():
-						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peak_widths[rep1, channel_number]
-					else:
-						self.thisdict_axis_1[output_file_name] = []
-						self.thisdict_axis_1[output_file_name] = self.thisdict_axis_1[output_file_name] + data_cont.data_list_raw[file1].peak_wisths[rep1, channel_number]
-
-			if self.string_y.__contains__("GP") == False and self.string_y.__contains__("Diff") == False:
-
-				if self.string_y.__contains__("prom") == False and self.string_y.__contains__("width") == False:
-					str1, str2 = self.string_y.split(" ")
-					channel_number = int(str2) - 1
-
-				
-
-					if output_file_name in self.thisdict_axis_2.keys():
-						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
-					else:
-						self.thisdict_axis_2[output_file_name] = []
-						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peaks[rep1, channel_number]
-
-				if self.string_y.__contains__("prom") == True:
-					str1, str2 = self.string_y.split(" ")
-					channel_number = int(str2) - 1
-
-					print (channel_number)
-
-					if output_file_name in self.thisdict_axis_2.keys():
-						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peak_prominences[rep1, channel_number]
-					else:
-						self.thisdict_axis_2[output_file_name] = []
-						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peak_prominences[rep1, channel_number]
-
-				if self.string_y.__contains__("width") == True:
-					str1, str2 = self.string_y.split(" ")
-					channel_number = int(str2) - 1
-
-				
-
-					if output_file_name in self.thisdict_axis_2.keys():
-						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peak_widths[rep1, channel_number]
-					else:
-						self.thisdict_axis_2[output_file_name] = []
-						self.thisdict_axis_2[output_file_name] = self.thisdict_axis_2[output_file_name] + data_cont.data_list_raw[file1].peak_wisths[rep1, channel_number]
+			
 
 
 
@@ -435,57 +296,7 @@ class UMAP_Window:
 
 		
 			
-		for key in self.thisdict_axis_1.keys():
-
-			
-
-
-			self.dot_plot[self.which_plot].scatter(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key )
-			self.dot_plot[self.which_plot].legend(loc='upper right')
-
-
-			#self.dens_plot.hist2d(self.thisdict_axis_1[key], self.thisdict_axis_2[key], label = key)
-
-		self.dot_plot[self.which_plot].set_ylabel(self.string_y)
-		self.dot_plot[self.which_plot].set_xlabel(self.string_x)
-
-		#self.dens_plot.set_ylabel(self.string_x)
-		#self.dens_plot.set_xlabel(self.string_y)
-
 		
-
-
-
-		"""line = self.Scale_list.get()
-						
-								self.dot_plot.set_xscale (line)
-								self.dot_plot.set_yscale (line)
-						
-								self.dens_plot.set_xscale (line)
-								self.dens_plot.set_yscale (line)
-						
-								x = np.array(self.thisdict_axis_1[key])
-								y = np.array(self.thisdict_axis_2[key])
-						
-						
-								nbins_x = np.sqrt(len(x))
-								nbins_y = np.sqrt(len(y))
-						
-								sns.kdeplot(x,y, ax = self.dens_plot, shade = True, cmap = "PuBu", cbar = True, cbar_ax = self.colorbar)
-								self.dens_plot.set_facecolor('white')"""
-
-
-		 
-		# Change color palette
-		#plt.pcolormesh(xi, yi, zi.reshape(xi.shape), shading='auto', cmap=plt.cm.Greens_r)
-		#plt.show()
-
-
-
-
-		self.canvas5.draw_idle()
-
-		self.figure5.tight_layout()
 
 	def __init__(self, win_width, win_height, dpi_all):
 
