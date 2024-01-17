@@ -366,7 +366,7 @@ class UMAP_Window:
 		self.dot_plot[key].scatter(transformed_data[:, 0], transformed_data[:, 1], c=colors, cmap='tab10', alpha=0.8)
 
 		# Add legend to the plot
-		self.dot_plot[key].legend(handles=handles, loc='top right')
+		self.dot_plot[key].legend(handles=handles, loc='upper right')
 
 		# Remove the axis labels
 		self.dot_plot[key].set_xticks([])
