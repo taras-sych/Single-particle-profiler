@@ -551,8 +551,8 @@ class Threshold_window:
 
 
 
-			if k == 0:
-				print(I1, I2, gp_1)
+			#if k == 0:
+				#print(I1, I2, gp_1)
 			
 			
 
@@ -883,7 +883,7 @@ class Threshold_window:
 		x1 = x1_list [channel_i]
 		y1_raw = y1_raw_list [channel_i]
 
-		print(self.means_dict)
+		#print(self.means_dict)
 
 
 		if self.normalization_index == "z-score":
@@ -1069,7 +1069,7 @@ class Threshold_window:
 
 			
 
-			print(self.data_frames_import ["Histograms"])
+			#print(self.data_frames_import ["Histograms"])
 
 			self.hist1.legend(loc='upper right')
 
@@ -1668,9 +1668,7 @@ class Threshold_window:
 
 						self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
 
-						print("---------------")
-						print("Here")
-						print("---------------")
+
 
 
 						

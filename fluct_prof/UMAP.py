@@ -271,14 +271,14 @@ class UMAP_Window:
 				file2 = file1
 
 
-				dimension = data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"].shape[1]
+				dimension = data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"].shape[0]
 
 				name = data_cont.tree_list_name[file1]
 
 				list1 = [name] * dimension
 
 
-				df = pd.concat([pd.DataFrame({"file": list1}), data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"]])
+				df = pd.concat([pd.DataFrame({"Composition": list1}), data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"]], axis = 1)
 
 
 
@@ -290,7 +290,36 @@ class UMAP_Window:
 					merged_df = df
 
 
-		print(merged_df)
+		
+
+
+		try:
+			merged_df = merged_df.drop('time', axis=1)
+		except:
+			pass
+
+		merged_df = merged_df.reset_index(drop=True)
+
+
+
+		filename = data_cont.initialdirectory + os.sep +  "Intensities.xlsx"
+
+		print(filename)
+
+		open_file = open(filename, 'w')
+
+		
+
+		
+
+
+
+		writer = pd.ExcelWriter(filename, engine='xlsxwriter')
+
+		#for key in self.data_frames_import.keys():
+		merged_df.to_excel(writer, sheet_name="Intensities")
+
+		writer.close()
 
 
 
@@ -353,7 +382,7 @@ class UMAP_Window:
 		self.tree.config(yscrollcommand = self.scrollbar.set)
 		self.scrollbar.config(command = self.tree.yview)
 
-		self.tree.bind('<<TreeviewSelect>>', self.Choose_dataset)
+		#self.tree.bind('<<TreeviewSelect>>', self.Choose_dataset)
 
 
 
