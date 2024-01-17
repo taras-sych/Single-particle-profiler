@@ -14,6 +14,8 @@ import lmfit
 
 import time
 
+import umap
+
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
@@ -278,7 +280,7 @@ class UMAP_Window:
 				list1 = [name] * dimension
 
 
-				df = pd.concat([pd.DataFrame({"Composition": list1}), data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"]], axis = 1)
+				df = pd.concat([pd.DataFrame({"Compositions": list1}), data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"]], axis = 1)
 
 
 
@@ -298,7 +300,7 @@ class UMAP_Window:
 		except:
 			pass
 
-		merged_df = merged_df.reset_index(drop=True)
+		
 
 
 
@@ -320,6 +322,60 @@ class UMAP_Window:
 		merged_df.to_excel(writer, sheet_name="Intensities")
 
 		writer.close()
+
+		self.do_umap(merged_df)
+
+
+	def do_umap(self, df):
+
+		#Extract the labels from the 'Compositions' column as a Categorical series with ordered=True
+		labels = df['Compositions'].values.tolist()
+		label_categories = pd.Categorical(labels, categories=pd.unique(labels), ordered=True)
+
+		# Remove the 'Compositions' column and convert the data to a NumPy array
+		data = df.drop('Compositions', axis=1).values
+
+		# Perform UMAP on the data to reduce the dimensionality
+		umap_reducer = umap.UMAP(n_components=2, random_state=45)
+		transformed_data = umap_reducer.fit_transform(data)
+
+		# Create a dictionary that maps unique labels to unique colors
+		unique_labels = label_categories.categories.tolist()
+		num_labels = len(unique_labels)
+		color_map = dict(zip(unique_labels, np.linspace(0, 1, num_labels)))
+
+		# Convert the labels to colors using the color map
+		colors = [color_map[label] for label in label_categories]
+
+		# Add number of data points for each specific label in the legend
+		label_counts = df['Compositions'].value_counts()
+		handles = []
+		for label in unique_labels:
+		    color = color_map[label]
+		    count = label_counts[label]
+		    handle = plt.plot([], [], marker="o", markersize=25, ls="", mec=None, mew=0, color=plt.cm.tab10(color),
+		                      label=f'{label} (n={count})')
+		    handles.append(handle[0])
+
+		# Plot the transformed data in 2D using the top two UMAP components
+		#fig, ax1 = plt.subplots(figsize=(20, 11.25))
+		#fig.subplots_adjust(left=0.05, right=0.7, bottom=0.05, top=0.95)
+
+		key = self.Plot_list.get()
+
+		self.dot_plot[key].scatter(transformed_data[:, 0], transformed_data[:, 1], c=colors, cmap='tab10', alpha=0.8)
+
+		# Add legend to the plot
+		self.dot_plot[key].legend(handles=handles, loc='top right')
+
+		# Remove the axis labels
+		self.dot_plot[key].set_xticks([])
+		self.dot_plot[key].set_yticks([])
+
+
+		self.canvas5.draw_idle()
+
+		self.figure5.tight_layout()
 
 
 
