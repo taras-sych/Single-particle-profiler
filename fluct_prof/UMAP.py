@@ -323,7 +323,63 @@ class UMAP_Window:
 
 		writer.close()
 
+
+		if self.norm_variable.get() == 1:
+
+			merged_df = self.normalize_data_channels(merged_df, self.Norm_list.get())
+
+			print (merged_df)
+
 		self.do_umap(merged_df)
+
+
+	
+	def normalize_data_channels(self, df, normalization):
+
+		if normalization == "max":
+
+
+			convert_dict = {} 
+			for key in list(df.columns[1:]):
+				convert_dict [key] = float
+
+			df = df.astype(convert_dict)
+
+			max_values = df.iloc[:, 1:].max(axis=1)
+
+
+
+			for index in range(len(df)):
+				max_value = df.iloc[index, 1:].max()
+				df.iloc[index, 1:] = df.iloc[index, 1:].div(max_value)
+
+
+			return df
+
+
+		if normalization != "max":
+
+			convert_dict = {} 
+			for key in list(df.columns[1:]):
+				convert_dict [key] = float
+
+			df = df.astype(convert_dict)
+
+						
+			divisor_column = normalization
+
+			print(divisor_column)
+			print(df.columns)
+
+			
+			for index in range(len(df)):
+				divisor_value = df.at[index, divisor_column]
+				#if divisor_value!= 0:
+				df.iloc[index, 1:] = df.iloc[index, 1:].div(divisor_value)
+
+			return df
+
+
 
 
 	def do_umap(self, df):
@@ -528,14 +584,28 @@ class UMAP_Window:
 		self.Plot_label = tk.Label(self.frame001, text = "Plot on: ")
 		self.Plot_label.grid(row = 0, column = 0, sticky = 'ew')
 
-		self.Plot_list = ttk.Combobox(self.frame001,values = ["Plot 1", "Plot 2", "Plot 3", "Plot 4"],  width = 18 )
+		self.Plot_list = ttk.Combobox(self.frame001,values = ["Plot 1", "Plot 2", "Plot 3", "Plot 4"],  width = 18)
 		self.Plot_list.config(state = "readonly")
 		self.Plot_list.set("Plot 1")
 
 		self.Plot_list.grid(row = 0, column = 1)
 
-		self.Plot_button = tk.Button(self.frame001, text="Cenk does magic", command=self.Plot_dataset)
-		self.Plot_button.grid(row = 1, column = 0, columnspan = 2, sticky = 'ew')
+		self.Norm_label = tk.Label(self.frame001, text = "Normalize: ")
+		self.Norm_label.grid(row = 1, column = 0, sticky = 'ew')
+
+		self.Norm_list = ttk.Combobox(self.frame001, values = ["max", "channel 1", "channel 2", "channel 3", "channel 4", "channel 5", "channel 6"],  width = 18)
+		self.Norm_list.config(state = "readonly")
+		self.Norm_list.set("max")
+
+		self.Norm_list.grid(row = 1, column = 1)
+
+		self.norm_variable = tk.IntVar()
+
+		self.Norm_check = tk.Checkbutton(self.frame001, text="Normalize", variable = self.norm_variable)
+		self.Norm_check.grid(row = 2, column = 0, columnspan = 2, sticky = 'e')
+
+		self.Plot_button = tk.Button(self.frame001, text="Cenk does magic", command = self.Plot_dataset)
+		self.Plot_button.grid(row = 3, column = 0, columnspan = 2, sticky = 'ew')
 
 
 
