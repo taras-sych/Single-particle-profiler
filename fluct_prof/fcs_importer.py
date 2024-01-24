@@ -5,6 +5,8 @@ from tkinter import ttk
 
 import copy
 
+import pandas as pd
+
 from fluct_prof import Correlation as corr_py
 
 
@@ -71,6 +73,8 @@ class Full_dataset_fcs:
 
 
         self.position = ''
+
+        self.metadata = None
 
 
         self.repetitions = repetitions_arg
@@ -154,7 +158,51 @@ def Fill_datasets_fcs( list_file):
     position = 0
     i = 0
 
+    metadata_filled = False
+
     while i < len(list_file):
+
+        if list_file[i].__contains__("DetectorWavelengthRangeStart1") and metadata_filled == False:
+
+            list_channel_names = []
+            list_starts = []
+            list_ends = []
+
+            metadata_filled = True
+
+            channel_index_temp = 1
+
+            while True:
+
+                if list_file[i].__contains__("DetectorWavelengthRangeStart"):
+
+                    list_channel_names.append("channel " + str(channel_index_temp))
+
+                    str1 , str2 = list_file[i].split(' = ')
+                    str3 , str4 = str2.split(' ')
+
+                    list_starts.append(float(str3))
+
+                    str1 , str2 = list_file[i+1].split(' = ')
+                    str3 , str4 = str2.split(' ')
+
+                    list_ends.append(float(str3))
+
+                    channel_index_temp += 1
+                    i += 2
+
+                else:
+                    break
+
+
+            metadata_dict = { "Channel": list_channel_names, "Start": list_starts, "End": list_ends}
+
+            metadata = pd.DataFrame(metadata_dict)
+
+
+
+
+
 
         
         if list_file[i].__contains__("Repetition"):
@@ -298,6 +346,8 @@ def Fill_datasets_fcs( list_file):
                         del item2.fluct_arr.y[array_size_min-1 : -1]
 
                 full_dataset = Full_dataset_fcs(repetitions, dataset_list)
+
+                full_dataset.metadata = metadata
 
 
                 full_dataset.position = str(chr((position)//6 + 65)) + "_" + str((position)%6 + 1)

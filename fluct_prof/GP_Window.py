@@ -110,6 +110,8 @@ class Threshold_window:
 		for key in self.data_frames_import.keys():
 			self.data_frames_import[key].to_excel(writer, sheet_name=key)
 
+		data_cont.data_list_raw[data_cont.file_index].metadata.to_excel(writer, sheet_name="Metadata")
+
 		writer.close()
 
 
@@ -2243,12 +2245,15 @@ class Threshold_window:
 
 		self.thresholds_entry_dict = {}
 		self.thresholds_label_dict = {}
+		self.wavelengths_label_dict = {}
 		#self.channels_flags = []
 		#self.cross_flags = []
 
 		row_counter = 0
 
 		counter = 0
+
+		metadata = data_cont.data_list_raw[data_cont.file_index].metadata
 
 		for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
 			
@@ -2261,6 +2266,18 @@ class Threshold_window:
 
 			self.thresholds_entry_dict[item.short_name].delete(0,"end")
 			self.thresholds_entry_dict[item.short_name].insert(0,str(2))
+
+
+			print(item.short_name)
+
+			first_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'Start'])
+			second_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'End'])
+
+
+			text1 = str(first_part) + " nm - " + str(second_part) + " nm"
+
+			self.wavelengths_label_dict[item.short_name] = tk.Label(self.frame_thresholds_2, text=text1)
+			self.wavelengths_label_dict[item.short_name].grid(row = row_counter, column = 2, sticky='w')
 
 			row_counter += 1
 

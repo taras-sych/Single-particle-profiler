@@ -582,7 +582,7 @@ class UMAP_Window:
 		
 
 		self.Plot_label = tk.Label(self.frame001, text = "Plot on: ")
-		self.Plot_label.grid(row = 0, column = 0, sticky = 'ew')
+		self.Plot_label.grid(row = 0, column = 0, sticky = 'w')
 
 		self.Plot_list = ttk.Combobox(self.frame001,values = ["Plot 1", "Plot 2", "Plot 3", "Plot 4"],  width = 18)
 		self.Plot_list.config(state = "readonly")
@@ -591,7 +591,7 @@ class UMAP_Window:
 		self.Plot_list.grid(row = 0, column = 1)
 
 		self.Norm_label = tk.Label(self.frame001, text = "Normalize: ")
-		self.Norm_label.grid(row = 1, column = 0, sticky = 'ew')
+		self.Norm_label.grid(row = 1, column = 0, sticky = 'w')
 
 		self.Norm_list = ttk.Combobox(self.frame001, values = ["max", "channel 1", "channel 2", "channel 3", "channel 4", "channel 5", "channel 6"],  width = 18)
 		self.Norm_list.config(state = "readonly")
@@ -602,7 +602,7 @@ class UMAP_Window:
 		self.norm_variable = tk.IntVar()
 
 		self.Norm_check = tk.Checkbutton(self.frame001, text="Normalize", variable = self.norm_variable)
-		self.Norm_check.grid(row = 2, column = 0, columnspan = 2, sticky = 'e')
+		self.Norm_check.grid(row = 2, column = 0, columnspan = 2, sticky = 'w')
 
 		self.Plot_button = tk.Button(self.frame001, text="Cenk does magic", command = self.Plot_dataset)
 		self.Plot_button.grid(row = 3, column = 0, columnspan = 2, sticky = 'ew')

@@ -377,6 +377,10 @@ class Left_frame :
 
 	def Plot_data(self, event):
 
+		#self.Datalist.configure(background="lightblue")
+
+
+
 		start = time.time()
 
 		
@@ -545,11 +549,13 @@ class Left_frame :
 		self.scrollbar.pack(side = "right", fill = "y")
 
 
-		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10)
+		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10, selectbackground="blue")
 		self.Datalist.pack(side = "left", anchor = "nw")
 		
 		
 		
+
+
 		self.tree=CheckboxTreeview(self.Datalist)
 		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
 		self.tree.pack()
