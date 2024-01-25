@@ -443,6 +443,10 @@ class Threshold_window:
 		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
 				data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
 
+
+
+
+
 		
 
 
@@ -548,7 +552,19 @@ class Threshold_window:
 				I2 = yp2_raw[k]
 
 
-			gp_1 = (I1-I2)/(I1+I2)
+			if I1 != 0 and I2 !=0:
+				
+				gp_1 = (I1-I2)/(I1+I2)
+
+				
+				
+				if abs(gp_1) < 1:
+					gp_list_temp.append(gp_1)
+
+			peaks_x_temp.append(yp1_raw[k])
+			peaks_y_temp.append(yp2_raw[k])
+
+
 
 
 
@@ -558,12 +574,10 @@ class Threshold_window:
 			
 			
 
-			peaks_x_temp.append(yp1_raw[k])
-			peaks_y_temp.append(yp2_raw[k])
+			
 
 
-			if abs(gp_1) < 1:
-				gp_list_temp.append(gp_1)
+			
 
 
 		self.data_frames_import ["GP Plot"] = pd.DataFrame({"GP list": gp_list_temp})
@@ -846,6 +860,8 @@ class Threshold_window:
 
 
 		self.means_dict = {}
+
+		
 		
 
 		
@@ -874,6 +890,8 @@ class Threshold_window:
 				self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].delete(0,"end")
 				self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].insert(0,str(th1))
 
+			data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i] = th1
+
 			self.means_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name] = np.mean(y1_raw)
 
 		channel = self.Threshold.get()
@@ -884,6 +902,7 @@ class Threshold_window:
 
 		x1 = x1_list [channel_i]
 		y1_raw = y1_raw_list [channel_i]
+		th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
 
 		#print(self.means_dict)
 
@@ -891,6 +910,10 @@ class Threshold_window:
 		if self.normalization_index == "z-score":
 			y1 = stats.zscore(y1_raw)
 
+		
+		print("---------------------------------------------")
+		print("threshold: ", th1)
+		print("---------------------------------------------")
 		peaks1, _ = find_peaks(y1, height=th1)
 
 
@@ -1172,6 +1195,10 @@ class Threshold_window:
 			for el in y1:
 				if el >= th1:
 					yh1.append(el)
+
+
+
+
 
 
 

@@ -419,7 +419,10 @@ class UMAP_Window:
 
 		key = self.Plot_list.get()
 
-		self.dot_plot[key].scatter(transformed_data[:, 0], transformed_data[:, 1], c=colors, cmap='tab10', alpha=0.8)
+		colormap = self.Cmap_list.get()
+		transparency = float(self.Transparency_entry.get())
+
+		self.dot_plot[key].scatter(transformed_data[:, 0], transformed_data[:, 1], c=colors, cmap=colormap, alpha=transparency)
 
 		# Add legend to the plot
 		self.dot_plot[key].legend(handles=handles, loc='upper right')
@@ -604,8 +607,25 @@ class UMAP_Window:
 		self.Norm_check = tk.Checkbutton(self.frame001, text="Normalize", variable = self.norm_variable)
 		self.Norm_check.grid(row = 2, column = 0, columnspan = 2, sticky = 'w')
 
+		self.Transparency_label = tk.Label(self.frame001, text = "Transparency: ")
+		self.Transparency_label.grid(row = 3, column = 0, sticky = 'w')
+
+		self.Transparency_entry = tk.Entry(self.frame001, width = 18)
+		self.Transparency_entry.grid(row = 3, column = 1, sticky = 'w')
+
+		self.Cmap_label = tk.Label(self.frame001, text = "Colormap: ")
+		self.Cmap_label.grid(row = 4, column = 0, sticky = 'w')
+
+		self.Cmap_list = ttk.Combobox(self.frame001, values = plt.colormaps(),  width = 18)
+		self.Cmap_list.config(state = "readonly")
+		self.Cmap_list.set("viridis")
+
+		self.Cmap_list.grid(row = 4, column = 1)
+
+
+
 		self.Plot_button = tk.Button(self.frame001, text="Cenk does magic", command = self.Plot_dataset)
-		self.Plot_button.grid(row = 3, column = 0, columnspan = 2, sticky = 'ew')
+		self.Plot_button.grid(row = 5, column = 0, columnspan = 2, sticky = 'ew')
 
 
 
