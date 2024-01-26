@@ -425,7 +425,8 @@ class UMAP_Window:
 		self.dot_plot[key].scatter(transformed_data[:, 0], transformed_data[:, 1], c=colors, cmap=colormap, alpha=transparency)
 
 		# Add legend to the plot
-		self.dot_plot[key].legend(handles=handles, loc='upper right')
+		#self.dot_plot[key].legend(handles=handles, loc='upper right')
+		self.dot_plot[key].legend(loc=self.Legend_list.get())
 
 		# Remove the axis labels
 		self.dot_plot[key].set_xticks([])
@@ -622,10 +623,21 @@ class UMAP_Window:
 
 		self.Cmap_list.grid(row = 4, column = 1)
 
+		self.Legend_label = tk.Label(self.frame001, text = "Legend loc: ")
+		self.Legend_label.grid(row = 5, column = 0, sticky = 'w')
+
+		legends_list = ["upper right", "upper left", "lower right", "lower left", "center right", "center left", "upper center", "lower center"]
+
+		self.Legend_list = ttk.Combobox(self.frame001, values = legends_list,  width = 18)
+		self.Legend_list.config(state = "readonly")
+		self.Legend_list.set("upper right")
+
+		self.Legend_list.grid(row = 5, column = 1)
+
 
 
 		self.Plot_button = tk.Button(self.frame001, text="Cenk does magic", command = self.Plot_dataset)
-		self.Plot_button.grid(row = 5, column = 0, columnspan = 2, sticky = 'ew')
+		self.Plot_button.grid(row = 6, column = 0, columnspan = 2, sticky = 'ew')
 
 
 
