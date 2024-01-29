@@ -465,28 +465,64 @@ class Threshold_window:
 
 		self.dot_plot.cla()
 
-		key1 = self.blue_combobox.get()
-		key2 = self.red_combobox.get()
+		#key1 = self.blue_combobox.get()
+		#key2 = self.red_combobox.get()
 
-		if self.Normalization_for_plot.get() == "Peak Intensity":
+		keys = []
 
-			axis_x_temp = self.yp1_raw_dict[key1]
-			axis_y_temp = self.yp1_raw_dict[key2]
+		for key in self.yp1_raw_dict.keys():
+			keys.append(key)
 
-		if self.Normalization_for_plot.get() == "Peak Prominence":
 
-			axis_x_temp = self.prominence_dict[key1]
-			axis_y_temp = self.prominence_dict[key2]
+		self.axis_x_temp = np.array([0]*len(self.yp1_raw_dict[keys[0]]))
+		self.axis_y_temp = np.array([0]*len(self.yp1_raw_dict[keys[0]]))
 
-		if self.Normalization_for_plot.get() == "Peak width at half max":
+		
 
-			axis_x_temp = self.width_dict[key1]
-			axis_y_temp = self.width_dict[key2]
+
+
+		for i in range (len(keys)):
+
+
+
+			if self.Normalization_for_plot.get() == "Peak Intensity":
+
+				if self.blue_channels_flags[i].get() == 1:
+
+					self.axis_x_temp += self.yp1_raw_dict[keys[i]]
+
+				if self.blue_channels_flags[i].get() == 1:
+					
+					self.axis_y_temp = self.yp1_raw_dict[keys[i]]
+
+			if self.Normalization_for_plot.get() == "Peak Prominence":
+
+				if self.blue_channels_flags[i].get() == 1:
+
+					self.axis_x_temp += self.prominence_dict[keys[i]]
+
+				if self.blue_channels_flags[i].get() == 1:
+					
+					self.axis_y_temp = self.prominence_dict[keys[i]]
+
+				
+
+			if self.Normalization_for_plot.get() == "Peak width at half max":
+
+				if self.blue_channels_flags[i].get() == 1:
+
+					self.axis_x_temp += self.width_dict[keys[i]]
+
+				if self.blue_channels_flags[i].get() == 1:
+					
+					self.axis_y_temp = self.width_dict[keys[i]]
+
+
 
 
 		data_temp = {}
-		data_temp[key1] = axis_x_temp
-		data_temp[key2] = axis_y_temp
+		data_temp[key1] = self.axis_x_temp
+		data_temp[key2] = self.axis_y_temp
 
 
 
@@ -497,7 +533,7 @@ class Threshold_window:
 
 
 
-		self.dot_plot.scatter(axis_x_temp, axis_y_temp)
+		self.dot_plot.scatter(self.axis_x_temp, self.axis_y_temp)
 		self.dot_plot.ticklabel_format(axis = "x", style="sci", scilimits = (0,0))
 		self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 
@@ -1116,666 +1152,7 @@ class Threshold_window:
 
 		self.Update_GP()
 
-		#------------------------------------------------------------------------------------------------------
-		#--------------   Processing for one channel data   ---------------------------------------------------
-		#------------------------------------------------------------------------------------------------------
-		#------------------------------------------------------------------------------------------------------
-		
-		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 1:
 
-			ch1_ind = 0
-
-			main_xlim = self.peaks.get_xlim()
-			main_ylim = self.peaks.get_ylim()
-
-			int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
-
-			x1 = []
-			
-			y1 = []
-			
-			y1_raw = []
-
-			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
-							
-				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
-
-					
-
-
-					if len(x1) == 0:
-						x_min = 0
-					else:
-						x_min = max(x1) + x1[1] - x1[0]
-
-					x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x]
-
-					x1.extend(x_temp_1)
-					#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
-					y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.y)
-
-			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[ch1_ind]
-
-			if th1 == None:
-
-				if self.normalization_index == "z-score":
-
-					th1 = 2
-					
-
-				if self.normalization_index == "manual":
-
-
-					th1 = int(2*np.mean(y1_raw))
-					
-
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(th1))
-
-
-			if self.normalization_index == "z-score":
-				y1 = stats.zscore(y1_raw)
-		
-
-			if self.normalization_index == "manual":
-
-
-				y1 = y1_raw
-
-			
-
-			yh1 = []
-
-
-
-
-			
-			
-
-			for el in y1:
-				if el >= th1:
-					yh1.append(el)
-
-
-
-
-
-
-
-
-
-			#which_channel = self.Threshold.get()
-
-			
-			peaks, _ = find_peaks(y1, height=th1)
-
-
-
-
-			xp1 = []
-
-			yp1 = []
-
-			yp1_raw = []
-
-			yp1_raw_sep = []
-
-			widths1 = peak_widths(y1_raw, peaks, rel_height=0.5)[0]
-
-			prominences1 = peak_prominences(y1_raw, peaks)[0]
-
-
-
-
-
-
-
-
-
-			for p in peaks:
-				yp1_raw_sep.append(y1_raw[p])
-
-
-
-
-			for p in peaks:
-				xp1.append(x1[p])
-
-				yp1.append(y1[p])
-
-
-				yp1_raw.append(y1_raw[p])
-
-
-
-
-			intensities_norm_1 = np.divide(yp1_raw, widths1)
-			
-
-			if self.fit_all_flag == False:
-				
-
-
-
-				self.hist1.set_title("Peak intensity histograms")
-
-				self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-				self.hist1.set_ylabel('Counts')
-				self.hist1.set_xlabel('Intensity (a.u.)')
-
-
-
-
-				#self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
-				#self.peaks.hlines(th1, min(x1), max(x1), color = 'magenta', zorder=2)
-				
-				#if (self.var.get() == 1):
-					#self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
-
-				bins_1 = int(np.sqrt(len(yh1)))
-				if bins_1 == 0:
-					bins_1 = 1
-				#self.hist1.hist(yp1_raw_sep, bins = bins_1, label = "total: " + str(len(yp1_raw_sep)))
-
-				if self.Normalization_for_plot.get() == "Peak Intensity": 
-
-					self.hist1.set_title("Peak intensity histograms")
-
-					self.n, bins, patches = self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
-
-				if self.Normalization_for_plot.get() == "Peak Prominence":
-
-					self.hist1.set_title("Peak prominence histograms")
-
-					self.n, bins, patches = self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
-
-				if self.Normalization_for_plot.get() == "Peak width at half max":
-
-					self.hist1.set_title("Peak width histograms")
-
-					self.n, bins, patches = self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
-
-				self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1_raw)
-				self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1_raw)
-
-
-				self.save_plot_dict["channel 1 prominences"] = fcs_importer.XY_plot(xp1, prominences1)
-				self.save_plot_dict["channel 1 widths"] = fcs_importer.XY_plot(xp1, widths1)
-				self.save_plot_dict["channel 1 norm"] = fcs_importer.XY_plot(xp1, intensities_norm_1)
-
-				self.x_bins=[]
-				for ii in range (len(bins)-1):
-					self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
-
-				self.save_plot_dict["channel 1 hist"] = fcs_importer.XY_plot(self.x_bins, self.n)
-					
-
-
-
-				self.hist1.legend(loc='upper right')
-
-				self.canvas5.draw_idle()
-
-				self.figure5.tight_layout()
-					
-			
-
-		#------------------------------------------------------------------------------------------------------
-		#--------------   Processing for multiple channels data   ---------------------------------------------
-		#------------------------------------------------------------------------------------------------------
-		#------------------------------------------------------------------------------------------------------
-
-		if data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number == 21:
-
-
-
-
-
-
-
-
-
-
-			if self.normalization_index == "z-score":
-				y1 = stats.zscore(y1_raw)
-				y2 = stats.zscore(y2_raw)
-
-			if self.normalization_index == "manual":
-
-
-				y1 = y1_raw
-				y2 = y2_raw
-			
-
-			yh1 = []
-			yh2 = []
-
-
-
-			
-			
-
-			for el in y1:
-				if el >= th1:
-					yh1.append(el)
-
-			for el in y2:
-				if el >= th1:
-					yh2.append(el)
-
-
-
-			which_channel = self.Threshold.get()
-
-			
-			peaks1, _ = find_peaks(y1, height=th1)
-
-			peaks2, _ = find_peaks(y2, height=th2)
-
-
-
-
-
-			if which_channel == "channel 1":
-
-				peaks = peaks1
-
-			if which_channel == "channel 2":
-
-				peaks = peaks2
-
-			if which_channel == "both and":
-
-				peaks1_temp = []
-				for peak in peaks1:
-					if y2[peak] > th2:
-						peaks1_temp.append(peak)
-
-				peaks2_temp = []
-				for peak in peaks2:
-					if y1[peak] > th1:
-						peaks2_temp.append(peak)
-
-				peaks = list(set(peaks1_temp).union(set(peaks2_temp)))
-
-
-				#peaks = list(set(peaks1).intersection(set(peaks2)))
-
-			if which_channel == "both or":
-
-				peaks = list(set(peaks1).union(set(peaks2)))
-
-			
-
-			widths1 = peak_widths(y1_raw, peaks, rel_height=0.5)[0]
-
-
-
-			widths2 = peak_widths(y2_raw, peaks, rel_height=0.5)[0]
-
-			prominences1 = peak_prominences(y1_raw, peaks)[0]
-
-
-
-			prominences2 = peak_prominences(y2_raw, peaks)[0]
-
-
-
-			xp1 = []
-			xp2 = []
-			yp1 = []
-
-			yp1_raw = []
-			yp2 = []
-
-			yp2_raw = []
-
-			yp1_raw_sep = []
-			yp2_raw_sep = []
-
-
-
-
-			for p in peaks1:
-				yp1_raw_sep.append(y1_raw[p])
-
-			for p in peaks2:
-				yp2_raw_sep.append(y2_raw[p])
-
-
-			for p in peaks:
-				xp1.append(x1[p])
-				xp2.append(x1[p])
-				yp1.append(y1[p])
-				yp2.append(y2[p])
-
-				yp1_raw.append(y1_raw[p])
-				yp2_raw.append(y2_raw[p])
-
-
-			intensities_norm_1 = np.divide(yp1_raw, widths1)
-			intensities_norm_2 = np.divide(yp2_raw, widths2)
-
-			self.n_peaks = len(yp1_raw)
-
-			
-			
-
-			if self.fit_all_flag == False:
-
-				self.peaks.set_title("Intensity traces")
-				
-				self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-				self.peaks.set_ylabel('Intensity (a.u.)')
-				self.peaks.set_xlabel('Time (s)')
-
-				self.hist1.set_title("Peak intensity histograms")
-
-				self.hist1.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-				self.hist1.set_ylabel('Counts')
-				self.hist1.set_xlabel('Intensity (a.u.)')
-
-
-
-				if which_channel == "channel 1" or which_channel == "both or" or which_channel == "both and":
-					#self.peaks.plot(x1, y1_raw, '#1f77b4', zorder=1)
-					if self.normalization_index == "z-score": 
-						th1_line = np.mean(y1_raw) + th1 * np.std(y1_raw)
-					if self.normalization_index == "manual":
-						th1_line = th1
-					#self.peaks.hlines(th1_line, min(x1), max(x1), color = 'magenta', zorder=2, linestyle = "--")
-					
-					#if (self.var.get() == 1):
-						#self.peaks.plot(xp1, yp1_raw, "x", color = 'magenta', zorder = 3)
-
-					bins_1 = int(np.sqrt(len(yp1_raw)))
-					if bins_1 == 0:
-						bins_1 = 1
-
-
-					if self.Normalization_for_plot.get() == "Peak Intensity": 
-
-						self.hist1.set_title("Peak intensity histograms")
-
-						self.n, bins, patches = self.hist1.hist(yp1_raw, bins = bins_1, label = "total: " + str(len(yp1_raw)))
-
-					if self.Normalization_for_plot.get() == "Peak Prominence":
-
-						self.hist1.set_title("Peak prominence histograms")
-
-						self.n, bins, patches = self.hist1.hist(prominences1, bins = bins_1, label = "total: " + str(len(prominences1)))
-
-					if self.Normalization_for_plot.get() == "Peak width at half max":
-
-						self.hist1.set_title("Peak width histograms")
-
-						self.n, bins, patches = self.hist1.hist(widths1, bins = bins_1, label = "total: " + str(len(widths1)))
-
-					self.save_plot_dict["channel 1 fluct"] = fcs_importer.XY_plot(x1, y1_raw)
-					self.save_plot_dict["channel 1 peaks"] = fcs_importer.XY_plot(xp1, yp1_raw)
-					self.save_plot_dict["channel 1 prominences"] = fcs_importer.XY_plot(xp1, prominences1)
-					self.save_plot_dict["channel 1 widths"] = fcs_importer.XY_plot(xp1, widths1)
-					self.save_plot_dict["channel 1 norm"] = fcs_importer.XY_plot(xp1, intensities_norm_1)
-
-
-
-					self.x_bins=[]
-					for ii in range (len(bins)-1):
-						self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
-
-					self.save_plot_dict["channel 1 hist"] = fcs_importer.XY_plot(self.x_bins, self.n)
-					
-
-				if which_channel == "channel 2" or which_channel == "both or" or which_channel == "both and":
-					
-					#self.peaks.plot(x2, y2_raw, '#ff7f0e', zorder=1)
-					if self.normalization_index == "z-score": 
-						th2_line = np.mean(y2_raw) + th2 * np.std(y2_raw)
-					if self.normalization_index == "manual":
-						th2_line = th2
-					#self.peaks.hlines(th2_line, min(x2), max(x2), color = 'green', zorder=2, linestyle = "--")
-
-					#if (self.var.get() == 1):
-						#self.peaks.plot(xp2, yp2_raw, "x", color = 'green', zorder = 3)
-
-					bins_2 = int(np.sqrt(len(yp2_raw)))
-					if bins_2 == 0:
-						bins_2 = 1
-					
-
-					if self.Normalization_for_plot.get() == "Peak Intensity":
-
-						self.hist1.set_title("Peak intensity histograms")
-
-						self.n, bins, patches = self.hist1.hist(yp2_raw, bins = bins_2, label = "total: " + str(len(yp2_raw)))
-
-					if self.Normalization_for_plot.get() == "Peak Prominence":
-
-						self.hist1.set_title("Peak prominence histograms")
-
-						self.n, bins, patches = self.hist1.hist(prominences2, bins = bins_2, label = "total: " + str(len(prominences2)))
-
-					if self.Normalization_for_plot.get() == "Peak width at half max":
-
-						self.hist1.set_title("Peak width histograms")
-
-						self.n, bins, patches = self.hist1.hist(widths2, bins = bins_2, label = "total: " + str(len(widths2)))
-
-
-
-					self.save_plot_dict["channel 2 fluct"] = fcs_importer.XY_plot(x2, y2_raw)
-					self.save_plot_dict["channel 2 peaks"] = fcs_importer.XY_plot(xp2, yp2_raw)
-					self.save_plot_dict["channel 2 prominences"] = fcs_importer.XY_plot(xp2, prominences2)
-					self.save_plot_dict["channel 2 widths"] = fcs_importer.XY_plot(xp2, widths2)
-					self.save_plot_dict["channel 2 norm"] = fcs_importer.XY_plot(xp1, intensities_norm_2)
-
-					self.x_bins=[]
-					for ii in range (len(bins)-1):
-						self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
-
-					self.save_plot_dict["channel 2 hist"] = fcs_importer.XY_plot(self.x_bins, self.n)
-
-				"""if data_cont.change_normal == False:
-														self.peaks.set_xlim(main_xlim)
-														self.peaks.set_ylim(main_ylim)"""
-
-				self.hist1.legend(loc='upper right')
-
-			gp_list_temp = []
-			peaks_y_temp = []
-			peaks_x_temp = []
-
-
-
-			
-			norm_mean = np.mean(yp2_raw)
-			
-			for k in range (len(yp1_raw)):
-				gp_1 = (yp1_raw[k] - yp2_raw[k])/(yp2_raw[k] + yp1_raw[k])
-				#gp_1 = -(yp1_raw[k] - (yp2_raw[k]-norm_mean))/((yp2_raw[k]-norm_mean) + yp1_raw[k])
-				#gp_1 = yp2_raw[k]/yp1_raw[k]
-				#gp_list_temp.append(gp_1)
-
-				peaks_x_temp.append(yp1_raw[k])
-				peaks_y_temp.append(yp2_raw[k])
-
-
-				if abs(gp_1) < 1:
-					gp_list_temp.append(gp_1)
-
-
-
-
-			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch1_ind] = peaks_x_temp
-			data_cont.data_list_raw[data_cont.file_index].peaks[data_cont.rep_index, ch2_ind] = peaks_y_temp
-
-			data_cont.data_list_raw[data_cont.file_index].peak_prominences[data_cont.rep_index, ch1_ind] = prominences1
-			data_cont.data_list_raw[data_cont.file_index].peak_prominences[data_cont.rep_index, ch2_ind] = prominences2
-
-			data_cont.data_list_raw[data_cont.file_index].peak_widths[data_cont.rep_index, ch1_ind] = widths1
-			data_cont.data_list_raw[data_cont.file_index].peak_widths[data_cont.rep_index, ch2_ind] = widths2
-
-			if self.Normalization_for_plot.get() == "Peak Intensity":
-
-				axis_x_temp = peaks_x_temp
-				axis_y_temp = peaks_y_temp
-
-
-			if self.Normalization_for_plot.get() == "Peak Prominence":
-
-				axis_x_temp = prominences1
-				axis_y_temp = prominences2
-
-			if self.Normalization_for_plot.get() == "Peak width at half max":
-
-				axis_x_temp = widths1
-				axis_y_temp = widths2
-
-
-			
-			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
-
-			self.dot_plot.scatter(axis_x_temp, axis_y_temp)
-			self.dot_plot.ticklabel_format(axis = "x", style="sci", scilimits = (0,0))
-			self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-
-
-			self.save_plot_dict["dot plot"] = fcs_importer.XY_plot(axis_x_temp, axis_y_temp)
-
-				
-			
-
-			self.x_bins=[]
-			for ii in range (len(bins)-1):
-				self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
-
-			self.save_plot_dict["gp histogram"] = fcs_importer.XY_plot(self.x_bins, self.n)
-			self.save_plot_dict["gp list"] = gp_list_temp
-
-
-			if self.fit_all_flag == False:
-				self.gp_hist.set_title("GP histogram")
-				self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-				self.gp_hist.set_ylabel('Counts (Total: ' + str(len(gp_list_temp)) + ')' )
-				self.gp_hist.set_xlabel('GP')
-
-
-				if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
-
-
-					x1 = np.linspace(min(self.x_bins), max(self.x_bins), num=500)
-					popt = []
-
-					for param in data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index].keys():
-				
-
-						
-						if param != "Total peaks":
-							popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index][param]))
-
-
-
-
-					if self.Components.get() == '1 component':
-						#print("1 comp")
-						self.gp_hist.plot(x1, fun.Gauss(x1, *popt), 'r-', label='fit')
-
-						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt))
-
-
-						data = [
-						    ['A1', popt[0]],
-						    ['Mean1', popt[1]],
-						    ['Sigma1', popt[2]],
-
-						]
-
-						# Define column names
-						columns = ['Parameter', 'Value']
-
-						# Create a pandas DataFrame
-
-						self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
-
-
-
-
-						
-
-					if self.Components.get() == '2 components':
-						#print("2 comp")
-						self.gp_hist.plot(x1, fun.Gauss2(x1, *popt), 'r-', label='fit')
-						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss2(x1, *popt))
-
-						popt1 = popt[:3]
-						popt2 = popt[3:6]
-						
-						self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
-						self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
-
-						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
-						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
-
-						data = [
-						    ['A1', popt[0]],
-						    ['Mean1', popt[1]],
-						    ['Sigma1', popt[2]],
-						    ['A2', popt[3]],
-						    ['Mean2', popt[4]],
-						    ['Sigma2', popt[5]],
-
-						]
-
-						# Define column names
-						columns = ['Parameter', 'Value']
-
-						# Create a pandas DataFrame
-
-						self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
-
-					if self.Components.get() == '3 components':
-						self.gp_hist.plot(x1, fun.Gauss3(x1, *popt), 'r-', label='fit')
-						self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss3(x1, *popt))
-						#print("3 comp")
-						popt1 = popt[:3]
-						popt2 = popt[3:6]
-						popt3 = popt[6:9]
-						
-						self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
-						self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
-						self.gp_hist.plot(x1, fun.Gauss(x1, *popt3), color = 'yellow', label='fit')
-
-						self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
-						self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
-						self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt3))
-
-						data = [
-						    ['A1', popt[0]],
-						    ['Mean1', popt[1]],
-						    ['Sigma1', popt[2]],
-						    ['A2', popt[3]],
-						    ['Mean2', popt[4]],
-						    ['Sigma2', popt[5]],
-						    ['A3', popt[6]],
-						    ['Mean3', popt[7]],
-						    ['Sigma3', popt[8]],
-
-						]
-
-						# Define column names
-						columns = ['Parameter', 'Value']
-
-						# Create a pandas DataFrame
-
-						self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
-
-
-
-
-
-				self.canvas5.draw_idle()
-
-				self.figure5.tight_layout()
 
 			
 
@@ -2153,6 +1530,8 @@ class Threshold_window:
 
 		self.Threshold_entries()
 
+		self.GP_flags()
+
 	
 
 		current_repetitions_number = data_cont.data_list_raw[data_cont.file_index].repetitions
@@ -2183,15 +1562,7 @@ class Threshold_window:
 		self.Threshold.config(values = self.threshold_detection_list)
 		self.Threshold.set(self.threshold_detection_list[0])
 
-		self.blue_combobox.config(values = self.channels_gp_list)
-		self.blue_combobox.set(self.channels_gp_list[0])
-
-		self.red_combobox.config(values = self.channels_gp_list)
-		if len(self.channels_gp_list) > 1:
-			self.red_combobox.set(self.channels_gp_list[1])
-
-		if len(self.channels_gp_list) == 1:
-			self.red_combobox.set(" ")
+		
 
 
 
@@ -2261,6 +1632,54 @@ class Threshold_window:
 			self.channels_flags.append(tk.IntVar(value=1))
 			self.flags_dict[item.short_name] = tk.Checkbutton(self.frame_checks_2, text=very_short_name, variable=self.channels_flags[-1], command=self.Peaks)
 			self.flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+			column_counter +=1
+
+	def GP_flags(self):
+
+		self.blue_checks_subframe.destroy()
+
+		self.blue_checks_subframe = tk.Frame(self.blue_checks_frame)
+		self.blue_checks_subframe.pack(side = "top", anchor = "nw")
+
+		self.red_checks_subframe.destroy()
+
+		self.red_checks_subframe = tk.Frame(self.red_checks_frame)
+		self.red_checks_subframe.pack(side = "top", anchor = "nw")
+
+		#-------------------------------------------------------------------------------------------
+
+		
+
+	
+
+		self.blue_flags_dict = {}
+		self.blue_channels_flags = []
+
+		self.red_flags_dict = {}
+		self.red_channels_flags = []
+
+		
+
+		column_counter = 0
+
+		counter = 0
+
+		for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
+			str1, str2 = item.short_name.split(" ")
+			very_short_name = "ch0" + str2
+
+			self.blue_channels_flags.append(tk.IntVar(value=1))
+			self.blue_flags_dict[item.short_name] = tk.Checkbutton(self.blue_checks_subframe, text=very_short_name, variable=self.blue_channels_flags[-1], command=self.Change_channel_for_2D_GP)
+			self.blue_flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+
+
+			self.red_channels_flags.append(tk.IntVar(value=1))
+			self.red_flags_dict[item.short_name] = tk.Checkbutton(self.red_checks_subframe, text=very_short_name, variable=self.red_channels_flags[-1], command=self.Change_channel_for_2D_GP)
+			self.red_flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
+
+
+
+
 			column_counter +=1
 
 	def Threshold_entries(self):
@@ -2499,33 +1918,35 @@ class Threshold_window:
 		self.channels_gp_list = []
 
 		self.blue_label = tk.Label(self.gp_toggled.sub_frame, text="Blue channel: ")
-		self.blue_label.grid(row = 0, column = 0, sticky='w')
+		self.blue_label.pack(side = "top", anchor = "nw")
 
-		self.blue_combobox = ttk.Combobox(self.gp_toggled.sub_frame,values = self.channels_gp_list, width = 9 )
-		self.blue_combobox.config(state = "readonly")
-		self.blue_combobox.grid(row = 0, column = 1, sticky = 'w')
+		self.blue_checks_frame = tk.Frame(self.gp_toggled.sub_frame)
+		self.blue_checks_frame.pack(side = "top", anchor = "nw")
 
-		self.blue_combobox.bind("<<ComboboxSelected>>", self.Change_channel_for_2D_GP)
+		self.blue_checks_subframe = tk.Frame(self.blue_checks_frame)
+		self.blue_checks_subframe.pack(side = "top", anchor = "nw")
 
-		
+
+		#self.blue_combobox.bind("<<ComboboxSelected>>", self.Change_channel_for_2D_GP)
 
 		self.red_label = tk.Label(self.gp_toggled.sub_frame, text="Red channel: ")
-		self.red_label.grid(row = 1, column = 0, sticky='w')
+		self.red_label.pack(side = "top", anchor = "nw")
 
-		self.red_combobox = ttk.Combobox(self.gp_toggled.sub_frame,values = self.channels_gp_list, width = 9 )
-		self.red_combobox.config(state = "readonly")
-		self.red_combobox.grid(row = 1, column = 1, sticky = 'w')
+		self.red_checks_frame = tk.Frame(self.gp_toggled.sub_frame)
+		self.red_checks_frame.pack(side = "top", anchor = "nw")
 
-		self.red_combobox.bind("<<ComboboxSelected>>", self.Change_channel_for_2D_GP)
+		self.red_checks_subframe = tk.Frame(self.red_checks_frame)
+		self.red_checks_subframe.pack(side = "top", anchor = "nw")
+
 
 		self.blue_background_var = tk.IntVar()
 		self.red_background_var = tk.IntVar()
 
 		self.Subtract_background_blue = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract blue background", variable=self.blue_background_var, command=self.Update_GP)
-		self.Subtract_background_blue.grid(row = 2, column = 0, columnspan =2, sticky='w')
+		self.Subtract_background_blue.pack(side = "top", anchor = "nw")
 
 		self.Subtract_background_red = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract red background", variable=self.red_background_var, command=self.Update_GP)
-		self.Subtract_background_red.grid(row = 3, column = 0, columnspan =2, sticky='w')
+		self.Subtract_background_red.pack(side = "top", anchor = "nw")
 
 		#----------------------------------------------------------------------------------------------------
 		#-------------------------------- Fitting frame -----------------------------------------------------
@@ -2677,16 +2098,6 @@ class Threshold_window:
 
 		
 
-
-		
-
-
-
-
-		
-
-
-
 	def Temp(self):
 		print("Temp function called")
 
@@ -2723,7 +2134,3 @@ class ToggledFrame(tk.Frame):
         else:
             self.sub_frame.forget()
             self.toggle_button.configure(text='+')
-
-
-
-
