@@ -456,7 +456,7 @@ class Threshold_window:
 
 		self.Peaks()
 
-	def Change_channel_for_2D_GP(self, event):
+	def Change_channel_for_2D_GP(self):
 		self.Update_dot_plot()
 		self.Update_GP()
 
@@ -474,11 +474,12 @@ class Threshold_window:
 			keys.append(key)
 
 
-		self.axis_x_temp = np.array([0]*len(self.yp1_raw_dict[keys[0]]))
-		self.axis_y_temp = np.array([0]*len(self.yp1_raw_dict[keys[0]]))
+		self.axis_x_temp = np.array([0.0]*len(self.yp1_raw_dict[keys[0]]))
+		self.axis_y_temp = np.array([0.0]*len(self.yp1_raw_dict[keys[0]]))
 
 		
-
+		key1 = "channel "
+		key2 = "channel "
 
 
 		for i in range (len(keys)):
@@ -489,21 +490,29 @@ class Threshold_window:
 
 				if self.blue_channels_flags[i].get() == 1:
 
-					self.axis_x_temp += self.yp1_raw_dict[keys[i]]
+					key1 += str(i+1) + ", "
 
-				if self.blue_channels_flags[i].get() == 1:
+					self.axis_x_temp += np.array(self.yp1_raw_dict[keys[i]])
+
+				if self.red_channels_flags[i].get() == 1:
+
+					key2 += str(i+1) + ", "
 					
-					self.axis_y_temp = self.yp1_raw_dict[keys[i]]
+					self.axis_y_temp += np.array(self.yp1_raw_dict[keys[i]])
 
 			if self.Normalization_for_plot.get() == "Peak Prominence":
 
 				if self.blue_channels_flags[i].get() == 1:
 
-					self.axis_x_temp += self.prominence_dict[keys[i]]
+					key1 += str(i+1) + ", "
 
-				if self.blue_channels_flags[i].get() == 1:
+					self.axis_x_temp += np.array(self.prominence_dict[keys[i]])
+
+				if self.red_channels_flags[i].get() == 1:
+
+					key2 += str(i+1) + ", "
 					
-					self.axis_y_temp = self.prominence_dict[keys[i]]
+					self.axis_y_temp += np.array(self.prominence_dict[keys[i]])
 
 				
 
@@ -511,11 +520,19 @@ class Threshold_window:
 
 				if self.blue_channels_flags[i].get() == 1:
 
-					self.axis_x_temp += self.width_dict[keys[i]]
+					key1 += str(i+1) + ", "
 
-				if self.blue_channels_flags[i].get() == 1:
+					self.axis_x_temp += np.array(self.width_dict[keys[i]])
+
+				if self.red_channels_flags[i].get() == 1:
+
+					key2 += str(i+1) + ", "
 					
-					self.axis_y_temp = self.width_dict[keys[i]]
+					self.axis_y_temp += np.array(self.width_dict[keys[i]])
+
+
+		key1 = key1[ : -1]
+		key2 = key2[ : -1]
 
 
 
@@ -537,8 +554,9 @@ class Threshold_window:
 		self.dot_plot.ticklabel_format(axis = "x", style="sci", scilimits = (0,0))
 		self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 
-		self.dot_plot.set_ylabel(key1)
-		self.dot_plot.set_xlabel(key2)
+		self.dot_plot.set_xlabel(key1)
+		self.dot_plot.set_ylabel(key2)
+		
 
 		self.canvas5.draw_idle()
 
@@ -547,16 +565,17 @@ class Threshold_window:
 
 	def Update_GP (self):
 
+		
 		self.gp_hist.cla()
 
-		key1 = self.blue_combobox.get()
-		key2 = self.red_combobox.get()
+		#key1 = self.blue_combobox.get()
+		#key2 = self.red_combobox.get()
 
-		yp1_raw = self.yp1_raw_dict[key1]
-		yp2_raw = self.yp1_raw_dict[key2]
+		#yp1_raw = self.yp1_raw_dict[key1]
+		#yp2_raw = self.yp1_raw_dict[key2]
 
-		mean1 = self.means_dict[key1]
-		mean2 = self.means_dict[key2]
+		mean1 = np.mean(self.axis_x_temp)
+		mean2 = np.mean(self.axis_y_temp)
 
 		peaks_x_temp = []
 		peaks_y_temp = []
@@ -569,7 +588,7 @@ class Threshold_window:
 
 		
 
-		for k in range (len(yp1_raw)):
+		for k in range (len(self.axis_x_temp)):
 			
 
 			
@@ -577,15 +596,15 @@ class Threshold_window:
 
 			if self.blue_background_var.get() == 1:
 				#print ("subtract background blue")
-				I1 = yp1_raw[k] - mean1
+				I1 = self.axis_x_temp[k] - mean1
 			else:
-				I1 = yp1_raw[k]
+				I1 = self.axis_x_temp[k]
 
 			if self.red_background_var.get() == 1:
 				#print ("subtract background red")
-				I2 = yp2_raw[k] - mean2
+				I2 = self.axis_y_temp[k] - mean2
 			else:
-				I2 = yp2_raw[k]
+				I2 = self.axis_y_temp[k]
 
 
 			if I1 != 0 and I2 !=0:
@@ -597,8 +616,8 @@ class Threshold_window:
 				if abs(gp_1) < 1:
 					gp_list_temp.append(gp_1)
 
-			peaks_x_temp.append(yp1_raw[k])
-			peaks_y_temp.append(yp2_raw[k])
+			peaks_x_temp.append(I1)
+			peaks_y_temp.append(I2)
 
 
 
@@ -613,7 +632,7 @@ class Threshold_window:
 			
 
 
-			
+		#print("Mean: ", np.mean(gp_list_temp))
 
 
 		self.data_frames_import ["GP Plot"] = pd.DataFrame({"GP list": gp_list_temp})
@@ -624,6 +643,8 @@ class Threshold_window:
 			self.gp_hist.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 			self.gp_hist.set_ylabel('Counts (Total: ' + str(len(gp_list_temp)) + ')' )
 			self.gp_hist.set_xlabel('GP')
+
+			#print(gp_list_temp)
 
 			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
 
@@ -813,7 +834,7 @@ class Threshold_window:
 		if self.fit_all_flag == False:
 				
 
-			self.peaks.set_title("Intensity traces")
+			self.peaks.set_title(data_cont.tree_list_name[data_cont.file_index] + " Repetition: " + str(data_cont.rep_index + 1))
 			
 			self.peaks.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 			self.peaks.set_ylabel('Intensity (a.u.)')
@@ -940,16 +961,14 @@ class Threshold_window:
 		y1_raw = y1_raw_list [channel_i]
 		th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
 
-		#print(self.means_dict)
+		
 
 
 		if self.normalization_index == "z-score":
 			y1 = stats.zscore(y1_raw)
 
 		
-		print("---------------------------------------------")
-		print("threshold: ", th1)
-		print("---------------------------------------------")
+		
 		peaks1, _ = find_peaks(y1, height=th1)
 
 
@@ -1526,6 +1545,8 @@ class Threshold_window:
 		data_cont.file_index = file1-1
 		data_cont.rep_index = rep1-1
 
+		
+
 		self.Channel_flags()
 
 		self.Threshold_entries()
@@ -1714,7 +1735,7 @@ class Threshold_window:
 			self.thresholds_entry_dict[item.short_name].insert(0,str(2))
 
 
-			print(item.short_name)
+			
 
 			first_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'Start'])
 			second_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'End'])
@@ -1942,10 +1963,10 @@ class Threshold_window:
 		self.blue_background_var = tk.IntVar()
 		self.red_background_var = tk.IntVar()
 
-		self.Subtract_background_blue = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract blue background", variable=self.blue_background_var, command=self.Update_GP)
+		self.Subtract_background_blue = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract blue background", variable=self.blue_background_var, command=self.Change_channel_for_2D_GP)
 		self.Subtract_background_blue.pack(side = "top", anchor = "nw")
 
-		self.Subtract_background_red = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract red background", variable=self.red_background_var, command=self.Update_GP)
+		self.Subtract_background_red = tk.Checkbutton(self.gp_toggled.sub_frame, text="Subtract red background", variable=self.red_background_var, command=self.Change_channel_for_2D_GP)
 		self.Subtract_background_red.pack(side = "top", anchor = "nw")
 
 		#----------------------------------------------------------------------------------------------------
