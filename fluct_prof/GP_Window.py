@@ -14,6 +14,8 @@ import lmfit
 
 import time
 
+import warnings
+
 
 from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
@@ -1003,10 +1005,14 @@ class Threshold_window:
 			self.yp1_raw_dict[key] = yp1_raw
 
 
+			warnings.filterwarnings('ignore')
+
 
 			self.width_dict[key] = peak_widths(y1_raw, peaks1, rel_height=0.5)[0]			
 
 			self.prominence_dict[key] = peak_prominences(y1_raw, peaks1)[0]
+
+			warnings.filterwarnings('default')
 
 
 		self.n_peaks = len(peaks1)
@@ -1735,10 +1741,15 @@ class Threshold_window:
 			self.thresholds_entry_dict[item.short_name].insert(0,str(2))
 
 
-			
+			#selected_element = df.loc[df['Name'] == 'Jane', 'Age']
+			#selected_element = df.at[df['Name'].eq('Jane').idxmax(), 'Age']
 
 			first_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'Start'])
 			second_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'End'])
+
+			#first_part = int(metadata.at[metadata['Channel'].eq(item.short_name), 'Start'])
+			#second_part = int(metadata.at[metadata['Channel'].eq(item.short_name), 'End'])
+
 
 
 			text1 = str(first_part) + " nm - " + str(second_part) + " nm"

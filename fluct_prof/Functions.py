@@ -674,7 +674,7 @@ def Which_tab():
 
 def Threshold_fun():
 
-	print(data_c.initialdirectory)
+	#print(data_c.initialdirectory)
 
 
 	if len(data_c.tree_list_name) > 0:

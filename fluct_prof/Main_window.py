@@ -147,13 +147,17 @@ class Left_frame :
 		
 		
 	def Continue_Import(self):
-		print("Continuing import")
+		#print("Continuing import")
 		self.dataset_list = fcs_importer.Fill_datasets_fcs(self.lines)
 
 
 		for self.dataset in self.dataset_list:
 
-			self.name1 = self.dataset.position + "__" + self.name 
+			if self.dataset.position != None:
+
+				self.name1 = self.dataset.position + "__" + self.name 
+			else:
+				self.name1 = self.name
 
 			treetree = d_tree.Data_tree (self.tree, self.name1, self.dataset.repetitions)
 			self.tree.selection_set(treetree.child_id)
@@ -474,6 +478,7 @@ class Left_frame :
 
 	def Curve_flags(self):
 
+
 		self.frame0003.destroy()
 
 		self.frame0003 = tk.Frame(self.frame024)
@@ -486,10 +491,12 @@ class Left_frame :
 
 		channels_to_display = 0
 
-		for i in range (len(data_cont.data_list_raw)):
-			if data_cont.data_list_raw[i].datasets_list[0].channels_number > channels_to_display:
-				channels_to_display = data_cont.data_list_raw[i].datasets_list[0].channels_number
-				file_index_local = i
+		"""for i in range (len(data_cont.data_list_raw)):
+									if data_cont.data_list_raw[i].datasets_list[0].channels_number > channels_to_display:
+										channels_to_display = data_cont.data_list_raw[i].datasets_list[0].channels_number
+										file_index_local = i"""
+
+		file_index_local = data_cont.file_index
 
 
 		for item in data_cont.data_list_raw[file_index_local].datasets_list[data_cont.rep_index].channels_list:

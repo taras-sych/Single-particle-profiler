@@ -354,7 +354,7 @@ def Fill_datasets_fcs( list_file):
 
                 full_dataset_list.append(full_dataset)
 
-                print("position imported: ", full_dataset.position)
+                #print("position imported: ", full_dataset.position)
 
 
 
@@ -364,7 +364,15 @@ def Fill_datasets_fcs( list_file):
                 dataset_list = []
                 
 
-                if position == positions -1:           
+                if position == positions -1: 
+
+                    
+
+                    if positions == 1:
+                        full_dataset.position = None
+
+                    
+
 
                     
                     

@@ -49,6 +49,8 @@ import random
 
 import seaborn as sns
 
+import warnings
+
 
 #--------------------------
 #End of importing general modules
@@ -71,7 +73,11 @@ from fluct_prof import Data_container as data_c
 #End of importing own modules
 #--------------------------
 
+#--------------------------
+#Ignore warnings
+#--------------------------
 
+#warnings.filterwarnings('ignore')
 
 
 sns.set(context='notebook', style='whitegrid')
