@@ -109,8 +109,33 @@ class Threshold_window:
 
 		writer = pd.ExcelWriter(filename, engine='xlsxwriter')
 
+
+
 		for key in self.data_frames_import.keys():
-			self.data_frames_import[key].to_excel(writer, sheet_name=key)
+
+			if key == "Traces":
+				if self.plot_var["Traces"].get() == 1:
+					self.data_frames_import[key].to_excel(writer, sheet_name=key)
+
+			if key == "Intensity peaks" or key == "Prominences" or key == "Widths":
+				if self.plot_var["Peaks"].get() == 1:
+					self.data_frames_import[key].to_excel(writer, sheet_name=key)
+
+			if key == "Histograms":
+				if self.plot_var["Intensity Histogram"].get() == 1:
+					self.data_frames_import[key].to_excel(writer, sheet_name=key)
+
+			if key == "Dot Plot":
+				if self.plot_var["Dot Plot"].get() == 1:
+					self.data_frames_import[key].to_excel(writer, sheet_name=key)
+
+			if key == "GP Plot":
+				if self.plot_var["GP Plot"].get() == 1:
+					self.data_frames_import[key].to_excel(writer, sheet_name=key)
+
+			if key == "Fitting Parameters":
+				if self.plot_var["GP Fit"].get() == 1:
+					self.data_frames_import[key].to_excel(writer, sheet_name=key)
 
 		data_cont.data_list_raw[data_cont.file_index].metadata.to_excel(writer, sheet_name="Metadata")
 
@@ -313,10 +338,23 @@ class Threshold_window:
 
 		output_dict = {}
 
+		
+
 		params = o1.params
 		print ("Chi_Sqr = ", o1.chisqr)
 		print ("Reduced Chi_Sqr = ", o1.redchi)
 		print ("Score = ", o1.bic)
+
+		#fitting_scores ["Chi_Sqr = "] = o1.chisqr
+		#fitting_scores ["Reduced Chi_Sqr = "] = o1.redchi
+		fitting_scores = [
+						    ["Chi_Sqr = ", o1.chisqr],
+						    ["Reduced Chi_Sqr = ", o1.redchi],
+						    ["Score = ", o1.bic],
+
+						]
+		
+		#self.data_frames_import ["GP Plot Score"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
 		popt = []
 		for param in self.list_of_params:
 			
@@ -347,6 +385,8 @@ class Threshold_window:
 			if self.Components.get() == '1 component':
 				self.gp_hist.plot(x1, fun.Gauss(x1, *popt), 'r-', label='fit')
 				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt))
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"GP_fit": fun.Gauss(x1, *popt)})], axis=1)
 
 				data = [
 						    ['A1', popt[0]],
@@ -362,13 +402,21 @@ class Threshold_window:
 
 				self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
 
+				self.data_frames_import ["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
 			if self.Components.get() == '2 components':
 				self.gp_hist.plot(x1, fun.Gauss2(x1, *popt), 'r-', label='fit')
 				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss2(x1, *popt))
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"GP_fit": fun.Gauss2(x1, *popt)})], axis=1)
 				popt1 = popt[:3]
 				popt2 = popt[3:6]
 				self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
 				self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 1": fun.Gauss(x1, *popt1)})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 2": fun.Gauss(x1, *popt2)})], axis=1)
 
 				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
 				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
@@ -390,9 +438,14 @@ class Threshold_window:
 
 				self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
 
+				self.data_frames_import ["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
 			if self.Components.get() == '3 components':
 				self.gp_hist.plot(x1, fun.Gauss3(x1, *popt), 'r-', label='fit')
 				self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss3(x1, *popt))
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"GP_fit": fun.Gauss3(x1, *popt)})], axis=1)
+				
 				popt1 = popt[:3]
 				popt2 = popt[3:6]
 				popt3 = popt[6:9]
@@ -403,6 +456,13 @@ class Threshold_window:
 				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
 				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
 				self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt3))
+
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 1": fun.Gauss(x1, *popt1)})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 2": fun.Gauss(x1, *popt2)})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 3": fun.Gauss(x1, *popt3)})], axis=1)
 
 				data = [
 						    ['A1', popt[0]],
@@ -423,6 +483,19 @@ class Threshold_window:
 						# Create a pandas DataFrame
 
 				self.save_plot_dict["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
+
+
+				self.data_frames_import ["Fitting Parameters"] = pd.DataFrame(data, columns=columns)
+
+			#print(self.data_frames_import ["Fitting Parameters"])
+			#print(pd.DataFrame(fitting_scores))
+
+			#print(pd.DataFrame(fitting_scores, columns=columns))
+
+			#columns = ['Score parameter', 'Value']
+
+			self.data_frames_import ["Fitting Parameters"] = pd.concat([self.data_frames_import ["Fitting Parameters"], pd.DataFrame(fitting_scores, columns=columns)], axis=0)
 
 
 
@@ -752,7 +825,7 @@ class Threshold_window:
 					#self.save_plot_dict["sum of gaussians"] = fcs_importer.XY_plot(x1, fun.Gauss3(x1, *popt))
 
 					self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
-					self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"GP_fit": fun.Gauss2(x1, *popt)})], axis=1)
+					self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"GP_fit": fun.Gauss3(x1, *popt)})], axis=1)
 
 					#print("3 comp")
 					popt1 = popt[:3]
@@ -856,6 +929,10 @@ class Threshold_window:
 
 		y1_raw_list = {}
 
+		x1_dict = {}
+
+		y1_raw_dict = {}
+
 		for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
 			
@@ -893,11 +970,18 @@ class Threshold_window:
 			x1_list [channel] = x1
 			y1_raw_list [channel] = y1_raw
 
+			x1_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].short_name] = x1
+			y1_raw_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].short_name] = y1_raw
+
+
+
 			if self.fit_all_flag == False:
 				if self.channels_flags[flag_counter].get() == 1:
 					self.peaks.plot(x1, y1_raw, zorder=1, label = data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].short_name)
 
 			flag_counter += 1
+
+		self.data_frames_import ["Traces"] =pd.concat([pd.DataFrame({"time": x1_dict["channel 1"]}), pd.DataFrame(y1_raw_dict)], axis=1)
 
 
 		
@@ -1017,7 +1101,7 @@ class Threshold_window:
 
 		self.n_peaks = len(peaks1)
 
-		self.data_frames_import = {}		
+			
 
 		self.data_frames_import ["Intensity peaks"] =pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.yp1_raw_dict)], axis=1) 
 		self.data_frames_import ["Prominences"] = pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.prominence_dict)], axis=1) 
@@ -1768,6 +1852,8 @@ class Threshold_window:
 
 	def __init__(self, win_width, win_height, dpi_all):
 
+		self.data_frames_import = {}
+
 
 		
 		self.save_plot_dict = {}
@@ -2131,10 +2217,11 @@ class Threshold_window:
 		
 
 	def Temp(self):
-		print("Temp function called")
+		pass
+		#print("Temp function called")
 
-		for key in self.plot_var.keys():
-			print(key, self.plot_var[key].get())
+		#for key in self.plot_var.keys():
+			#print(key, self.plot_var[key].get())
 
 
 
