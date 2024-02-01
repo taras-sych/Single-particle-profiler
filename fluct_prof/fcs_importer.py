@@ -76,6 +76,9 @@ class Full_dataset_fcs:
 
         self.metadata = None
 
+        self.blue_setup = None
+        self.red_setup = None
+
 
         self.repetitions = repetitions_arg
         self.datasets_list = dataset_list_arg

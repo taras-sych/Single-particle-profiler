@@ -622,23 +622,25 @@ class Threshold_window:
 
 
 
+		if self.fit_all_flag == False:
 
+			self.dot_plot.scatter(self.axis_x_temp, self.axis_y_temp)
+			self.dot_plot.ticklabel_format(axis = "x", style="sci", scilimits = (0,0))
+			self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 
+			self.dot_plot.set_xlabel(key1)
+			self.dot_plot.set_ylabel(key2)
+			
 
-		self.dot_plot.scatter(self.axis_x_temp, self.axis_y_temp)
-		self.dot_plot.ticklabel_format(axis = "x", style="sci", scilimits = (0,0))
-		self.dot_plot.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+			self.canvas5.draw_idle()
 
-		self.dot_plot.set_xlabel(key1)
-		self.dot_plot.set_ylabel(key2)
-		
-
-		self.canvas5.draw_idle()
-
-		self.figure5.tight_layout()
+			self.figure5.tight_layout()
 
 
 	def Update_GP (self):
+
+		data_cont.data_list_raw[data_cont.file_index].blue_setup = self.blue_channels_flags
+		data_cont.data_list_raw[data_cont.file_index].red_setup = self.red_channels_flags
 
 		
 		self.gp_hist.cla()
@@ -656,6 +658,13 @@ class Threshold_window:
 		peaks_y_temp = []
 
 		gp_list_temp = []
+
+		print("blue: ")
+		for item in data_cont.data_list_raw[data_cont.file_index].blue_setup:
+			print(item.get())
+		print("red: ")
+		for item in data_cont.data_list_raw[data_cont.file_index].red_setup:
+			print(item.get())
 
 		
 
@@ -711,6 +720,14 @@ class Threshold_window:
 
 
 		self.data_frames_import ["GP Plot"] = pd.DataFrame({"GP list": gp_list_temp})
+
+		if self.fit_all_flag == True:
+						
+			self.n, bins, patches = self.gp_hist.hist(gp_list_temp, bins = int(np.sqrt(len(gp_list_temp))))
+
+			self.x_bins=[]
+			for ii in range (len(bins)-1):
+				self.x_bins.append( (bins[ii+1] - bins[ii])/2 + bins[ii])
 
 
 		if self.fit_all_flag == False:
@@ -1250,8 +1267,8 @@ class Threshold_window:
 		#------------------------------------------------------------------------------------------------------
 
 
-		if self.fit_all_flag == False:
-			self.Update_dot_plot()	
+		
+		self.Update_dot_plot()	
 
 
 		#------------------------------------------------------------------------------------------------------
@@ -1757,17 +1774,62 @@ class Threshold_window:
 		self.red_checks_subframe = tk.Frame(self.red_checks_frame)
 		self.red_checks_subframe.pack(side = "top", anchor = "nw")
 
-		#-------------------------------------------------------------------------------------------
+		self.blue_channels_flags = []
+
+		self.red_channels_flags = []
+
+		for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
+			self.blue_channels_flags.append(tk.IntVar(value=1))
+			self.red_channels_flags.append(tk.IntVar(value=1))
+
+
+		value1 = np.mean(range(len(self.red_channels_flags)))
+
+
+
+		if data_cont.data_list_raw[data_cont.file_index].blue_setup == None:
+
+			data_cont.data_list_raw[data_cont.file_index].blue_setup = []
+
+			for i in range(len(self.blue_channels_flags)):
+
+				if i < value1:
+					data_cont.data_list_raw[data_cont.file_index].blue_setup.append(tk.IntVar(value=1))
+
+				if i > value1:
+					data_cont.data_list_raw[data_cont.file_index].blue_setup.append(tk.IntVar(value=0))
+
+        
+
+		if data_cont.data_list_raw[data_cont.file_index].red_setup == None:
+
+			data_cont.data_list_raw[data_cont.file_index].red_setup = []
+
+			for i in range(len(self.red_channels_flags)):
+
+				if i < value1:
+					data_cont.data_list_raw[data_cont.file_index].red_setup.append(tk.IntVar(value=0))
+
+				if i > value1:
+					data_cont.data_list_raw[data_cont.file_index].red_setup.append(tk.IntVar(value=1))
+
+
+
+		self.blue_channels_flags = data_cont.data_list_raw[data_cont.file_index].blue_setup
+		self.red_channels_flags = data_cont.data_list_raw[data_cont.file_index].red_setup
+
+
+
 
 		
 
 	
 
 		self.blue_flags_dict = {}
-		self.blue_channels_flags = []
+		
 
 		self.red_flags_dict = {}
-		self.red_channels_flags = []
+		
 
 		
 
@@ -1779,13 +1841,13 @@ class Threshold_window:
 			str1, str2 = item.short_name.split(" ")
 			very_short_name = "ch0" + str2
 
-			self.blue_channels_flags.append(tk.IntVar(value=1))
-			self.blue_flags_dict[item.short_name] = tk.Checkbutton(self.blue_checks_subframe, text=very_short_name, variable=self.blue_channels_flags[-1], command=self.Change_channel_for_2D_GP)
+			#self.blue_channels_flags.append(tk.IntVar(value=1))
+			self.blue_flags_dict[item.short_name] = tk.Checkbutton(self.blue_checks_subframe, text=very_short_name, variable=self.blue_channels_flags[column_counter], command=self.Change_channel_for_2D_GP)
 			self.blue_flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
 
 
-			self.red_channels_flags.append(tk.IntVar(value=1))
-			self.red_flags_dict[item.short_name] = tk.Checkbutton(self.red_checks_subframe, text=very_short_name, variable=self.red_channels_flags[-1], command=self.Change_channel_for_2D_GP)
+			#self.red_channels_flags.append(tk.IntVar(value=1))
+			self.red_flags_dict[item.short_name] = tk.Checkbutton(self.red_checks_subframe, text=very_short_name, variable=self.red_channels_flags[column_counter], command=self.Change_channel_for_2D_GP)
 			self.red_flags_dict[item.short_name].grid(row = 0, column = column_counter, sticky='w')
 
 
