@@ -137,7 +137,15 @@ class Threshold_window:
 				if self.plot_var["GP Fit"].get() == 1:
 					self.data_frames_import[key].to_excel(writer, sheet_name=key)
 
-		data_cont.data_list_raw[data_cont.file_index].metadata.to_excel(writer, sheet_name="Metadata")
+
+		output_metadataframe = pd.DataFrame()
+
+		threshold_header = "Threshold (" + self.normalization_index + ")"
+
+		output_metadataframe = pd.concat([data_cont.data_list_raw[data_cont.file_index].metadata, pd.DataFrame({threshold_header: data_cont.data_list_raw[data_cont.file_index].threshold_list})], axis=1)
+	
+
+		output_metadataframe.to_excel(writer, sheet_name="Metadata")
 
 		writer.close()
 
@@ -659,12 +667,12 @@ class Threshold_window:
 
 		gp_list_temp = []
 
-		print("blue: ")
-		for item in data_cont.data_list_raw[data_cont.file_index].blue_setup:
-			print(item.get())
-		print("red: ")
-		for item in data_cont.data_list_raw[data_cont.file_index].red_setup:
-			print(item.get())
+		"""print("blue: ")
+								for item in data_cont.data_list_raw[data_cont.file_index].blue_setup:
+									print(item.get())
+								print("red: ")
+								for item in data_cont.data_list_raw[data_cont.file_index].red_setup:
+									print(item.get())"""
 
 		
 
@@ -1047,8 +1055,8 @@ class Threshold_window:
 					th1 = int(2*np.mean(y1_raw))
 
 
-				self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].delete(0,"end")
-				self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].insert(0,str(th1))
+			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].delete(0,"end")
+			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].insert(0,str(th1))
 
 			data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i] = th1
 
