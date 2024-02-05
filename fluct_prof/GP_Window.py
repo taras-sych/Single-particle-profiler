@@ -1062,7 +1062,17 @@ class Threshold_window:
 
 			self.means_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name] = np.mean(y1_raw)
 
-		channel = self.Threshold.get()
+		
+		
+		
+		if data_cont.data_list_raw[data_cont.file_index].detection_how == None:
+
+			channel = self.Threshold.get()
+
+			data_cont.data_list_raw[data_cont.file_index].detection_how = channel
+		else:
+
+			channel = data_cont.data_list_raw[data_cont.file_index].detection_how
 
 		str1, str2 = channel.split(' ')
 
@@ -1077,6 +1087,9 @@ class Threshold_window:
 
 		if self.normalization_index == "z-score":
 			y1 = stats.zscore(y1_raw)
+
+		if self.normalization_index == "manual":
+			y1 = y1_raw
 
 		
 		
@@ -1437,7 +1450,15 @@ class Threshold_window:
 
 	def Threshold_callback(self, event):
 
-			self.Peaks()
+		
+
+		data_cont.data_list_raw[data_cont.file_index].detection_how = self.Threshold.get()
+
+		
+
+
+
+		self.Peaks()
 
 
 	def Put_default(self):
@@ -1445,60 +1466,27 @@ class Threshold_window:
 		self.normalization_index = self.Normalization.get()
 
 		if self.normalization_index == "z-score":
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(1))
 
-			
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(1))
+			for key in self.thresholds_entry_dict.keys():
+				self.thresholds_entry_dict[key].delete(0,"end")
+				self.thresholds_entry_dict[key].insert(0,str(2))
 
 		if self.normalization_index == "manual":
 
-
-
-			x1 = []
-			x2 = []
-			y1 = []
-			y2 = []
-			y1_raw = []
-			y2_raw = []
-
-			int_div = int(data_cont.rep_index/data_cont.data_list_raw[data_cont.file_index].binning)
-
-			for rep_index_i in range (data_cont.data_list_raw[data_cont.file_index].repetitions):
-							
-				if int(rep_index_i/data_cont.data_list_raw[data_cont.file_index].binning) == int_div:
-
-					
-
-
-					if len(x1) == 0:
-						x_min = 0
-					else:
-						x_min = max(x1) + x1[1] - x1[0]
-
-					x_temp_1 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.x]
-					x_temp_2 = [elem + x_min for elem in data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.x]
-
-
-					x1.extend(x_temp_1)
-					#y1.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[0].fluct_arr.y)
-					y1_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch1_ind].fluct_arr.y)
-
-					x2.extend(x_temp_2)
-					#y2.extend(data_list_current[data_cont.file_index].datasets_list[rep_index_i].channels_list[1].fluct_arr.y)
-					y2_raw.extend(data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[ch2_ind].fluct_arr.y)
-
-
-
-			self.ch1_th.delete(0,"end")
-			self.ch1_th.insert(0,str(round(np.mean(y1_raw),2)))
+			for key in self.thresholds_entry_dict.keys():
+				self.thresholds_entry_dict[key].delete(0,"end")
+				self.thresholds_entry_dict[key].insert(0,str(self.means_dict[key]))
 
 			
-			self.ch2_th.delete(0,"end")
-			self.ch2_th.insert(0,str(round(np.mean(y2_raw),2)))
+
+
+
+			
 
 		self.Update_thresholds_button.invoke()
+
+	def Apply_thresholds(self):
+		print("Apply to all")
 
 
 	def Normalize(self):
@@ -1696,7 +1684,15 @@ class Threshold_window:
 		self.threshold_detection_list.append("all")
 
 		self.Threshold.config(values = self.threshold_detection_list)
-		self.Threshold.set(self.threshold_detection_list[0])
+
+		
+		
+		if data_cont.data_list_raw[data_cont.file_index].detection_how != None:
+
+			self.Threshold.set(data_cont.data_list_raw[data_cont.file_index].detection_how)
+		else:
+		
+			self.Threshold.set(self.threshold_detection_list[0])
 
 		
 
@@ -2092,8 +2088,11 @@ class Threshold_window:
 		self.Update_thresholds_button = tk.Button(self.frame001, text="Update thresholds", command=self.Update_thresholds)
 		self.Update_thresholds_button.grid(row = 7, column = 0, columnspan = 2, sticky='ew')
 
+		self.Apply_thresholds_button = tk.Button(self.frame001, text="Apply to all", command=self.Apply_thresholds)
+		self.Apply_thresholds_button.grid(row = 8, column = 0, columnspan = 2, sticky='ew')
+
 		self.Put_mean_button = tk.Button(self.frame001, text="Set to default", command=self.Put_default)
-		self.Put_mean_button.grid(row = 8, column = 0, columnspan = 2, sticky='ew')
+		self.Put_mean_button.grid(row = 9, column = 0, columnspan = 2, sticky='ew')
 
 		#----------------------------------------------------------------------------------------------------
 		#-------------------------------- GP calculation widgets --------------------------------------------

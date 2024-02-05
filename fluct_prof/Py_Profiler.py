@@ -77,7 +77,7 @@ from fluct_prof import Data_container as data_c
 #Ignore warnings
 #--------------------------
 
-#warnings.filterwarnings('ignore')
+warnings.filterwarnings('ignore')
 
 
 sns.set(context='notebook', style='whitegrid')
