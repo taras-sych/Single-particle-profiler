@@ -1052,7 +1052,7 @@ class Threshold_window:
 				if self.normalization_index == "manual":
 
 
-					th1 = int(2*np.mean(y1_raw))
+					th1 = round(np.mean(y1_raw))
 
 
 			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].delete(0,"end")
@@ -1127,14 +1127,14 @@ class Threshold_window:
 			self.yp1_raw_dict[key] = yp1_raw
 
 
-			warnings.filterwarnings('ignore')
+			#warnings.filterwarnings('ignore')
 
 
 			self.width_dict[key] = peak_widths(y1_raw, peaks1, rel_height=0.5)[0]			
 
 			self.prominence_dict[key] = peak_prominences(y1_raw, peaks1)[0]
 
-			warnings.filterwarnings('default')
+			#warnings.filterwarnings('default')
 
 
 		self.n_peaks = len(peaks1)
@@ -1475,7 +1475,8 @@ class Threshold_window:
 
 			for key in self.thresholds_entry_dict.keys():
 				self.thresholds_entry_dict[key].delete(0,"end")
-				self.thresholds_entry_dict[key].insert(0,str(self.means_dict[key]))
+				self.thresholds_entry_dict[key].insert(0,str(round(self.means_dict[key])))
+
 
 			
 
@@ -1737,6 +1738,9 @@ class Threshold_window:
 
 
 		data_cont.data_list_raw[data_cont.file_index].binning = int(self.Binning_choice.get())
+
+
+		self.Put_default()
 
 		
 
