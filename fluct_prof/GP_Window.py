@@ -524,7 +524,8 @@ class Threshold_window:
 			data_cont.data_list_raw[data_cont.file_index].threshold_list[channel] = float(self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel].short_name].get())
 
 		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
-				data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
+			
+			data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] = None
 
 
 
@@ -1478,16 +1479,22 @@ class Threshold_window:
 				self.thresholds_entry_dict[key].insert(0,str(round(self.means_dict[key])))
 
 
-			
-
-
-
-			
-
+		
 		self.Update_thresholds_button.invoke()
 
 	def Apply_thresholds(self):
-		print("Apply to all")
+		ref_channel = data_cont.data_list_raw[data_cont.file_index].detection_how
+
+		th_list = data_cont.data_list_raw[data_cont.file_index].threshold_list
+
+		ch_num = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_number
+
+
+
+		for i in range (len(data_cont.data_list_raw)):
+			if data_cont.data_list_raw[i].datasets_list[0].channels_number == ch_num:
+				data_cont.data_list_raw[i].detection_how = ref_channel
+				data_cont.data_list_raw[i].threshold_list = th_list
 
 
 	def Normalize(self):
