@@ -381,7 +381,7 @@ def Fill_datasets_csv( df):
 
     for column in df.columns[1:]:
 
-        #print(column)
+        print(column)
 
         str1 , str2 = column.split('S')
 
