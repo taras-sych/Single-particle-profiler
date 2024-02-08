@@ -1912,18 +1912,20 @@ class Threshold_window:
 			#selected_element = df.loc[df['Name'] == 'Jane', 'Age']
 			#selected_element = df.at[df['Name'].eq('Jane').idxmax(), 'Age']
 
-			first_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'Start'])
-			second_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'End'])
+			if type(metadata) != type(None):
 
-			#first_part = int(metadata.at[metadata['Channel'].eq(item.short_name), 'Start'])
-			#second_part = int(metadata.at[metadata['Channel'].eq(item.short_name), 'End'])
+				first_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'Start'])
+				second_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'End'])
+
+				#first_part = int(metadata.at[metadata['Channel'].eq(item.short_name), 'Start'])
+				#second_part = int(metadata.at[metadata['Channel'].eq(item.short_name), 'End'])
 
 
 
-			text1 = str(first_part) + " nm - " + str(second_part) + " nm"
+				text1 = str(first_part) + " nm - " + str(second_part) + " nm"
 
-			self.wavelengths_label_dict[item.short_name] = tk.Label(self.frame_thresholds_2, text=text1)
-			self.wavelengths_label_dict[item.short_name].grid(row = row_counter, column = 2, sticky='w')
+				self.wavelengths_label_dict[item.short_name] = tk.Label(self.frame_thresholds_2, text=text1)
+				self.wavelengths_label_dict[item.short_name].grid(row = row_counter, column = 2, sticky='w')
 
 			row_counter += 1
 
