@@ -519,9 +519,13 @@ class Threshold_window:
 
 
 
+
+
 		for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
 			data_cont.data_list_raw[data_cont.file_index].threshold_list[channel] = float(self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel].short_name].get())
+
+		
 
 		if data_cont.data_list_raw[data_cont.file_index].gp_fitting[data_cont.rep_index] != None:
 			
@@ -533,12 +537,9 @@ class Threshold_window:
 
 		
 
-
-
-
-
-
 		self.Peaks()
+
+
 
 	def Change_channel_for_2D_GP(self):
 		self.Update_dot_plot()
@@ -1483,6 +1484,10 @@ class Threshold_window:
 		self.Update_thresholds_button.invoke()
 
 	def Apply_thresholds(self):
+
+
+
+
 		ref_channel = data_cont.data_list_raw[data_cont.file_index].detection_how
 
 		th_list = data_cont.data_list_raw[data_cont.file_index].threshold_list
@@ -1493,8 +1498,10 @@ class Threshold_window:
 
 		for i in range (len(data_cont.data_list_raw)):
 			if data_cont.data_list_raw[i].datasets_list[0].channels_number == ch_num:
-				data_cont.data_list_raw[i].detection_how = ref_channel
-				data_cont.data_list_raw[i].threshold_list = th_list
+				data_cont.data_list_raw[i].detection_how = copy.deepcopy(ref_channel)
+				data_cont.data_list_raw[i].threshold_list = copy.deepcopy(th_list)
+
+	
 
 
 	def Normalize(self):
