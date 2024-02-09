@@ -451,10 +451,67 @@ class Left_frame :
 		#root.update()
 
 	def Delete_dataset(self):
+
+		index = self.tree.selection()
+		num1, num = index[0].split('I')
+
+
+		
+
+		num = int(num, 16)
+
+		sum1 = num 
+		file = 0
+
+		rep = 0
+		
+
+
+		for i in range (len(data_cont.data_list_raw)):
+			#print ("I am here")
+			rep = 0
+			sum1-=1
+			file+=1
+			if sum1 == 0:
+				file1 = file
+				rep1 = rep
+
+			
+			for j in range (data_cont.repetitions_list[i]):
+				sum1-=1
+				rep+=1
+				if sum1 == 0:
+					file1 = file
+					rep1 = rep
+
+
+
+		if rep1 == 0:
+			rep1+=1
+
+
+
+
+		
+
+		data_cont.file_index = file1-1
+		data_cont.rep_index = rep1-1
 		
 		index = self.tree.selection()
 		for sel in index:
 			self.tree.delete(sel)
+
+		del data_cont.binning_list [data_cont.file_index]
+		del data_cont.tree_list [data_cont.file_index]
+		del data_cont.tree_list_name [data_cont.file_index]
+		del data_cont.data_list_raw [data_cont.file_index]
+		del data_cont.repetitions_list [data_cont.file_index]
+		del data_cont.total_channels_list [data_cont.file_index]
+
+
+		
+		children = self.tree.get_children()
+		self.tree.selection_set(children[0])
 
 	def Delete_all_datasets(self):
 		
@@ -463,6 +520,7 @@ class Left_frame :
 
 		for dataset in self.tree.get_children():
 			self.tree.delete(dataset)
+			
 		self.traces.clear()
 		self.corr.clear()
 		self.canvas1.draw_idle()
@@ -470,10 +528,12 @@ class Left_frame :
 		self.figure1.tight_layout()
 	
 
-		data_list_raw = []
-		data_list_current = []
-		tree_list = []
-		tree_list_name = []
+		data_cont.binning_list = []
+		data_cont.tree_list = []
+		data_cont.tree_list_name = []
+		data_cont.data_list_raw = []
+		data_cont.repetitions_list = []
+		data_cont.total_channels_list = []
 
 
 	def Curve_flags(self):

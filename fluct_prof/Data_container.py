@@ -116,3 +116,5 @@ total_channels_list = []
 
 dpi_all = 75
 
+dirdir = dir()
+
