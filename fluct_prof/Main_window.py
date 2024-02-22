@@ -308,17 +308,32 @@ class Left_frame :
 						Button_ok = tk.Button(self.win_check, text="OK", command=self.Continue_Import)
 						Button_ok.grid(row = CarrierRows + 3, column = 0, columnspan = CarrierColumns+1, sticky='ew')
 					
-					else:self.Continue_Import()
+					else:
+						self.Continue_Import()
 
 
 				if filename.endswith('.SIN'): 
 					self.dataset = fcs_importer.Fill_datasets_sin(lines)
 
-				if filename.endswith('.csv'):
+				if filename.endswith('.csv') or filename.endswith('.txt'):
 
-					print(filename)
+					#print(filename)
 
-					df = pd.read_csv(filename)
+					if filename.endswith('.csv'):
+
+						df = pd.read_csv(filename)
+
+					if filename.endswith('.txt'):
+
+						df = pd.read_csv(filename, sep="\t")
+
+						df['Time [s]'] = df['Time [s]']*1000
+
+						del df['Number']
+
+						df = df.rename({'Time [s]': 'Time [ms]', 'Intensity': 'ChS1', 'Intensity.1': 'ChS2'}, axis='columns')
+
+						print (df)
 
 
 					self.dataset_list = fcs_importer.Fill_datasets_csv(df)
