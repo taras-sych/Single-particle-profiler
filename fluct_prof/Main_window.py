@@ -312,7 +312,8 @@ class Left_frame :
 						Button_ok = tk.Button(self.win_check, text="OK", command=self.Continue_Import)
 						Button_ok.grid(row = CarrierRows + 3, column = 0, columnspan = CarrierColumns+1, sticky='ew')
 					
-					else:self.Continue_Import()
+					else:
+						self.Continue_Import()
 
 
 				if filename.endswith('.SIN'): 
