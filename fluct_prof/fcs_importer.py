@@ -417,7 +417,7 @@ def Fill_datasets_csv( df):
             
             
 
-        array_fluct = XY_plot(x_new,y_new)
+        array_fluct = XY_plot(x_new, y_new)
 
 
         channel = fcs_channel(long_name, array_fluct, array_corr, short_name)

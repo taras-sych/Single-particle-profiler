@@ -333,7 +333,7 @@ class Left_frame :
 
 						df = df.rename({'Time [s]': 'Time [ms]', 'Intensity': 'ChS1', 'Intensity.1': 'ChS2'}, axis='columns')
 
-						print (df)
+						#print (df)
 
 
 					self.dataset_list = fcs_importer.Fill_datasets_csv(df)
