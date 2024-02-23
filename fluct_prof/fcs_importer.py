@@ -381,7 +381,7 @@ def Fill_datasets_csv( df):
 
     for column in df.columns[1:]:
 
-        print(column)
+        #print(column)
 
         str1 , str2 = column.split('S')
 
@@ -400,20 +400,46 @@ def Fill_datasets_csv( df):
         x_new = []
         y_new = []
 
-        counter = 1
-        i = 0
-        j = 0
-        sum1 = 0 
+        chunk_length = int( 1/(x[1] - x[0]))
 
-        while i < len(x):
-            sum1 += y[i]
-            if x[i] > counter:
-                x_new.append(x[j]/1000)
-                y_new.append(sum1)
-                sum1=0
-                counter += 1
-                j = i+1
-            i+=1
+        x = list(x)
+        del x[-1]
+        x_last = x[-1]
+
+        timestep = (x[1] - x[0])*chunk_length
+
+        timepoint = 0
+
+        while timepoint + timestep < x_last:
+
+            i = int(timepoint)
+            j = int(timepoint + timestep)
+
+            sum1 = sum(y[i:j])
+
+            x_new.append(timepoint/1000)
+            y_new.append(sum1)
+
+            timepoint += timestep
+
+        #print(len(x), len(y), len(x_new), len(y_new), x_new[1]-x_new[0],  x_new[2]-x_new[1])
+
+        
+
+        """counter = 1
+                                i = 0
+                                j = 0
+                                sum1 = 0 
+                        
+                                while i < len(x):
+                                    sum1 += y[i]
+                                    if x[i] > counter:
+                                        x_new.append(x[j]/1000)
+                                        y_new.append(sum1)
+                                        sum1=0
+                                        counter += 1
+                                        j = i+1
+                                    i+=1"""
             
             
 
@@ -424,35 +450,35 @@ def Fill_datasets_csv( df):
 
         channels_fluct_list.append(channel)
 
-    for column1 in df.columns[1:]:
-        for column2 in df.columns[1:]:
-            if column1 != column2:
-
-                str1 , str2 = column1.split('S')
-                str3 , str4 = column2.split('S')
-
-                
-                long_name = "Cross-correlation detector Meta" + str2 + " versus detector Meta" + str4
-
-                str1, str2 = long_name.split(" versus ")
-                str3, str4 = str1.split("Meta")
-                str5, str6 = str2.split("Meta")
-                
-                short_name = "channel " + str4 + " vs " + str(int(str6))
-
-                x = df[column_t]
-                y1 = df[column1]
-                y2 = df[column2]
-
-                timestep = (x[1] - x[0])/1000
-
-                x3, y3 = corr_py.correlate_full (timestep, y1, y2)
-
-                array_corr = XY_plot(x3,y3)
-
-                channel = fcs_cross(long_name,  array_corr, short_name)
-
-                channels_cross_list.append(channel)
+    """for column1 in df.columns[1:]:
+                    for column2 in df.columns[1:]:
+                        if column1 != column2:
+            
+                            str1 , str2 = column1.split('S')
+                            str3 , str4 = column2.split('S')
+            
+                            
+                            long_name = "Cross-correlation detector Meta" + str2 + " versus detector Meta" + str4
+            
+                            str1, str2 = long_name.split(" versus ")
+                            str3, str4 = str1.split("Meta")
+                            str5, str6 = str2.split("Meta")
+                            
+                            short_name = "channel " + str4 + " vs " + str(int(str6))
+            
+                            x = df[column_t]
+                            y1 = df[column1]
+                            y2 = df[column2]
+            
+                            timestep = (x[1] - x[0])/1000
+            
+                            x3, y3 = corr_py.correlate_full (timestep, y1, y2)
+            
+                            array_corr = XY_plot(x3,y3)
+            
+                            channel = fcs_cross(long_name,  array_corr, short_name)
+            
+                            channels_cross_list.append(channel)"""
 
     dataset_list.append(Dataset_fcs(len(channels_fluct_list), len(channels_cross_list), channels_fluct_list, channels_cross_list))
 
