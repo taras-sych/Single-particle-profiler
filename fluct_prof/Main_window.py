@@ -321,7 +321,7 @@ class Left_frame :
 
 				if filename.endswith('.csv') or filename.endswith('.txt'):
 
-					print(filename)
+					#print(filename)
 
 					if filename.endswith('.csv'):
 
@@ -335,9 +335,25 @@ class Left_frame :
 
 						del df['Number']
 
-						df = df.rename({'Time [s]': 'Time [ms]', 'Intensity': 'ChS1', 'Intensity.1': 'ChS2'}, axis='columns')
 
-						print(df)
+
+
+
+						df = df.rename({'Time [s]': 'Time [ms]'}, axis='columns')
+
+						column_counter=1
+
+						while column_counter < len(df.columns):
+
+							heading = 'ChS' + str(column_counter)
+
+							df = df.rename({df.columns[column_counter]: heading}, axis='columns')
+
+							column_counter += 1
+
+						#print(df)
+
+						
 
 						
 
