@@ -566,6 +566,10 @@ class Threshold_window:
 		key1 = "channel "
 		key2 = "channel "
 
+		
+		self.means1 = 0
+		self.means2 = 0
+
 
 		for i in range (len(keys)):
 
@@ -578,12 +582,14 @@ class Threshold_window:
 					key1 += str(i+1) + ", "
 
 					self.axis_x_temp += np.array(self.yp1_raw_dict[keys[i]])
+					self.means1 += self.means_dict[keys[i]]
 
 				if self.red_channels_flags[i].get() == 1:
 
 					key2 += str(i+1) + ", "
 					
 					self.axis_y_temp += np.array(self.yp1_raw_dict[keys[i]])
+					self.means2 += self.means_dict[keys[i]]
 
 			if self.Normalization_for_plot.get() == "Peak Prominence":
 
@@ -592,12 +598,14 @@ class Threshold_window:
 					key1 += str(i+1) + ", "
 
 					self.axis_x_temp += np.array(self.prominence_dict[keys[i]])
+					self.means1 += self.means_dict[keys[i]]
 
 				if self.red_channels_flags[i].get() == 1:
 
 					key2 += str(i+1) + ", "
 					
 					self.axis_y_temp += np.array(self.prominence_dict[keys[i]])
+					self.means2 += self.means_dict[keys[i]]
 
 				
 
@@ -608,12 +616,14 @@ class Threshold_window:
 					key1 += str(i+1) + ", "
 
 					self.axis_x_temp += np.array(self.width_dict[keys[i]])
+					self.means1 += self.means_dict[keys[i]]
 
 				if self.red_channels_flags[i].get() == 1:
 
 					key2 += str(i+1) + ", "
 					
 					self.axis_y_temp += np.array(self.width_dict[keys[i]])
+					self.means2 += self.means_dict[keys[i]]
 
 
 		key1 = key1[ : -1]
@@ -661,8 +671,8 @@ class Threshold_window:
 		#yp1_raw = self.yp1_raw_dict[key1]
 		#yp2_raw = self.yp1_raw_dict[key2]
 
-		mean1 = np.mean(self.axis_x_temp)
-		mean2 = np.mean(self.axis_y_temp)
+		mean1 = self.means1
+		mean2 = self.means2
 
 		peaks_x_temp = []
 		peaks_y_temp = []
