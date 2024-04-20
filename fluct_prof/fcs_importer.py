@@ -441,7 +441,7 @@ def Fill_datasets_csv( df, dir_output, filename):
 
         x_last = x[-1]
 
-        print(x_last)
+        #print(x_last)
 
         timestep = (x[1] - x[0])*chunk_length
         timestep_raw = (x[1] - x[0])
@@ -451,10 +451,10 @@ def Fill_datasets_csv( df, dir_output, filename):
         data_array_new = []
         x_new = []
 
-        print("-----------------------------------------")
-        print("Before stitching loop")
-        print("timestep: ", chunk_length, len(x), data_array.shape)
-        print("-----------------------------------------")
+        #print("-----------------------------------------")
+        #print("Before stitching loop")
+        #print("timestep: ", chunk_length, len(x), data_array.shape)
+        #print("-----------------------------------------")
 
        
 
@@ -466,7 +466,7 @@ def Fill_datasets_csv( df, dir_output, filename):
             j = int(timepoint + chunk_length)
 
 
-            print(i, j, " of ", len(x))
+            #print(i, j, " of ", len(x))
 
             #print(arr2)
 
@@ -483,21 +483,21 @@ def Fill_datasets_csv( df, dir_output, filename):
 
         arr1 = np.array(data_array_new)
 
-        print("-----------------------------------------")
-        print("After stitching loop")
-        print("-----------------------------------------")
+        #print("-----------------------------------------")
+        #print("After stitching loop")
+        #print("-----------------------------------------")
 
         #print(arr1)
-        print(arr1.shape)
+        #print(arr1.shape)
 
-        print("x_new")
-        print(len(x_new))
+        #print("x_new")
+        #print(len(x_new))
 
         column_labels = []
         for i in range(arr1.shape[1]):
             column_labels.append("ChS" + str(i+1))
 
-        print(column_labels)
+        #print(column_labels)
 
         df_output = pd.DataFrame(arr1, columns=column_labels)
 
@@ -505,9 +505,9 @@ def Fill_datasets_csv( df, dir_output, filename):
 
         df_output.insert(0, "Time [ms]", x_new)
 
-        print(df_output)
+        #print(df_output)
 
-        print(filename)
+        #print(filename)
 
         excel_file_path = filename + "_spp_corrected.csv"
         df_output.to_csv(excel_file_path, index=False)
