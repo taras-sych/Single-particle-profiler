@@ -358,7 +358,7 @@ class Left_frame :
 						
 
 
-					self.dataset_list = fcs_importer.Fill_datasets_csv(df)
+					self.dataset_list = fcs_importer.Fill_datasets_csv(df, data_cont.initialdirectory,  filename)
 
 
 					for self.dataset in self.dataset_list:

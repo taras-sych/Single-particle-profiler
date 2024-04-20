@@ -402,7 +402,12 @@ def Fill_datasets_fcs( list_file):
         
 #---------------------------------------------------
 
-def Fill_datasets_csv( df):
+def Fill_datasets_csv( df, dir_output, filename):
+
+
+    print("-----------------------------------------")
+    print("Fill_datasets_csv")
+    print("-----------------------------------------")
 
     channels_fluct_list = []
     channels_cross_list = []
@@ -413,49 +418,102 @@ def Fill_datasets_csv( df):
 
     x = df[column_t]
 
-    timestep = (x[1] - x[0])/1000
+
 
     data_array = df[df.columns[1:]]
 
     
+    #print(df)
+    
 
-    del data_array[-1]
+    #del data_array[-1]
 
     data_array = data_array.to_numpy()
 
     
 
-    chunk_length = int( 1/(x[1] - x[0]))
+    if "spp_corrected" not in filename:
 
-    x = list(x)
-    del x[-1]
+        chunk_length = int( 1/(x[1] - x[0]))
 
-    x_last = x[-1]
+        x = list(x)
+        del x[-1]
 
-    timestep = (x[1] - x[0])*chunk_length
+        x_last = x[-1]
 
-    timepoint = 0
+        print(x_last)
 
-    data_array_new = []
-    x_new = []
+        timestep = (x[1] - x[0])*chunk_length
+        timestep_raw = (x[1] - x[0])
 
-    while timepoint + timestep < x_last:
+        timepoint = x[0]
 
-        i = int(timepoint)
-        j = int(timepoint + timestep)
+        data_array_new = []
+        x_new = []
+
+        print("-----------------------------------------")
+        print("Before stitching loop")
+        print("timestep: ", timestep, x[1] - x[0], data_array.shape)
+        print("-----------------------------------------")
+
+        j = 0
+
+        while j < len(x):
+
+            if x[j] >= timepoint + timestep:
+
+                i = x.index(timepoint)
+                #j = x.index(timepoint + timestep)
+
+
+                print(x[i], x[j], " of ", x[-1])
 
 
 
-        sum1 = np.sum(arr[i:j], axis = 0)
+                sum1 = np.mean(data_array[i:j], axis = 0)
 
-        x_new.append(timepoint/1000)
-        data_array_new.append(sum1)
+                x_new.append(timepoint/1000)
+                data_array_new.append(sum1)
 
-        timepoint += timestep
+                timepoint = x[j]
 
-    arr1 = np.array(data_array_new)
+            j+=1
+
+        arr1 = np.array(data_array_new)
+
+        print("-----------------------------------------")
+        print("After stitching loop")
+        print("-----------------------------------------")
+
+        #print(arr1)
+        print(arr1.shape)
+
+        print("x_new")
+        print(len(x_new))
+
+        column_labels = []
+        for i in range(arr1.shape[1]):
+            column_labels.append("ChS" + str(i+1))
+
+        print(column_labels)
+
+        df_output = pd.DataFrame(arr1, columns=column_labels)
+
+        x_new_arr = np.array(x_new)*1000
+
+        df_output.insert(0, "Time [ms]", x_new)
+
+        print(df_output)
+
+        print(filename)
+
+        excel_file_path = filename + "_spp_corrected.csv"
+        df_output.to_csv(excel_file_path, index=False)
+    else:
 
 
+        arr1 = data_array
+        x_new = x
 
     for i in range (len(df.columns) - 1):
 
@@ -475,7 +533,7 @@ def Fill_datasets_csv( df):
 
         array_corr = XY_plot(x1,y1)
 
-        y_new = arr1[:, i+1]
+        y_new = arr1[:, i]
 
         array_fluct = XY_plot(x_new, y_new)
 
