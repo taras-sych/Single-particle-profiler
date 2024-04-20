@@ -446,38 +446,40 @@ def Fill_datasets_csv( df, dir_output, filename):
         timestep = (x[1] - x[0])*chunk_length
         timestep_raw = (x[1] - x[0])
 
-        timepoint = x[0]
+        timepoint = 0
 
         data_array_new = []
         x_new = []
 
         print("-----------------------------------------")
         print("Before stitching loop")
-        print("timestep: ", timestep, x[1] - x[0], data_array.shape)
+        print("timestep: ", chunk_length, len(x), data_array.shape)
         print("-----------------------------------------")
 
-        j = 0
+       
 
-        while j < len(x):
-
-            if x[j] >= timepoint + timestep:
-
-                i = x.index(timepoint)
-                #j = x.index(timepoint + timestep)
-
-
-                print(x[i], x[j], " of ", x[-1])
+        while timepoint + chunk_length < len(x):
 
 
 
-                sum1 = np.mean(data_array[i:j], axis = 0)
+            i = int(timepoint)
+            j = int(timepoint + chunk_length)
 
-                x_new.append(timepoint/1000)
-                data_array_new.append(sum1)
 
-                timepoint = x[j]
+            print(i, j, " of ", len(x))
 
-            j+=1
+            #print(arr2)
+
+
+
+            sum1 = np.mean(data_array[i:j], axis = 0)
+
+            x_new.append(x[i]/1000)
+            data_array_new.append(sum1)
+
+            timepoint = timepoint + chunk_length
+
+            
 
         arr1 = np.array(data_array_new)
 
