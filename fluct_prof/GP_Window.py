@@ -1067,12 +1067,15 @@ class Threshold_window:
 					th1 = round(np.mean(y1_raw))
 
 
-			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].delete(0,"end")
-			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name].insert(0,str(th1))
+
+
+
+			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[channel_i].short_name].delete(0,"end")
+			self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[channel_i].short_name].insert(0,str(th1))
 
 			data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i] = th1
 
-			self.means_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name] = np.mean(y1_raw)
+			self.means_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[channel_i].short_name] = np.mean(y1_raw)
 
 		
 		
@@ -1116,7 +1119,7 @@ class Threshold_window:
 
 		for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
-			key = data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel_i].short_name
+			key = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[channel_i].short_name
 
 			x1 = x1_list [channel_i]
 			y1_raw = y1_raw_list [channel_i]
