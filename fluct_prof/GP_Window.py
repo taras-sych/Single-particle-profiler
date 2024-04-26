@@ -523,7 +523,7 @@ class Threshold_window:
 
 		for channel in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
 
-			data_cont.data_list_raw[data_cont.file_index].threshold_list[channel] = float(self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.file_index].channels_list[channel].short_name].get())
+			data_cont.data_list_raw[data_cont.file_index].threshold_list[channel] = float(self.thresholds_entry_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[channel].short_name].get())
 
 		
 
