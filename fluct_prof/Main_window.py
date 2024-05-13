@@ -215,7 +215,7 @@ class Left_frame :
 		if data_cont.initialdirectory == '':
 			data_cont.initialdirectory = __file__
 
-		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('CSV files', '*.csv'), ('All files', '*'), ]
+		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('CSV files', '*.csv'), ('LSM files', '*.lsm'), ('All files', '*'), ]
 		
 
 		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(data_cont.initialdirectory),title = "Select file", filetypes = ftypes)
@@ -319,9 +319,18 @@ class Left_frame :
 				if filename.endswith('.SIN'): 
 					self.dataset = fcs_importer.Fill_datasets_sin(lines)
 
-				if filename.endswith('.csv') or filename.endswith('.txt'):
+				if filename.endswith('.csv') or filename.endswith('.txt') or filename.endswith('.lsm'):
+
+					#self.array =  tifffile.imread(self.lsm_file_name, key = 0)
 
 					#print(filename)
+
+					if filename.endswith('.lsm'):
+						some_array = tifffile.imread(filename, key = 0)
+
+						print(some_array.shape)
+
+						print(whatever)
 
 					if filename.endswith('.csv'):
 

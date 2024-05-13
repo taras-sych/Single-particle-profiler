@@ -1116,17 +1116,35 @@ class Threshold_window:
 		self.yp1_raw_dict = {}
 		self.width_dict = {}
 		self.prominence_dict = {}
+		self.number_of_peaks = {}
+
+		self.number_of_peaks["total"] = len(peaks1)
 
 		for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+
+			
 
 			key = data_cont.data_list_raw[data_cont.file_index].datasets_list[0].channels_list[channel_i].short_name
 
 			x1 = x1_list [channel_i]
 			y1_raw = y1_raw_list [channel_i]
 
+
+			if self.normalization_index == "z-score":
+				y1 = stats.zscore(y1_raw)
+
+			if self.normalization_index == "manual":
+				y1 = y1_raw
+
+
+
+			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
+
 			xp1 = []
 			yp1 = []
 			yp1_raw = []
+
+			peaks_above = 0
 
 			for p in peaks1:
 
@@ -1135,6 +1153,15 @@ class Threshold_window:
 				yp1.append(y1[p])
 				
 				yp1_raw.append(y1_raw[p])
+
+				if y1[p] > th1:
+					peaks_above += 1
+
+			self.number_of_peaks[channel_i] = peaks_above
+
+			#print(channel_i, th1, peaks_above)
+
+
 
 
 			self.xp1_dict[key] = xp1
@@ -1159,6 +1186,23 @@ class Threshold_window:
 		self.data_frames_import ["Intensity peaks"] =pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.yp1_raw_dict)], axis=1) 
 		self.data_frames_import ["Prominences"] = pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.prominence_dict)], axis=1) 
 		self.data_frames_import ["Widths"] = pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.width_dict)], axis=1) 
+
+		#------------------------------------------------------------------------------------------------------
+		#--------------   Print peaks statistics   ------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+		#------------------------------------------------------------------------------------------------------
+
+		for item in self.tree_ch.get_children():
+   			self.tree_ch.delete(item)
+
+		for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+
+			text_line = "channel " + str(channel_i)
+
+			self.tree_ch.insert(parent = '', index = 'end', iid=channel_i, text = text_line, values = (self.number_of_peaks["total"], self.number_of_peaks[channel_i]))
+
+
+
 
 		
 
@@ -2126,6 +2170,30 @@ class Threshold_window:
 
 		self.Put_mean_button = tk.Button(self.frame001, text="Set to default", command=self.Put_default)
 		self.Put_mean_button.grid(row = 9, column = 0, columnspan = 2, sticky='ew')
+
+		#----------------------------------------------------------------------------------------------------
+		#-------------------------------- Peak statistics ---------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+		#----------------------------------------------------------------------------------------------------
+
+		self.peak_st_toggled = ToggledFrame(self.frame002, text='Peak statistics', relief="raised", borderwidth=1)
+		self.peak_st_toggled.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+
+		self.tree_ch = ttk.Treeview(self.peak_st_toggled.sub_frame)
+
+		self.tree_ch['columns'] = ("Total peaks", "Above threshold")
+
+		self.tree_ch.column("#0", width = 70)
+		#self.tree_ch.column("Channel", width = 70)
+		self.tree_ch.column("Total peaks", width = 70)
+		self.tree_ch.column("Above threshold", width = 70)
+
+		self.tree_ch.heading("#0",text="Channel",anchor=tk.W)
+		#self.tree_ch.heading("Channel",text="Channel",anchor=tk.W)
+		self.tree_ch.heading("Total peaks",text="Total peaks",anchor=tk.W)
+		self.tree_ch.heading("Above threshold",text="Above threshold",anchor=tk.W)
+
+		self.tree_ch.pack()
 
 		#----------------------------------------------------------------------------------------------------
 		#-------------------------------- GP calculation widgets --------------------------------------------
