@@ -1878,6 +1878,13 @@ class Threshold_window:
 				if i > value1:
 					data_cont.data_list_raw[data_cont.file_index].blue_setup.append(tk.IntVar(value=0))
 
+
+			if len(self.red_channels_flags) == 1:
+
+				data_cont.data_list_raw[data_cont.file_index].blue_setup.append(tk.IntVar(value=1))
+
+
+
         
 
 		if data_cont.data_list_raw[data_cont.file_index].red_setup == None:
@@ -1891,6 +1898,10 @@ class Threshold_window:
 
 				if i > value1:
 					data_cont.data_list_raw[data_cont.file_index].red_setup.append(tk.IntVar(value=1))
+
+			if len(self.red_channels_flags) == 1:
+
+				data_cont.data_list_raw[data_cont.file_index].red_setup.append(tk.IntVar(value=1))
 
 
 
@@ -1910,7 +1921,8 @@ class Threshold_window:
 		self.red_flags_dict = {}
 		
 
-		
+		#print(len(self.blue_channels_flags))
+		#print(len(self.red_channels_flags))
 
 		column_counter = 0
 
