@@ -527,11 +527,19 @@ def Fill_datasets_csv( df, dir_output, filename):
         short_name = "channel " + str(int(str2))
 
         x = df[column_t]
-        y = df[column]
+        y = list(df[column])
+
+        del y[-1]
+
+        y = np.array(y)
 
         timestep = (x[1] - x[0])/1000
 
         x1, y1 = corr_py.correlate_full (timestep, y, y)
+
+        #print(short_name)
+
+        #print(x1, y1)
 
         array_corr = XY_plot(x1,y1)
 
