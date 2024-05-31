@@ -381,6 +381,28 @@ class Threshold_window:
 			
 		if self.fit_all_flag == False:
 			self.gp_hist.cla()
+
+			"""try:
+													self.data_frames_import ["GP Plot"].drop(columns=["bins_fit", "GP_fit"])
+									
+												except:
+													pass
+									
+												try:
+													self.data_frames_import ["GP Plot"].drop(columns=["component 1", "component 2"])
+									
+												except:
+													pass
+									
+									
+												try:
+													self.data_frames_import ["GP Plot"].drop(columns=["component 3"])
+									
+												except:
+													pass
+									"""
+
+
 										
 										
 			self.gp_hist.set_title("GP histogram")
@@ -421,9 +443,9 @@ class Threshold_window:
 				popt2 = popt[3:6]
 				self.gp_hist.plot(x1, fun.Gauss(x1, *popt1), color = 'yellow', label='fit')
 				self.gp_hist.plot(x1, fun.Gauss(x1, *popt2), color = 'yellow', label='fit')
-				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				#self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
 				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 1": fun.Gauss(x1, *popt1)})], axis=1)
-				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				#self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
 				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 2": fun.Gauss(x1, *popt2)})], axis=1)
 
 				self.save_plot_dict["component 1"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt1))
@@ -465,11 +487,11 @@ class Threshold_window:
 				self.save_plot_dict["component 2"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt2))
 				self.save_plot_dict["component 3"] = fcs_importer.XY_plot(x1, fun.Gauss(x1, *popt3))
 
-				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				#self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
 				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 1": fun.Gauss(x1, *popt1)})], axis=1)
-				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				#self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
 				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 2": fun.Gauss(x1, *popt2)})], axis=1)
-				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
+				#self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"bins_fit": x1})], axis=1)
 				self.data_frames_import ["GP Plot"] = pd.concat([self.data_frames_import ["GP Plot"], pd.DataFrame({"component 3": fun.Gauss(x1, *popt3)})], axis=1)
 
 				data = [
