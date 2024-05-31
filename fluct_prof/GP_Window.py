@@ -141,8 +141,26 @@ class Threshold_window:
 		output_metadataframe = pd.DataFrame()
 
 		threshold_header = "Threshold (" + self.normalization_index + ")"
+		number_of_peaks_header = "Number of peaks"
+		number_of_peaks_th_header = "Number of peaks above threshold"
 
-		output_metadataframe = pd.concat([data_cont.data_list_raw[data_cont.file_index].metadata, pd.DataFrame({threshold_header: data_cont.data_list_raw[data_cont.file_index].threshold_list})], axis=1)
+		#print(self.number_of_peaks["total"])
+		#print(self.number_of_peaks)
+
+
+		list_of_total_number = []
+		list_of_th_number = []
+
+		for key in self.number_of_peaks.keys():
+
+			if key != 'total':
+				list_of_th_number.append(self.number_of_peaks[key])
+				list_of_total_number.append(self.number_of_peaks['total'])
+
+		output_metadataframe = pd.concat([data_cont.data_list_raw[data_cont.file_index].metadata, 
+			pd.DataFrame({threshold_header: data_cont.data_list_raw[data_cont.file_index].threshold_list}), 
+			pd.DataFrame({number_of_peaks_header: list_of_total_number}),
+			pd.DataFrame({number_of_peaks_th_header: list_of_th_number})], axis=1)
 	
 
 		output_metadataframe.to_excel(writer, sheet_name="Metadata")
@@ -382,25 +400,31 @@ class Threshold_window:
 		if self.fit_all_flag == False:
 			self.gp_hist.cla()
 
-			"""try:
-													self.data_frames_import ["GP Plot"].drop(columns=["bins_fit", "GP_fit"])
+			
+
+			
+
+			try:
+				self.data_frames_import ["GP Plot"] = self.data_frames_import ["GP Plot"].drop(["bins_fit", "GP_fit"], axis=1)
+
+			except:
+				pass
+
+			try:
+				self.data_frames_import ["GP Plot"] = self.data_frames_import ["GP Plot"].drop(columns=["component 1", "component 2"])
+
+			except:
+				pass
+
+
+			try:
+				self.data_frames_import ["GP Plot"] = self.data_frames_import ["GP Plot"].drop(columns=["component 3"])
+
+			except:
+				pass
+
+			
 									
-												except:
-													pass
-									
-												try:
-													self.data_frames_import ["GP Plot"].drop(columns=["component 1", "component 2"])
-									
-												except:
-													pass
-									
-									
-												try:
-													self.data_frames_import ["GP Plot"].drop(columns=["component 3"])
-									
-												except:
-													pass
-									"""
 
 
 										
