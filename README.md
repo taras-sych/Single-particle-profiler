@@ -29,6 +29,7 @@ How to analyze SPP (based on previous release):
 https://www.youtube.com/watch?v=NAwmWDSHEV8
 
 How to analyze SPP (including Spot-iSPP, based on this release):
+https://www.youtube.com/watch?v=p5afSZSkbfE
 
 How to acquire data for SPP and Spot-iSPP:
 https://www.youtube.com/watch?v=IicPvjPySDY&list=PLvnnxg3kwLpWX5M-e-14hhWQVPsPEQ5jB
