@@ -8,22 +8,29 @@ What can it do:
    - Dye loading in Liposomes
    - Antibody binding to Virus-Like Particles
    - RNA loading into Lipid Nano-Particles
-2. Biophysical profiling:
+4. Operational on data acquired on microscopes with FCS mode or with image acquisition mode, using photon counting or conventional PMT detectors
+3. Biophysical profiling:
    - Characterization of membrane fluidity
    - in Lipoproteins
    - in Liposomes
    - in Extracellular vesicles
    - in Virus-Like Particles
    - in Lipid Nano-Particles
-3. Fitting of correlation curves for FCS
+4. Fitting of correlation curves for FCS
 
-Reads files (.fcs, .SIN, .xlsx)
+
+Reads files (.fcs, .SIN, .xlsx, .csv, .txt)
 
 ## For standalone distributions, see the link below:
+https://drive.google.com/drive/folders/1E48Apdwgemc6TjAFaYCvr_2vAziwJcbK
 
-
-## Manual is available here: 
+## Manuals are available: 
+How to analyze SPP (based on previous release):
 https://www.youtube.com/watch?v=NAwmWDSHEV8
+
+How to analyze SPP (including Spot-iSPP, based on this release):
+
+How to acquire data for SPP and Spot-iSPP:
 
 ## Paper here (when using, cite):
 https://www.nature.com/articles/s41587-023-01825-5
