@@ -31,6 +31,7 @@ https://www.youtube.com/watch?v=NAwmWDSHEV8
 How to analyze SPP (including Spot-iSPP, based on this release):
 
 How to acquire data for SPP and Spot-iSPP:
+https://www.youtube.com/watch?v=IicPvjPySDY&list=PLvnnxg3kwLpWX5M-e-14hhWQVPsPEQ5jB
 
 ## Paper here (when using, cite):
 https://www.nature.com/articles/s41587-023-01825-5
