@@ -26,7 +26,7 @@ https://drive.google.com/drive/folders/1E48Apdwgemc6TjAFaYCvr_2vAziwJcbK
 
 ## Manuals are available: 
 How to analyze SPP (based on previous release):
-https://www.youtube.com/watch?v=NAwmWDSHEV8
+https://www.youtube.com/watch?v=pgXFNSjlXHk&list=PLvnnxg3kwLpWJjBRsYiTrF1a5CBaAzQK4
 
 How to analyze SPP (including Spot-iSPP, based on this release):
 https://www.youtube.com/watch?v=p5afSZSkbfE
