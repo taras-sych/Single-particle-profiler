@@ -248,8 +248,15 @@ def Fill_datasets_fcs( list_file):
                 if list_file[i+1].__contains__("versus"):
 
                     str1, str2 = long_name.split(" versus ")
-                    str3, str4 = str1.split("Meta")
-                    str5, str6 = str2.split("Meta")
+                    if str1.__contains__("Meta"):
+                        str3, str4 = str1.split("Meta")
+                    if str1.__contains__("Ch"):
+                        str3, str4 = str1.split("Ch")
+                    
+                    if str2.__contains__("Meta"):
+                        str5, str6 = str2.split("Meta")
+                    if str2.__contains__("Ch"):
+                        str5, str6 = str2.split("Ch")
                     
                     short_name = "channel " + str4 + " vs " + str(int(str6))
 
@@ -279,7 +286,11 @@ def Fill_datasets_fcs( list_file):
 
                 else:
 
-                    str1, str2 = long_name.split("Meta")
+                    if long_name.__contains__("Meta"):
+                        str1, str2 = long_name.split("Meta")
+
+                    if long_name.__contains__("Ch"):
+                        str1, str2 = long_name.split("Ch")
                 
                     short_name = "channel " + str(int(str2))
                     
