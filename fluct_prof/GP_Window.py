@@ -1163,6 +1163,10 @@ class Threshold_window:
 		self.width_dict = {}
 		self.prominence_dict = {}
 		self.number_of_peaks = {}
+		self.xp1_raw_above_dict = {}
+		self.yp1_raw_above_dict = {}
+		self.xp1_raw_below_dict = {}
+		self.yp1_raw_below_dict = {}
 
 		self.number_of_peaks["total"] = len(peaks1)
 
@@ -1174,6 +1178,8 @@ class Threshold_window:
 
 			x1 = x1_list [channel_i]
 			y1_raw = y1_raw_list [channel_i]
+
+
 
 
 			if self.normalization_index == "z-score":
@@ -1189,8 +1195,14 @@ class Threshold_window:
 			xp1 = []
 			yp1 = []
 			yp1_raw = []
+			xp1_raw_above = []
+			yp1_raw_above = []
+			xp1_raw_below = []
+			yp1_raw_below = []
 
 			peaks_above = 0
+
+			
 
 			for p in peaks1:
 
@@ -1200,12 +1212,20 @@ class Threshold_window:
 				
 				yp1_raw.append(y1_raw[p])
 
+
 				if y1[p] > th1:
 					peaks_above += 1
+					xp1_raw_above.append(x1[p])
+					yp1_raw_above.append(y1_raw[p])
+				else:
+					xp1_raw_below.append(x1[p])
+					yp1_raw_below.append(y1_raw[p])
 
 			self.number_of_peaks[channel_i] = peaks_above
 
 			#print(channel_i, th1, peaks_above)
+
+			
 
 
 
@@ -1213,6 +1233,10 @@ class Threshold_window:
 			self.xp1_dict[key] = xp1
 			self.yp1_dict[key] = yp1
 			self.yp1_raw_dict[key] = yp1_raw
+			self.xp1_raw_above_dict[key] = xp1_raw_above
+			self.yp1_raw_above_dict[key] = yp1_raw_above
+			self.xp1_raw_below_dict[key] = xp1_raw_below
+			self.yp1_raw_below_dict[key] = yp1_raw_below
 
 
 			#warnings.filterwarnings('ignore')
@@ -1263,8 +1287,15 @@ class Threshold_window:
 				flag_counter = 0
 
 				for key in self.xp1_dict.keys():
-					if self.channels_flags[flag_counter].get() == 1:
-						self.peaks.scatter(self.xp1_dict[key], self.yp1_raw_dict[key], zorder=1)
+					if self.channels_flags[flag_counter].get() == 1 and self.Threshold.get() == key:
+
+						self.peaks.scatter(self.xp1_dict[key], self.yp1_raw_dict[key], marker='x', zorder=1)
+
+					if self.channels_flags[flag_counter].get() == 1 and self.Threshold.get() != key:
+
+						self.peaks.scatter(self.xp1_raw_above_dict[key], self.yp1_raw_above_dict[key], marker='x', c='green', zorder=1)
+						self.peaks.scatter(self.xp1_raw_below_dict[key], self.yp1_raw_below_dict[key], marker='x', c='red', zorder=1)
+
 						 
 					flag_counter += 1
 
