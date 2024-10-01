@@ -275,6 +275,10 @@ class UMAP_Window:
 
 				dimension = data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"].shape[0]
 
+				print("file: ", file1)
+
+				print(data_cont.data_list_raw[file1].export_dataframe["Intensity peaks"])
+
 				name = data_cont.tree_list_name[file1]
 
 				list1 = [name] * dimension
@@ -328,7 +332,7 @@ class UMAP_Window:
 
 			merged_df = self.normalize_data_channels(merged_df, self.Norm_list.get())
 
-			print (merged_df)
+		#print (merged_df)
 
 		self.do_umap(merged_df)
 
@@ -368,8 +372,8 @@ class UMAP_Window:
 						
 			divisor_column = normalization
 
-			print(divisor_column)
-			print(df.columns)
+			#print(divisor_column)
+			#print(df.columns)
 
 			
 			for index in range(len(df)):
@@ -386,10 +390,14 @@ class UMAP_Window:
 
 		#Extract the labels from the 'Compositions' column as a Categorical series with ordered=True
 		labels = df['Compositions'].values.tolist()
+		#print(labels)
 		label_categories = pd.Categorical(labels, categories=pd.unique(labels), ordered=True)
+
+
 
 		# Remove the 'Compositions' column and convert the data to a NumPy array
 		data = df.drop('Compositions', axis=1).values
+		#print(data.shape)
 
 		# Perform UMAP on the data to reduce the dimensionality
 		umap_reducer = umap.UMAP(n_components=2, random_state=45)
@@ -397,6 +405,7 @@ class UMAP_Window:
 
 		# Create a dictionary that maps unique labels to unique colors
 		unique_labels = label_categories.categories.tolist()
+		#print(unique_labels)
 		num_labels = len(unique_labels)
 		color_map = dict(zip(unique_labels, np.linspace(0, 1, num_labels)))
 
@@ -405,11 +414,12 @@ class UMAP_Window:
 
 		# Add number of data points for each specific label in the legend
 		label_counts = df['Compositions'].value_counts()
+		#print(label_counts)
 		handles = []
 		for label in unique_labels:
 		    color = color_map[label]
 		    count = label_counts[label]
-		    handle = plt.plot([], [], marker="o", markersize=25, ls="", mec=None, mew=0, color=plt.cm.tab10(color),
+		    handle = plt.plot([], [], marker="o", markersize=25, ls="", mec=None, mew=0, color=plt.cm.viridis(color),
 		                      label=f'{label} (n={count})')
 		    handles.append(handle[0])
 
@@ -425,8 +435,8 @@ class UMAP_Window:
 		self.dot_plot[key].scatter(transformed_data[:, 0], transformed_data[:, 1], c=colors, cmap=colormap, alpha=transparency)
 
 		# Add legend to the plot
-		#self.dot_plot[key].legend(handles=handles, loc='upper right')
-		self.dot_plot[key].legend(loc=self.Legend_list.get())
+		self.dot_plot[key].legend(handles=handles, loc='upper right')
+		#self.dot_plot[key].legend(loc=self.Legend_list.get())
 
 		# Remove the axis labels
 		self.dot_plot[key].set_xticks([])
