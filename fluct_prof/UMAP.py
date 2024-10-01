@@ -402,6 +402,7 @@ class UMAP_Window:
 
 		# Convert the labels to colors using the color map
 		colors = [color_map[label] for label in label_categories]
+		#print (color_map)
 
 		# Add number of data points for each specific label in the legend
 		label_counts = df['Compositions'].value_counts()
@@ -409,7 +410,8 @@ class UMAP_Window:
 		for label in unique_labels:
 		    color = color_map[label]
 		    count = label_counts[label]
-		    handle = plt.plot([], [], marker="o", markersize=25, ls="", mec=None, mew=0, color=plt.cm.tab10(color),
+		    cmap = mplcm.get_cmap(self.Cmap_list.get())
+		    handle = plt.plot([], [], marker="o", markersize=10, ls="", mec=None, mew=0, color=cmap(color),
 		                      label=f'{label} (n={count})')
 		    handles.append(handle[0])
 
@@ -426,7 +428,7 @@ class UMAP_Window:
 
 		# Add legend to the plot
 		#self.dot_plot[key].legend(handles=handles, loc='upper right')
-		self.dot_plot[key].legend(loc=self.Legend_list.get())
+		self.dot_plot[key].legend(handles=handles, loc=self.Legend_list.get())
 
 		# Remove the axis labels
 		self.dot_plot[key].set_xticks([])

@@ -101,7 +101,7 @@ class Threshold_window:
 
 		open_file = open(filename, 'w')
 
-		data_cont.data_list_raw[data_cont.file_index].export_dataframe = self.data_frames_import
+		data_cont.data_list_raw[data_cont.file_index].export_dataframe = copy.deepcopy(self.data_frames_import)
 
 		
 
