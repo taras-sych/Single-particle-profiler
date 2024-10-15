@@ -70,19 +70,6 @@ from fluct_prof import fcs_importer
 #End of importing own modules
 #--------------------------
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Threshold_window:
 
 
