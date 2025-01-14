@@ -143,6 +143,9 @@ class Threshold_window:
 		threshold_header = "Threshold (" + self.normalization_index + ")"
 		number_of_peaks_header = "Number of peaks"
 		number_of_peaks_th_header = "Number of peaks above threshold"
+		mean_above_header = "Mean of above threshold"
+		median_above_header = "Median of above threshold"
+		std_above_header = "Std of above threshold"
 
 		#print(self.number_of_peaks["total"])
 		#print(self.number_of_peaks)
@@ -150,6 +153,9 @@ class Threshold_window:
 
 		list_of_total_number = []
 		list_of_th_number = []
+		list_of_means_above = []
+		list_of_medians_above = []
+		list_of_stds_above = []
 
 		for key in self.number_of_peaks.keys():
 
@@ -157,15 +163,26 @@ class Threshold_window:
 				list_of_th_number.append(self.number_of_peaks[key])
 				list_of_total_number.append(self.number_of_peaks['total'])
 
+		for key in self.peaks_above_mean_dict:
+			list_of_means_above.append(self.peaks_above_mean_dict[key])
+			list_of_medians_above.append(self.peaks_above_median_dict[key])
+			list_of_stds_above.append(self.peaks_above_SD_dict[key])
+
+
 		output_metadataframe = pd.concat([data_cont.data_list_raw[data_cont.file_index].metadata, 
 			pd.DataFrame({threshold_header: data_cont.data_list_raw[data_cont.file_index].threshold_list}), 
 			pd.DataFrame({number_of_peaks_header: list_of_total_number}),
-			pd.DataFrame({number_of_peaks_th_header: list_of_th_number})], axis=1)
+			pd.DataFrame({number_of_peaks_th_header: list_of_th_number}),
+			pd.DataFrame({mean_above_header: list_of_means_above}),
+			pd.DataFrame({median_above_header: list_of_medians_above}),
+			pd.DataFrame({std_above_header: list_of_stds_above})], axis=1)
 	
 
 		output_metadataframe.to_excel(writer, sheet_name="Metadata")
 
 		writer.close()
+
+		
 
 
 
@@ -1251,9 +1268,25 @@ class Threshold_window:
 
 		self.n_peaks = len(peaks1)
 
+		self.peaks_above_mean_dict = {}
+		self.peaks_above_median_dict = {}
+		self.peaks_above_SD_dict = {}
+
+		for key1 in self.yp1_raw_above_dict.keys():
+			self.peaks_above_mean_dict [key1] = np.mean(self.yp1_raw_above_dict[key1])
+			self.peaks_above_median_dict [key1] = np.median(self.yp1_raw_above_dict[key1])
+			self.peaks_above_SD_dict [key1] = np.std(self.yp1_raw_above_dict[key1])
+
+
+
 			
 
 		self.data_frames_import ["Intensity peaks"] =pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.yp1_raw_dict)], axis=1) 
+		for key1 in self.yp1_raw_above_dict.keys():
+			self.data_frames_import ["Intensity peaks"] = pd.concat([self.data_frames_import ["Intensity peaks"], pd.DataFrame({key1: self.yp1_raw_above_dict[key1]})], axis=1)
+
+
+
 		self.data_frames_import ["Prominences"] = pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.prominence_dict)], axis=1) 
 		self.data_frames_import ["Widths"] = pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.width_dict)], axis=1) 
 
