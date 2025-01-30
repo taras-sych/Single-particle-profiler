@@ -321,16 +321,52 @@ class Left_frame :
 
 				if filename.endswith('.csv') or filename.endswith('.txt') or filename.endswith('.lsm'):
 
+					start_time_1 = time.time()
+
 					#self.array =  tifffile.imread(self.lsm_file_name, key = 0)
 
 					#print(filename)
 
 					if filename.endswith('.lsm'):
-						some_array = tifffile.imread(filename, key = 0)
 
-						print(some_array.shape)
+						df_data_dict = {}
+						raw_data_array = tifffile.imread(filename, key = 0)
 
-						print(whatever)
+						#print(some_array.shape)
+
+						#print(some_array.lsm_metadata)
+
+						timestep = tifffile.TiffFile(filename).lsm_metadata['TimeIntervall']/raw_data_array.shape[-1] * 1000
+
+						number_of_points = raw_data_array.shape[-1]*raw_data_array.shape[-2]
+
+						raw_data_time = np.linspace(0, (number_of_points * timestep) - timestep, num = number_of_points)
+
+						df_data_dict['Time [ms]'] = raw_data_time
+
+						channels_number_1 = raw_data_array.shape[0]
+
+						if len(raw_data_array.shape) == 2:
+							reshaped_array = raw_data_array.reshape(-1)
+							df_data_dict['ChS1'] = reshaped_array
+
+						if len(raw_data_array.shape) == 3:
+							reshaped_array = raw_data_array.reshape(channels_number_1, -1)
+							for channel_i in range(channels_number_1):
+								string1 = 'ChS' + str(channel_i + 1) 
+								df_data_dict[string1] = reshaped_array[channel_i]
+
+						#print(a123.lsm_metadata['TimeIntervall']/some_array.shape[-1] * 1000000)
+
+						df = pd.DataFrame(df_data_dict)
+
+						#print(df)
+
+						#print(whatever)
+
+						#np.linspace(start, stop, num=50)
+
+						
 
 					if filename.endswith('.csv'):
 
@@ -368,6 +404,10 @@ class Left_frame :
 
 
 					self.dataset_list = fcs_importer.Fill_datasets_csv(df, data_cont.initialdirectory,  filename)
+
+					#print("hello")
+					end_time_1 = time.time()
+					#print("time running: ", end_time_1 - start_time_1)
 
 
 					for self.dataset in self.dataset_list:
