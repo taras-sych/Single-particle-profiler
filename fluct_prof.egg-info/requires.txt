@@ -5,3 +5,5 @@ ttkwidgets
 scipy
 seaborn
 tifffile
+xlsxwriter
+umap-learn
