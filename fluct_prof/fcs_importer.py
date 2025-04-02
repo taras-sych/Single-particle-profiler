@@ -442,10 +442,15 @@ def Fill_datasets_csv( df, dir_output, filename):
     data_array = data_array.to_numpy()
 
     
-
+    
     if "spp_corrected" not in filename:
 
         chunk_length = int( 1/(x[1] - x[0]))
+
+        if (chunk_length < 1):
+            chunk_length = 1
+
+        #print (x[0], x[1], x[1] - x[0])
 
         x = list(x)
         del x[-1]
@@ -468,7 +473,8 @@ def Fill_datasets_csv( df, dir_output, filename):
         #print("-----------------------------------------")
 
        
-
+        #print ("len(x)", len(x))
+        #print (chunk_length)
         while timepoint + chunk_length < len(x):
 
 
@@ -490,8 +496,10 @@ def Fill_datasets_csv( df, dir_output, filename):
 
             timepoint = timepoint + chunk_length
 
-            
+            #print (timepoint)
 
+            
+        #print (x_new)
         arr1 = np.array(data_array_new)
 
         #print("-----------------------------------------")
@@ -527,6 +535,9 @@ def Fill_datasets_csv( df, dir_output, filename):
 
         arr1 = data_array
         x_new = x
+
+    
+
 
     for i in range (len(df.columns) - 1):
 

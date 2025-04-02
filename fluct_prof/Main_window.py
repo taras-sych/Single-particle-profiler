@@ -321,6 +321,8 @@ class Left_frame :
 
 				if filename.endswith('.csv') or filename.endswith('.txt') or filename.endswith('.lsm'):
 
+
+
 					start_time_1 = time.time()
 
 					#self.array =  tifffile.imread(self.lsm_file_name, key = 0)
@@ -376,6 +378,9 @@ class Left_frame :
 
 						df = pd.read_csv(filename, sep="\t")
 
+						
+						#print("CSV is read")
+
 						df['Time [s]'] = df['Time [s]']*1000
 
 						del df['Number']
@@ -404,6 +409,8 @@ class Left_frame :
 
 
 					self.dataset_list = fcs_importer.Fill_datasets_csv(df, data_cont.initialdirectory,  filename)
+
+					#print("FCS importer managed")
 
 					#print("hello")
 					end_time_1 = time.time()
