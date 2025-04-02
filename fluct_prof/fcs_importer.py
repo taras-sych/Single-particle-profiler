@@ -447,6 +447,9 @@ def Fill_datasets_csv( df, dir_output, filename):
 
         chunk_length = int( 1/(x[1] - x[0]))
 
+        if (chunk_length < 1):
+            chunk_length = 1
+
         x = list(x)
         del x[-1]
 
