@@ -577,6 +577,11 @@ class Threshold_window:
 	
 	def Update_thresholds (self):
 
+		left, right = self.peaks.get_xlim()
+		bottom, top = self.peaks.get_ylim()
+
+
+
 
 		data_cont.change_normal = False
 
@@ -601,6 +606,9 @@ class Threshold_window:
 		
 
 		self.Peaks()
+
+		self.peaks.set_xlim(left, right)
+		self.peaks.set_ylim(bottom, top)
 
 
 
@@ -1619,6 +1627,11 @@ class Threshold_window:
 
 	def Threshold_callback(self, event):
 
+		left, right = self.peaks.get_xlim()
+		bottom, top = self.peaks.get_ylim()
+
+		
+
 		
 
 		data_cont.data_list_raw[data_cont.file_index].detection_how = self.Threshold.get()
@@ -1628,6 +1641,9 @@ class Threshold_window:
 
 
 		self.Peaks()
+
+		self.peaks.set_xlim(left, right)
+		self.peaks.set_ylim(bottom, top)
 
 
 	def Put_default(self):
@@ -1926,6 +1942,11 @@ class Threshold_window:
 		
 
 		self.Peaks()
+
+	def Binning_all(self):
+
+		for item in data_cont.data_list_raw:
+			item.binning = int(self.Binning_choice.get())
 
 
 	def Channel_flags(self):
@@ -2231,14 +2252,17 @@ class Threshold_window:
 
 		self.Binning_choice.bind("<<ComboboxSelected>>", self.Binning)
 
+		self.Apply_all_batch_button = tk.Button(self.display_subframe_1, text="Apply to all", command=self.Binning_all)
+		self.Apply_all_batch_button.grid(row = 2, column = 0, columnspan = 2, sticky='ew')
+
 
 		self.Norm_label = tk.Label(self.display_subframe_1, text="Histogram: ")
-		self.Norm_label.grid(row = 2, column = 0, sticky = 'w')
+		self.Norm_label.grid(row = 3, column = 0, sticky = 'w')
 
 		self.Normalization_for_plot = ttk.Combobox(self.display_subframe_1,values = ["Peak Intensity", "Peak Prominence", "Peak width at half max"], width = 9 )
 		self.Normalization_for_plot.config(state = "readonly")
 		
-		self.Normalization_for_plot.grid(row = 2, column = 1, sticky = 'ew')
+		self.Normalization_for_plot.grid(row = 3, column = 1, sticky = 'ew')
 
 		self.Normalization_for_plot.set("Peak Intensity")
 
@@ -2247,7 +2271,7 @@ class Threshold_window:
 		self.var_show_peaks = tk.IntVar()
 
 		self.Peaks_button=tk.Checkbutton(self.display_subframe_1, text="Display peaks", variable=self.var_show_peaks, command=self.Update_thresholds)
-		self.Peaks_button.grid(row = 3, column = 0, columnspan =2, sticky='w')
+		self.Peaks_button.grid(row = 4, column = 0, columnspan =2, sticky='w')
 
 		#----------------------------------------------------------------------------------------------------
 		#-------------------------------- Peak detection widgets --------------------------------------------
@@ -2493,6 +2517,12 @@ class Threshold_window:
 
 		self.Export_plot_button = tk.Button(self.frame00000001, text="Save plot data", command=self.Save_plot_data)
 		self.Export_plot_button.pack(side = "left", anchor = "nw")
+
+		self.Export_checked_plot_button = tk.Button(self.frame00000001, text="Save checked", command=self.Save_plot_data)
+		self.Export_checked_plot_button.pack(side = "left", anchor = "nw")
+
+		self.Export_all_plot_button = tk.Button(self.frame00000001, text="Save all", command=self.Save_plot_data)
+		self.Export_all_plot_button.pack(side = "left", anchor = "nw")
 
 		self.plot_var = {}
 
