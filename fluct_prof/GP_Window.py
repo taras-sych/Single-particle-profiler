@@ -2189,9 +2189,16 @@ class Threshold_window:
 		self.scrollbar_t = tk.Scrollbar(self.frame003)
 		self.scrollbar_t.pack(side = "right", fill = "y")
 
+		self.scrollbar_th = tk.Scrollbar(self.frame003, orient='horizontal')
+		self.scrollbar_th.pack(side = "top", fill = "x")
+
+		
+
 
 		self.Datalist_t = tk.Listbox(self.frame003, width = 100, height = 10)
 		self.Datalist_t.pack(side = "top", anchor = "nw")
+
+		
 		
 		
 		
@@ -2202,6 +2209,9 @@ class Threshold_window:
 
 		self.tree_t.config(yscrollcommand = self.scrollbar_t.set)
 		self.scrollbar_t.config(command = self.tree_t.yview)
+
+		self.tree_t.config(xscrollcommand = self.scrollbar_th.set)
+		self.scrollbar_th.config(command = self.tree_t.xview)
 
 		self.tree_t.bind('<<TreeviewSelect>>', self.Plot_trace)
 
@@ -2216,6 +2226,8 @@ class Threshold_window:
 
 		self.UnCheck_all_button = tk.Button(self.frame003, text="Deselect all", command=self.Deselect_all)
 		self.UnCheck_all_button.pack(side = "right", fill = "y")
+
+		
 
 
 		#----------------------------------------------------------------------------------------------------
