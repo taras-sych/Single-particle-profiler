@@ -218,10 +218,16 @@ class Left_frame :
 		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('CSV files', '*.csv'), ('LSM files', '*.lsm'), ('All files', '*'), ]
 		
 
+		filenames = []
 		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(data_cont.initialdirectory),title = "Select file", filetypes = ftypes)
 
+		if (len(filenames) == 0):
+			print("No files selected")
+
 		
-		filename = filenames[0]
+		#filename = filenames[0]
+
+
 		#print (filename)
 
 		line = "file 1 out of " + str(len(filenames))
@@ -666,6 +672,22 @@ class Left_frame :
 			column_counter +=1
 
 
+	def Select_all(self):
+		list_all = self.tree.get_children()
+		for item in self.tree.get_children():
+			self.tree.change_state(item, "checked")
+			for item1 in self.tree.get_children(item):
+				self.tree.change_state(item1, "checked")
+
+
+	def Deselect_all(self):
+		list_all = self.tree.get_children()
+		for item in self.tree.get_children():
+			self.tree.change_state(item, "unchecked")
+			for item1 in self.tree.get_children(item):
+				self.tree.change_state(item1, "unchecked")
+
+
 	def __init__ (self, frame0, win_width, win_height, dpi_all):
 
 
@@ -688,12 +710,16 @@ class Left_frame :
 		self.Clear_all_Button = tk.Button(self.frame01, text="Delete all", command=self.Delete_all_datasets)
 		self.Clear_all_Button.pack(side = "left", anchor = "nw")
 
+		
+
 
 		self.frame02 = tk.Frame(frame0)
 		self.frame02.pack(side="left", fill="x", anchor = "nw")
 
 		self.frame04 = tk.Frame(frame0)
 		self.frame04.pack(side="left", fill="x", anchor = "nw")
+
+		
 
 
 		self.frame03 = tk.Frame(self.frame02)
@@ -724,8 +750,21 @@ class Left_frame :
 
 		self.Datalist.config(width = 100, height = 10)
 
+		self.frame025 = tk.Frame(self.frame02)
+		self.frame025.pack(side = "top", fill = "x", anchor='nw')
+
+		self.Check_all_button = tk.Button(self.frame025, text="Select all", command=self.Select_all)
+		self.Check_all_button.pack(side = "right", fill = "y")
+
+		self.UnCheck_all_button = tk.Button(self.frame025, text="Deselect all", command=self.Deselect_all)
+		self.UnCheck_all_button.pack(side = "right", fill = "y")
+
+		
+
 		self.frame024 = tk.Frame(self.frame02)
 		self.frame024.pack(side = "top", fill = "x", anchor='nw')
+
+		
 
 		self.frame0003 = tk.Frame(self.frame024)
 		self.frame0003.pack(side = "left", fill = "x")

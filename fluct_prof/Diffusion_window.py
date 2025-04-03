@@ -1038,6 +1038,30 @@ class Diffusion_window :
 				column_counter +=1
 
 
+	def Select_all(self):
+		list_all = self.tree.get_children()
+		for item in self.tree.get_children():
+			self.tree.change_state(item, "checked")
+
+			for item1 in self.tree.get_children(item):
+				self.tree.change_state(item1, "checked")
+
+				for item2 in self.tree.get_children(item1):
+					self.tree.change_state(item2, "checked")
+
+
+	def Deselect_all(self):
+		list_all = self.tree.get_children()
+		for item in self.tree.get_children():
+			self.tree.change_state(item, "unchecked")
+
+			for item1 in self.tree.get_children(item):
+				self.tree.change_state(item1, "unchecked")
+
+				for item2 in self.tree.get_children(item1):
+					self.tree.change_state(item2, "unchecked")
+
+
 
 	def __init__(self, win_width, win_height, dpi_all):
 
@@ -1093,6 +1117,13 @@ class Diffusion_window :
 
 
 		self.Datalist.config(width = 100, height = 10)
+
+
+		self.Check_all_button = tk.Button(self.frame0002, text="Select all", command=self.Select_all)
+		self.Check_all_button.pack(side = "right", fill = "y")
+
+		self.UnCheck_all_button = tk.Button(self.frame0002, text="Deselect all", command=self.Deselect_all)
+		self.UnCheck_all_button.pack(side = "right", fill = "y")
 
 		for i in range(0, len(data_cont.tree_list_name)):
 			name = data_cont.tree_list_name[i]

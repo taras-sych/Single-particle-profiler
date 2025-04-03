@@ -2109,7 +2109,20 @@ class Threshold_window:
 			row_counter += 1
 
 
+	def Select_all(self):
+		list_all = self.tree_t.get_children()
+		for item in self.tree_t.get_children():
+			self.tree_t.change_state(item, "checked")
+			for item1 in self.tree_t.get_children(item):
+				self.tree_t.change_state(item1, "checked")
 
+
+	def Deselect_all(self):
+		list_all = self.tree_t.get_children()
+		for item in self.tree_t.get_children():
+			self.tree_t.change_state(item, "unchecked")
+			for item1 in self.tree_t.get_children(item):
+				self.tree_t.change_state(item1, "unchecked")
 
 
 
@@ -2177,6 +2190,12 @@ class Threshold_window:
 
 		self.Datalist_t.config(width = 100, height = 10)
 
+		self.Check_all_button = tk.Button(self.frame003, text="Select all", command=self.Select_all)
+		self.Check_all_button.pack(side = "right", fill = "y")
+
+		self.UnCheck_all_button = tk.Button(self.frame003, text="Deselect all", command=self.Deselect_all)
+		self.UnCheck_all_button.pack(side = "right", fill = "y")
+
 
 		#----------------------------------------------------------------------------------------------------
 		#---------------------------------- Display widgets -------------------------------------------------
@@ -2197,7 +2216,7 @@ class Threshold_window:
 		self.display_subframe_1 = tk.Frame(self.display_subframe)
 		self.display_subframe_1.pack(side = "top", anchor = "nw")
 
-		self.Binning_label = tk.Label(self.display_subframe_1, text="Binning: ")
+		self.Binning_label = tk.Label(self.display_subframe_1, text="Batch repetitions: ")
 		self.Binning_label.grid(row = 1, column = 0, sticky = 'w')
 
 		divisors = []
