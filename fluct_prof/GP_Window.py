@@ -2194,7 +2194,7 @@ class Threshold_window:
 
 		
 		self.frame003 = tk.Frame(self.frame002)
-		self.frame003.pack(side = "top", anchor = "nw")
+		self.frame003.pack(side = "top", anchor = "ew")
 
 
 		self.scrollbar_t = tk.Scrollbar(self.frame003)
