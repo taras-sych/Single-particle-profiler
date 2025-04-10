@@ -2178,8 +2178,19 @@ class Threshold_window:
 
 		self.win_threshold.geometry(self.line1)
 
-		self.frame002 = tk.Frame(self.win_threshold)
-		self.frame002.pack(side = "left", anchor = "nw")
+		self.frame_navigator = tk.PanedWindow(self.win_threshold, orient="horizontal")
+		self.frame_navigator.pack_propagate(0)
+
+		self.frame002 = tk.Frame(self.frame_navigator)
+		self.frame_navigator.add(self.frame002)
+
+		self.frame000 = tk.Frame(self.win_threshold)
+		self.frame_navigator.add(self.frame000)
+
+		self.frame_navigator.pack(side=tk.TOP, expand=1, fill=tk.BOTH)
+
+		#self.frame002 = tk.Frame(self.win_threshold)
+		#self.frame002.pack(side = "left", anchor = "nw")
 
 		
 		self.frame003 = tk.Frame(self.frame002)
@@ -2195,16 +2206,19 @@ class Threshold_window:
 		
 
 
-		self.Datalist_t = tk.Listbox(self.frame003, width = 100, height = 10)
-		self.Datalist_t.pack(side = "top", anchor = "nw")
+		#self.Datalist_t = tk.Listbox(self.frame003, width = 100, height = 10)
+		#self.Datalist_t.pack(side = "top", anchor = "nw")
 
 		
 		
 		
 		
-		self.tree_t = CheckboxTreeview(self.Datalist_t)
+		self.tree_t = CheckboxTreeview(self.frame003)
 		self.tree_t.heading("#0",text="Imported datasets",anchor=tk.W)
-		self.tree_t.pack()
+		self.tree_t.column('#0', stretch=1)
+		#self.tree_t.heading("#1",text="Second column",anchor=tk.W)
+		self.tree_t.pack(expand=True, fill='x')
+
 
 
 		self.tree_t.config(yscrollcommand = self.scrollbar_t.set)
@@ -2219,7 +2233,7 @@ class Threshold_window:
 
 		
 
-		self.Datalist_t.config(width = 100, height = 10)
+		#self.Datalist_t.config(width = 100, height = 10)
 
 		self.Check_all_button = tk.Button(self.frame003, text="Select all", command=self.Select_all)
 		self.Check_all_button.pack(side = "right", fill = "y")
@@ -2472,8 +2486,8 @@ class Threshold_window:
 		#----------------------------------------------------------------------------------------------------
 
 
-		self.frame000 = tk.Frame(self.win_threshold)
-		self.frame000.pack(side = "left", anchor = "nw")
+		#self.frame000 = tk.Frame(self.win_threshold)
+		#self.frame000.pack(side = "left", anchor = "nw")
 
 
 		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
