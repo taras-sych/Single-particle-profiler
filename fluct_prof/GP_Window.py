@@ -1489,39 +1489,42 @@ class Threshold_window:
 		self.frame000041 = tk.Frame(self.fit_toggled.sub_frame)
 		self.frame000041.pack(side = "top", anchor = "nw")
 
+		self.frame004 = tk.Frame(self.frame000041)
+		self.frame004.pack(side = "top", fill = "both", expand = "yes")
 
 
-		self.frame00004 = tk.Frame(self.frame000041)
 
-		#self.t2 = ToggledFrame(self.frame000041, text='Fold', relief="raised", borderwidth=1)
-		
-
-		#self.frame00004 = self.t2.sub_frame
-		
-
-
-		self.mycanvas = tk.Canvas(self.frame00004)
-		self.mycanvas.pack(side = "left")
-
-
-		self.param_scrollbar  = tk.Scrollbar(self.frame00004, orient = "vertical", command = self.mycanvas.yview)
-		self.param_scrollbar.pack( side = "right", fill = "y" )
-
-		self.mycanvas.configure (yscrollcommand = self.param_scrollbar.set)
-
-		self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
-
-		self.frame004 = tk.Frame(self.mycanvas)
-		#self.frame0041 = tk.Frame(self.mycanvas)
-		
-		self.mycanvas.create_window ((0,0), window=self.frame004, anchor="nw")
-
-		self.frame00004.pack(side = "top", fill = "both", expand = "yes")
-		#self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
-
-		#self.t2 = ToggledFrame(self.frame0041, text='Fold', relief="raised", borderwidth=1)
-		#self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
-		#self.frame004 = self.t2.sub_frame
+		"""self.frame00004 = tk.Frame(self.frame000041)
+						
+								#self.t2 = ToggledFrame(self.frame000041, text='Fold', relief="raised", borderwidth=1)
+								
+						
+								#self.frame00004 = self.t2.sub_frame
+								
+						
+						
+								self.mycanvas = tk.Canvas(self.frame00004)
+								self.mycanvas.pack(side = "left")
+						
+						
+								self.param_scrollbar  = tk.Scrollbar(self.frame00004, orient = "vertical", command = self.mycanvas.yview)
+								self.param_scrollbar.pack( side = "right", fill = "y" )
+						
+								self.mycanvas.configure (yscrollcommand = self.param_scrollbar.set)
+						
+								self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
+						
+								self.frame004 = tk.Frame(self.mycanvas)
+								#self.frame0041 = tk.Frame(self.mycanvas)
+								
+								self.mycanvas.create_window ((0,0), window=self.frame004, anchor="nw")
+						
+								self.frame00004.pack(side = "top", fill = "both", expand = "yes")
+								#self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+						
+								#self.t2 = ToggledFrame(self.frame0041, text='Fold', relief="raised", borderwidth=1)
+								#self.t2.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+								#self.frame004 = self.t2.sub_frame"""
 
 
 
@@ -2181,8 +2184,10 @@ class Threshold_window:
 		self.frame_navigator = tk.PanedWindow(self.win_threshold, orient="horizontal")
 		self.frame_navigator.pack_propagate(0)
 
-		self.frame002 = tk.Frame(self.frame_navigator)
-		self.frame_navigator.add(self.frame002)
+		self.frame002_x = tk.Frame(self.frame_navigator)
+		self.frame_navigator.add(self.frame002_x)
+
+		
 
 		self.frame000 = tk.Frame(self.win_threshold)
 		self.frame_navigator.add(self.frame000)
@@ -2193,15 +2198,15 @@ class Threshold_window:
 		#self.frame002.pack(side = "left", anchor = "nw")
 
 		
-		self.frame003 = tk.Frame(self.frame002)
-		self.frame003.pack(side = "top", anchor = "ew")
+		self.frame003 = tk.Frame(self.frame002_x)
+		self.frame003.pack(side = "top", anchor = "nw", fill = "x")
 
 
 		self.scrollbar_t = tk.Scrollbar(self.frame003)
 		self.scrollbar_t.pack(side = "right", fill = "y")
 
-		self.scrollbar_th = tk.Scrollbar(self.frame003, orient='horizontal')
-		self.scrollbar_th.pack(side = "top", fill = "x")
+		#self.scrollbar_th = tk.Scrollbar(self.frame003, orient='horizontal')
+		#self.scrollbar_th.pack(side = "top", fill = "x")
 
 		
 
@@ -2224,8 +2229,8 @@ class Threshold_window:
 		self.tree_t.config(yscrollcommand = self.scrollbar_t.set)
 		self.scrollbar_t.config(command = self.tree_t.yview)
 
-		self.tree_t.config(xscrollcommand = self.scrollbar_th.set)
-		self.scrollbar_th.config(command = self.tree_t.xview)
+		#self.tree_t.config(xscrollcommand = self.scrollbar_th.set)
+		#self.scrollbar_th.config(command = self.tree_t.xview)
 
 		self.tree_t.bind('<<TreeviewSelect>>', self.Plot_trace)
 
@@ -2241,6 +2246,34 @@ class Threshold_window:
 		self.UnCheck_all_button = tk.Button(self.frame003, text="Deselect all", command=self.Deselect_all)
 		self.UnCheck_all_button.pack(side = "right", fill = "y")
 
+
+		
+
+		
+
+		#self.frame002 = tk.Frame(self.frame002_canvas)
+		#self.frame002.pack(side = "top", anchor = "nw", fill = "x")
+
+		self.frame002_xx = tk.Frame(self.frame002_x)
+
+		self.frame002_canvas = tk.Canvas(self.frame002_xx)
+		self.frame002_canvas.pack(side = "left", anchor = "nw", fill = "x")
+
+
+		self.scrollbar_2  = tk.Scrollbar(self.frame002_xx, orient = "vertical", command = self.frame002_canvas.yview)
+		self.scrollbar_2.pack( side = "right", fill = "y" )
+
+		self.frame002_canvas.configure (yscrollcommand = self.scrollbar_2.set)
+
+		self.frame002_canvas.bind('<Configure>', lambda e: self.frame002_canvas.configure(scrollregion = self.frame002_canvas.bbox('all')))
+
+		self.frame002 = tk.Frame(self.frame002_canvas)
+		#self.frame0041 = tk.Frame(self.mycanvas)
+		
+		self.frame002_canvas.create_window ((0,0), window=self.frame002, anchor="nw")
+
+		self.frame002_xx.pack(side = "top", anchor = "nw", fill = "x")
+
 		
 
 
@@ -2251,6 +2284,8 @@ class Threshold_window:
 
 		self.display_frame = ToggledFrame(self.frame002, text='Display', relief="raised", borderwidth=1)
 		self.display_frame.pack(fill="x", expand=1, pady=2, padx=2, anchor="n")
+
+
 
 		self.display_subframe = self.display_frame.sub_frame
 
