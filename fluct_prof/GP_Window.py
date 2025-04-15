@@ -2251,28 +2251,28 @@ class Threshold_window:
 
 		
 
-		#self.frame002 = tk.Frame(self.frame002_canvas)
-		#self.frame002.pack(side = "top", anchor = "nw", fill = "x")
+		self.frame002 = tk.Frame(self.frame002_x)
+		self.frame002.pack(side = "top", anchor = "nw", fill = "x")
 
-		self.frame002_xx = tk.Frame(self.frame002_x)
-
-		self.frame002_canvas = tk.Canvas(self.frame002_xx)
-		self.frame002_canvas.pack(side = "left", anchor = "nw", fill = "x")
-
-
-		self.scrollbar_2  = tk.Scrollbar(self.frame002_xx, orient = "vertical", command = self.frame002_canvas.yview)
-		self.scrollbar_2.pack( side = "right", fill = "y" )
-
-		self.frame002_canvas.configure (yscrollcommand = self.scrollbar_2.set)
-
-		self.frame002_canvas.bind('<Configure>', lambda e: self.frame002_canvas.configure(scrollregion = self.frame002_canvas.bbox('all')))
-
-		self.frame002 = tk.Frame(self.frame002_canvas)
-		#self.frame0041 = tk.Frame(self.mycanvas)
-		
-		self.frame002_canvas.create_window ((0,0), window=self.frame002, anchor="nw")
-
-		self.frame002_xx.pack(side = "top", anchor = "nw", fill = "x")
+		"""self.frame002_xx = tk.Frame(self.frame002_x)
+						
+								self.frame002_canvas = tk.Canvas(self.frame002_xx)
+								self.frame002_canvas.pack(side = "left", anchor = "nw", fill = "x")
+						
+						
+								self.scrollbar_2  = tk.Scrollbar(self.frame002_xx, orient = "vertical", command = self.frame002_canvas.yview)
+								self.scrollbar_2.pack( side = "right", fill = "y" )
+						
+								self.frame002_canvas.configure (yscrollcommand = self.scrollbar_2.set)
+						
+								self.frame002_canvas.bind('<Configure>', lambda e: self.frame002_canvas.configure(scrollregion = self.frame002_canvas.bbox('all')))
+						
+								self.frame002 = tk.Frame(self.frame002_canvas)
+								#self.frame0041 = tk.Frame(self.mycanvas)
+								
+								self.frame002_canvas.create_window ((0,0), window=self.frame002, anchor="nw")
+						
+								self.frame002_xx.pack(side = "top", anchor = "nw", fill = "x")"""
 
 		
 
