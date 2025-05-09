@@ -844,7 +844,9 @@ def Export_function():
 
 		chan = {}
 
-
+		print(data_c.data_list_raw[file1].datasets_list[rep1].channels_list)
+		print(data_c.data_list_raw[file1].datasets_list[rep1].channels_list[0].short_name)
+		print(data_c.data_frame.channels_flags.keys())
 		for channel in range(len(data_c.data_list_raw[file1].datasets_list[rep1].channels_list)):
 
 			if data_c.data_frame.channels_flags[data_c.data_list_raw[file1].datasets_list[rep1].channels_list[channel].short_name].get() == 1:
