@@ -86,10 +86,49 @@ from fluct_prof import fcs_importer
 class Threshold_window:
 
 
+	def Save_all_plot_data(self):
 
+		list1 = self.tree_t.get_children('')
+
+		for item in list1:
+
+
+			self.tree_t.selection_set(item)
+
+			self.tree_t.focus(item)
+
+			self.tree_t.see(item)
+
+			self.tree_t.event_generate("<<TreeviewSelect>>")
+
+			self.Save_plot_data()
+
+	def Save_checked_plot_data(self):
+
+		list1 = self.tree_t.get_children('')
+
+		list2 = self.tree_t.get_checked('')
+
+		print(list1)
+		print(list2)
+
+		common_elements = list(set(list1) & set(list2))
+
+		for item in common_elements:
+
+			self.tree_t.selection_set(item)
+
+			self.tree_t.focus(item)
+
+			self.tree_t.see(item)
+
+			self.tree_t.event_generate("<<TreeviewSelect>>")
+
+			self.Save_plot_data()
+
+
+	
 	def Save_plot_data(self):
-
-
 
 
 		#print(self.save_plot_dict.keys())
@@ -98,6 +137,8 @@ class Threshold_window:
 
 		name = data_cont.tree_list_name[data_cont.file_index]
 		filename = data_cont.initialdirectory + os.sep +  name + "_Plots_gp.xlsx"
+
+		print(name)
 
 		open_file = open(filename, 'w')
 
@@ -2579,10 +2620,10 @@ class Threshold_window:
 		self.Export_plot_button = tk.Button(self.frame00000001, text="Save plot data", command=self.Save_plot_data)
 		self.Export_plot_button.pack(side = "left", anchor = "nw")
 
-		self.Export_checked_plot_button = tk.Button(self.frame00000001, text="Save checked", command=self.Save_plot_data)
+		self.Export_checked_plot_button = tk.Button(self.frame00000001, text="Save checked", command=self.Save_checked_plot_data)
 		self.Export_checked_plot_button.pack(side = "left", anchor = "nw")
 
-		self.Export_all_plot_button = tk.Button(self.frame00000001, text="Save all", command=self.Save_plot_data)
+		self.Export_all_plot_button = tk.Button(self.frame00000001, text="Save all", command=self.Save_all_plot_data)
 		self.Export_all_plot_button.pack(side = "left", anchor = "nw")
 
 		self.plot_var = {}
