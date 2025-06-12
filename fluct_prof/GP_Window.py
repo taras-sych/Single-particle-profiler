@@ -112,9 +112,14 @@ class Threshold_window:
 		print(list1)
 		print(list2)
 
-		common_elements = list(set(list1) & set(list2))
+		num1, num = index.split('I')
+			
 
-		for item in common_elements:
+		num = int(num, 16)
+
+		
+
+		for item in list1:
 
 			self.tree_t.selection_set(item)
 
