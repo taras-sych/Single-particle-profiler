@@ -1017,6 +1017,9 @@ class Diffusion_window :
 
 		counter = 0
 
+		print (data_cont.file_index)
+		print (data_cont.rep_index)
+
 		for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
 			str1, str2 = item.short_name.split(" ")
 			very_short_name = "ch0" + str2
