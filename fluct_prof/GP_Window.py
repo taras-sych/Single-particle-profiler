@@ -1206,26 +1206,110 @@ class Threshold_window:
 
 			channel = data_cont.data_list_raw[data_cont.file_index].detection_how
 
-		str1, str2 = channel.split(' ')
+		
+		if channel != "All channels AND" and channel != "All channels OR":
+			str1, str2 = channel.split(' ')
 
-		channel_i = int(str2) - 1
+			channel_i = int(str2) - 1
 
-		x1 = x1_list [channel_i]
-		y1_raw = y1_raw_list [channel_i]
-		th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
+			x1 = x1_list [channel_i]
+			y1_raw = y1_raw_list [channel_i]
+			th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
 
 		
 
 
-		if self.normalization_index == "z-score":
-			y1 = stats.zscore(y1_raw)
+			if self.normalization_index == "z-score":
+				y1 = stats.zscore(y1_raw)
 
-		if self.normalization_index == "manual":
-			y1 = y1_raw
+			if self.normalization_index == "manual":
+				y1 = y1_raw
 
-		
-		
-		peaks1, _ = find_peaks(y1, height=th1)
+			
+			
+			peaks1, _ = find_peaks(y1, height=th1)
+
+		if channel == "All channels AND":
+
+			peaks_real = []
+
+			for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+
+				x1 = x1_list [channel_i]
+				y1_raw = y1_raw_list [channel_i]
+				th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
+
+			
+
+
+				if self.normalization_index == "z-score":
+					y1 = stats.zscore(y1_raw)
+
+				if self.normalization_index == "manual":
+					y1 = y1_raw
+
+				
+				
+				peaks1, _ = find_peaks(y1, height=th1)
+
+				peaks_real_temp = []
+
+				for channel_j in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+
+					if channel_j != channel_i:
+
+						x1 = x1_list [channel_j]
+						y1_raw = y1_raw_list [channel_j]
+						th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_j]
+
+						if self.normalization_index == "z-score":
+							y1 = stats.zscore(y1_raw)
+
+						if self.normalization_index == "manual":
+							y1 = y1_raw
+
+
+						for p in peaks1:
+
+							if y1[p] > th1:
+								peaks_real_temp.append(p)
+
+
+					peaks_real = list(set(peaks_real_temp).union(set(peaks_real)))
+					peaks_real_temp = []
+
+			peaks1 = peaks_real
+
+		if channel == "All channels OR":
+
+			peaks_real = []
+
+			for channel_i in range (len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list)):
+
+				x1 = x1_list [channel_i]
+				y1_raw = y1_raw_list [channel_i]
+				th1 = data_cont.data_list_raw[data_cont.file_index].threshold_list[channel_i]
+
+			
+
+
+				if self.normalization_index == "z-score":
+					y1 = stats.zscore(y1_raw)
+
+				if self.normalization_index == "manual":
+					y1 = y1_raw
+
+				
+				
+				peaks1, _ = find_peaks(y1, height=th1)
+
+				peaks_real = list(set(peaks1).union(set(peaks_real)))
+
+
+			peaks1 = peaks_real
+
+
+
 
 
 		self.xp1_dict = {}
@@ -1928,7 +2012,8 @@ class Threshold_window:
 
 
 
-		self.threshold_detection_list.append("all")
+		self.threshold_detection_list.append("All channels AND")
+		self.threshold_detection_list.append("All channels OR")
 
 		self.Threshold.config(values = self.threshold_detection_list)
 
