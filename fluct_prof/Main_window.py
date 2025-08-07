@@ -863,10 +863,10 @@ class sFCS_frame:
 	def Transfer_all_extracted(self):
 		for index in range (len(self.dataset_names)):
 			self.file_number = index
-			try:
-				self.Transfer_extracted()
-			except:
-				print("file number ", self.file_number+1, " cannot be transferred")
+			
+			self.Transfer_extracted()
+			
+				
 
 	def Transfer_extracted(self):
 		name = self.dataset_names [self.file_number]
@@ -895,6 +895,13 @@ class sFCS_frame:
 			data_cont.peaks_list.append([None] * dataset.repetitions)
 
 			data_cont.list_of_channel_pairs.append([None])
+
+			#data_cont.tree_list[-1].selection_set(treetree.child_id)
+			#children = self.tree.get_children()
+			#self.tree.selection_set(children[0])
+
+		else:
+			print("file number ", self.file_number+1, " cannot be transferred, please, extract traces first")
 
 
 	def Plot_this_file(self):
