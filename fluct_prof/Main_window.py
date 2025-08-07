@@ -860,6 +860,14 @@ class Left_frame :
 
 class sFCS_frame:
 
+	def Transfer_all_extracted(self):
+		for index in range (len(self.dataset_names)):
+			self.file_number = index
+			try:
+				self.Transfer_extracted()
+			except:
+				print("file number ", self.file_number+1, " cannot be transferred")
+
 	def Transfer_extracted(self):
 		name = self.dataset_names [self.file_number]
 		if name in self.dictionary_of_extracted:
@@ -947,6 +955,13 @@ class sFCS_frame:
 
 	def Empty_function(self):
 		print("Empty function invoked")
+
+	def Extraxt_all_traces(self):
+
+		for index in range (len(self.dataset_names)):
+			self.file_number = index
+			self.Extract_trace()
+
 
 	def Extract_trace(self):
 
@@ -1348,7 +1363,10 @@ class sFCS_frame:
 
 
 		self.Extract_button = tk.Button(self.frame023, text="Extract trace", command=self.Extract_trace)
-		self.Extract_button.grid(row = 0, column = 0, columnspan = 2, sticky="EW")
+		self.Extract_button.grid(row = 0, column = 0, sticky="EW")
+
+		self.Extract_all_button = tk.Button(self.frame023, text="Extract all", command=self.Extraxt_all_traces)
+		self.Extract_all_button.grid(row = 0, column = 1, sticky="EW")
 
 		self.Binning_label = tk.Label(self.frame023,  text = "Pixel binning: ")
 		self.Binning_label.grid(row = 1, column = 0, sticky = 'ew')
@@ -1401,7 +1419,10 @@ class sFCS_frame:
 		self.Display_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
 
 		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Transfer_extracted)
-		self.Transfer_button.grid(row = 8, column = 0, columnspan =2, sticky="EW")
+		self.Transfer_button.grid(row = 8, column = 0, sticky="EW")
+
+		self.Transfer_all_button = tk.Button(self.frame023, text="Transfer all", command=self.Transfer_all_extracted)
+		self.Transfer_all_button.grid(row = 8, column = 1, sticky="EW")
 
 
 		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
