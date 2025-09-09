@@ -2140,7 +2140,7 @@ class Threshold_window:
 				if i < value1:
 					data_cont.data_list_raw[data_cont.file_index].blue_setup.append(tk.IntVar(value=1))
 
-				if i > value1:
+				if i >= value1:
 					data_cont.data_list_raw[data_cont.file_index].blue_setup.append(tk.IntVar(value=0))
 
 
@@ -2158,7 +2158,7 @@ class Threshold_window:
 
 			for i in range(len(self.red_channels_flags)):
 
-				if i < value1:
+				if i <= value1:
 					data_cont.data_list_raw[data_cont.file_index].red_setup.append(tk.IntVar(value=0))
 
 				if i > value1:
@@ -2193,9 +2193,11 @@ class Threshold_window:
 
 		counter = 0
 
+		#print("channels list: ", len(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list))
 		for item in data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list:
 			str1, str2 = item.short_name.split(" ")
 			very_short_name = "ch0" + str2
+			
 
 			#self.blue_channels_flags.append(tk.IntVar(value=1))
 			self.blue_flags_dict[item.short_name] = tk.Checkbutton(self.blue_checks_subframe, text=very_short_name, variable=self.blue_channels_flags[column_counter], command=self.Change_channel_for_2D_GP)
