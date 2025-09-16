@@ -77,7 +77,7 @@ def Create_root():
 
 	tabs.add(frame0, text = "Single Particle Profiler")
 	tabs.add(frame1, text = "Scanning FCS (cross)")
-	#tabs.add(frame2, text = "Scanning FCS (carpet)")
+	tabs.add(frame2, text = "Scanning FCS (carpet)")
 
 	tabs_number = 3;
 
@@ -88,6 +88,8 @@ def Create_root():
 	data_frame = main_w.Left_frame(frame0_l, win_width, win_height, dpi_all )
 
 	data_frame_sFCS = main_w.sFCS_frame(frame1_l, win_width, win_height, dpi_all )
+
+	data_frame_sFCS = main_w.sFCS_frame(frame2_l, win_width, win_height, dpi_all )
 
 binning_list = []
 
