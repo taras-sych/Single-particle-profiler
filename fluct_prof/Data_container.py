@@ -77,7 +77,7 @@ def Create_root():
 
 	tabs.add(frame0, text = "Single Particle Profiler")
 	tabs.add(frame1, text = "Scanning FCS (cross)")
-	#tabs.add(frame2, text = "Scanning FCS (carpet)")
+	tabs.add(frame2, text = "Scanning FCS (carpet)")
 
 	tabs_number = 3;
 
