@@ -1242,7 +1242,7 @@ class sFCS_frame:
 		binned_data = eg.intensity_carpet_plot(1, bin_size=bins, n_slices = slices)
 
 		
-		self.image.imshow(binned_data,origin="lower")
+		self.image.imshow(binned_data,origin="lower", aspect="auto", cmap="rainbow")
 		self.canvas1.draw_idle()
 
 		
