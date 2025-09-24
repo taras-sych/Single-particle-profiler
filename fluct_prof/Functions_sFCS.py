@@ -6,6 +6,7 @@ import lmfit
 import pandas as pd
 from datetime import datetime
 from fluct_prof import Analyse_sFCS_data_MLE_BIC as data_an
+from czifile import CziFile
 
 
 class File_sFCS:
@@ -183,3 +184,13 @@ def params_lists_to_object(list_of_params, list_of_inits, list_of_vary, list_of_
         params.add(list_of_params[i], float(list_of_inits[i]), vary = int(list_of_vary[i]), 
                    min = float(list_of_min[i]), max = float(list_of_max[i]))
     return params
+
+
+
+class File_sFCS_czi:
+
+    def __init__(self, filename):
+        with CziFile(filename) as czi:
+            image_data = czi.asarray()  # Convert to numpy array
+
+        self.carpet_full = image_data[0, :, 0, 0, 0, :, 0].T

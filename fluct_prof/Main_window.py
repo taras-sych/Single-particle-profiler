@@ -1484,6 +1484,783 @@ class sFCS_frame:
 		self.framepb.pack(side="top", fill="x")
 
 
+class sFCS_carpet:
+
+	def Transfer_all_extracted(self):
+		for index in range (len(self.dataset_names)):
+			self.file_number = index
+			
+			self.Transfer_extracted()
+			
+				
+
+	def Transfer_extracted(self):
+		name = self.dataset_names [self.file_number]
+		if name in self.dictionary_of_extracted:
+
+			dataset = self.dictionary_of_extracted[name]
+
+			treetree = d_tree.Data_tree (data_cont.data_frame.tree, name, dataset.repetitions)
+			
+			data_cont.tree_list.append(treetree)
+
+			data_cont.tree_list_name.append(name)
+
+			data_cont.binning_list.append(1)
+
+
+			data_cont.data_list_raw.append(dataset)
+
+
+			#data_list_current.append(dataset1)
+
+
+			data_cont.total_channels_list.append(dataset.datasets_list[0].channels_number + dataset.datasets_list[0].cross_number)
+			data_cont.repetitions_list.append(dataset.repetitions)
+
+			data_cont.peaks_list.append([None] * dataset.repetitions)
+
+			data_cont.list_of_channel_pairs.append([None])
+
+			#data_cont.tree_list[-1].selection_set(treetree.child_id)
+			#children = self.tree.get_children()
+			#self.tree.selection_set(children[0])
+
+		else:
+			print("file number ", self.file_number+1, " cannot be transferred, please, extract traces first")
+
+
+	def Plot_this_file(self):
+
+		self.traces.cla()
+
+		self.corr.cla()
+
+
+		name = self.dataset_names [self.file_number]
+		if name in self.dictionary_of_extracted:
+			rep = int(self.Rep_Display__choice.get()) - 1
+			channel = self.Chan_Display__choice.get()
+
+			dataset = self.dictionary_of_extracted [name] 
+
+			if channel == 'all':
+
+				print("Dataset list length", len(dataset.datasets_list))
+
+				for i in range (0, dataset.datasets_list[rep].channels_number): 
+
+					#print(len(dataset.datasets_list[rep].channels_list[i].fluct_arr.x))
+
+					self.traces.plot(dataset.datasets_list[rep].channels_list[i].fluct_arr.x, dataset.datasets_list[rep].channels_list[i].fluct_arr.y, label = dataset.datasets_list[rep].channels_list[i].short_name)
+
+					self.corr.plot(dataset.datasets_list[rep].channels_list[i].auto_corr_arr.x, dataset.datasets_list[rep].channels_list[i].auto_corr_arr.y, label = dataset.datasets_list[rep].channels_list[i].short_name)
+
+				for i in range (0, dataset.datasets_list[rep].cross_number):
+
+					self.corr.plot(dataset.datasets_list[rep].cross_list[i].cross_corr_arr.x, dataset.datasets_list[rep].cross_list[i].cross_corr_arr.y, label = dataset.datasets_list[rep].cross_list[i].short_name)
+
+
+
+		
+		self.traces.set_title("Intensity traces")
+		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.traces.set_ylabel('Counts (Hz)')
+		self.traces.set_xlabel('Time (s)')
+		self.traces.legend(loc='upper right')
+
+
+
+
+		self.corr.set_title("Correlation curves")
+		self.corr.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.corr.set_ylabel('G(tau)')
+		self.corr.set_xlabel('Delay time')
+		self.corr.set_xscale ('log')
+		self.corr.legend(loc='upper right')
+
+		self.canvas1.draw_idle()
+
+		
+
+		self.figure1.tight_layout()
+		
+
+	def Empty_function(self):
+		print("Empty function invoked")
+
+	def Extraxt_all_traces(self):
+
+		for index in range (len(self.dataset_names)):
+			self.file_number = index
+			self.Extract_trace()
+
+	def Corr_carpet(self):
+
+		repetitions = int(self.Repetitions_entry.get())
+		binning = int(self.Binning__choice.get())
+		self.timestep = float(self.Timestep_entry.get())
+
+
+
+		carpet_full = copy.deepcopy(self.eg.carpet_full)
+
+		rep_length = int(carpet_full.shape[1]/repetitions)
+
+		rep_number = 1
+
+		start = rep_length*(rep_number - 1)
+		end = rep_length*rep_number
+
+		if end >= carpet_full.shape[1]:
+			end = carpet_full.shape[1] - 1
+
+
+		carpet = carpet_full[:,start : end]
+
+		dimension = int(carpet.shape[0]/binning)
+
+		self.carpet_binned = carpet.reshape(dimension, binning, carpet.shape[1]).sum(axis=1)
+
+		correlation_carpet = []
+
+		for i in range(self.carpet_binned.shape[0]):
+			trace = self.carpet_binned[i,:]
+			#x = np.linspace(start*timestep, end*timestep, end-start)
+			x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
+			correlation_carpet.append(y1)
+			#print(x1[1] - x1[0])
+
+		correlation_carpet_2d = np.stack(correlation_carpet, axis=0)
+
+
+
+
+
+
+		x = x1  # arbitrary X-axis
+		y = np.linspace(1, correlation_carpet_2d.shape[0], correlation_carpet_2d.shape[0])              # keep Y pixel indices
+
+
+		X, Y = np.meshgrid(x, y)
+
+		self.image.cla()
+		self.corr_carpet.cla()
+
+		self.image.imshow(self.carpet_binned, origin="lower", aspect="auto", cmap="rainbow")
+		self.image.set_xlabel("Timepoints")
+		self.image.set_ylabel("Pixels scanned")
+		self.image.set_title("sFCS trace carpet, binning = " + str(binning))
+
+
+		self.corr_carpet.pcolormesh(X, Y, correlation_carpet_2d, shading='auto', cmap='rainbow')
+		self.corr_carpet.set_xlabel("Delay time")
+		self.corr_carpet.set_xscale("log")
+		self.corr_carpet.set_ylabel("Lines")
+		self.corr_carpet.set_title("sFCS correlation carpet")
+
+		self.canvas1.draw_idle()
+
+			
+
+		self.figure1.tight_layout()
+
+
+		self.selected_line_t = None
+		self.selected_line_c = None
+		self.Plot_this_line(int(correlation_carpet_2d.shape[0]/2))
+
+
+
+		
+	def Plot_this_line(self, trace_number):
+
+		trace = self.carpet_binned[trace_number,:]
+		x = np.linspace(0, self.carpet_binned.shape[1]*self.timestep, self.carpet_binned.shape[1])
+
+		x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
+		#print(x1[1] - x1[0])
+
+		line = self.carpet_binned[trace_number, :]
+
+
+
+		self.traces.cla()
+		self.corr.cla()
+
+		self.traces.plot(x, trace, label="trace", color="blue")
+		self.traces.set_xlabel("time (s)")
+		self.traces.set_ylabel("Intensity (a.u.)")
+
+		self.corr.scatter(x1, y1, label="trace", color="blue")
+		self.corr.set_xscale("log")
+		self.corr.set_xlabel("Delay time")
+		self.corr.set_ylabel("G(tau)")
+
+		self.selected_line_t = self.image.axhline(y=trace_number, color='red', linestyle='-', linewidth=3)
+		self.selected_line_c = self.corr_carpet.axhline(y=trace_number, color='red', linestyle='-', linewidth=3)
+
+		self.canvas1.draw_idle()
+
+			
+
+		self.figure1.tight_layout()
+
+
+	def onclick(self, event):
+
+		if event.inaxes != self.image and event.inaxes != self.corr_carpet:  # only react if inside the image
+			return
+
+		if self.selected_line_t is not None:
+			self.selected_line_t.remove()
+
+		if self.selected_line_c is not None:
+			self.selected_line_c.remove()
+
+
+		trace_number = int(round(event.ydata))
+		self.Plot_this_line(trace_number)
+
+
+
+	def Extract_trace(self):
+
+		name = self.dataset_names [self.file_number]
+		sedec = Sidecut_sFCS(self.dataset_list[self.file_number])
+		if len(sedec.array.shape) == 3:
+			channels_number = sedec.array.shape[0]
+			array_length = sedec.array.shape[1]
+		else:
+			channels_number = 1
+			array_length = sedec.array.shape[0]
+
+		print("shape ", sedec.array.shape)
+
+		print("channels number ", channels_number)
+
+		repetitions = int(self.Repetitions_entry.get())
+		self.reps_to_display = []
+		for i in range (0, repetitions):
+			self.reps_to_display.append(i+1)
+
+		bins = int(self.Binning__choice.get())
+		timestep = float(self.Timestep_entry.get())
+
+		list_of_y = []
+
+		x_full = np.linspace(0, array_length*timestep, num=array_length)
+		#print(sedec.array.shape[0])
+
+		self.channels_to_display = []
+		counter_of_invalid_channels = 0
+		for channel_no in range(0, channels_number):
+
+			#try:
+
+			y = sedec.isolate_maxima(channel_no, bins)
+
+			list_of_y.append(y)
+
+			self.channels_to_display.append(str(channel_no))
+
+			#except:
+
+				#print ("channel number ", channel_no, " has not enough signal")
+				#counter_of_invalid_channels+=1
+
+
+			channels_number-=counter_of_invalid_channels
+
+			#self.traces.plot(x, y, label = "channel " + str(channel_no))
+
+			#self.canvas1.draw_idle()
+
+		
+
+			#self.figure1.tight_layout()
+
+
+		self.channels_to_display.append('all')
+		self.Chan_Display__choice.config(values = self.channels_to_display)
+		self.Rep_Display__choice.config(values = self.reps_to_display)
+
+		length_rep = int (array_length/repetitions)
+		
+
+		
+		dataset_list_arg = []
+		for rep_index_i in range (repetitions):
+
+
+			channels_list_arg = []
+
+			for channel in range (channels_number):
+
+				end = length_rep*(rep_index_i + 1)
+				start = end - length_rep
+
+				print(channel, rep_index_i, start, end)
+
+				if rep_index_i == repetitions-1:
+
+					if end != len (x_full) - 1:
+
+						end = len (x_full) - 1
+
+				
+
+				x = x_full[start : end]
+				y = list_of_y[channel][start : end]
+
+
+
+				min1 = min(x)
+
+				x1 = [a - min1 for a in x]
+
+				x = x1
+
+				
+
+				Tr = fcs_importer.XY_plot(x,y)
+
+				timestep = x[1] - x[0]
+
+				x1, y1 = corr_py.correlate_full (timestep, np.array(Tr.y), np.array(Tr.y))
+
+				AutoCorr = fcs_importer.XY_plot(x1,y1)
+
+				long_name = name + "channel " + str(channel)
+
+				short_name = "channel " + str(channel)
+
+				Ch_dataset = fcs_importer.fcs_channel (long_name, Tr, AutoCorr, short_name)
+
+				channels_list_arg.append(Ch_dataset)
+
+			cross_list_arg = []
+
+			if channels_number > 1:
+				channel1 = 0
+				while channel1 < channels_number:
+				#for channel1 in range (0, channels_number):
+					end = length_rep*(rep_index_i + 1)
+					start = end - length_rep
+
+					#print(channel, rep_index_i, start, end)
+
+					if rep_index_i == repetitions-1:
+
+						if end != len (x_full) - 1:
+
+							end = len (x_full) - 1
+
+					
+
+					x = x_full[start : end]
+					y = list_of_y[channel1][start : end]
+
+
+
+					min1 = min(x)
+
+					x1 = [a - min1 for a in x]
+
+					x = x1
+
+					
+
+					Tr1 = fcs_importer.XY_plot(x,y)
+
+					channel2 = channel1 + 1
+					while channel2 < channels_number:
+
+					#for channel2 in range (channel1 +1, channels_number):
+						end = length_rep*(rep_index_i + 1)
+						start = end - length_rep
+
+						#print(channel, rep_index_i, start, end)
+
+						if rep_index_i == repetitions-1:
+
+							if end != len (x_full) - 1:
+
+								end = len (x_full) - 1
+
+						
+
+						x = x_full[start : end]
+						y = list_of_y[channel2][start : end]
+
+
+
+						min1 = min(x)
+
+						x1 = [a - min1 for a in x]
+
+						x = x1
+
+						
+
+						Tr2 = fcs_importer.XY_plot(x,y)
+
+						timestep = Tr1.x[1] - Tr1.x[0]
+
+						x1, y1 = corr_py.correlate_full (timestep, np.array(Tr1.y), np.array(Tr2.y))
+
+						CrossCorr_12 = fcs_importer.XY_plot(x1,y1)
+
+						short_name_12 = "channel " + str(channel1) + " vs " + "channel " + str(channel2)
+
+						x1, y1 = corr_py.correlate_full (timestep, np.array(Tr2.y), np.array(Tr1.y))
+
+						CrossCorr_21 = fcs_importer.XY_plot(x1,y1)
+
+						short_name_21 = "channel " + str(channel2) + " vs " + "channel " + str(channel1)
+
+						Cross_dataset = fcs_importer.fcs_cross (short_name_12, CrossCorr_12, short_name_12)
+						cross_list_arg.append(Cross_dataset)
+						Cross_dataset = fcs_importer.fcs_cross (short_name_21, CrossCorr_21, short_name_21)
+						cross_list_arg.append(Cross_dataset)
+
+						channel2 += 1
+
+					channel1 += 1
+
+
+
+
+
+
+			FCS_Dataset =  fcs_importer.Dataset_fcs(channels_number, len(cross_list_arg), channels_list_arg, cross_list_arg )
+
+			dataset_list_arg.append(FCS_Dataset)
+
+
+
+		
+		dataset = 	fcs_importer.Full_dataset_fcs(repetitions, dataset_list_arg)
+
+		self.dictionary_of_extracted [name] = dataset
+
+		self.Plot_this_file()
+
+		#name = data_cont.tree_list_name[data_cont.file_index] + " " + str(repetitions_new)
+
+		#treetree = d_tree.Data_tree (self.tree, name, dataset.repetitions)
+
+		#treetree = d_tree.Data_tree (data_cont.data_frame.tree, name, dataset.repetitions)
+
+		#data_cont.tree_list.append(treetree)
+
+		#data_cont.tree_list_name.append(name)
+
+		#data_cont.binning_list.append(1)
+
+
+		#data_cont.data_list_raw.append(dataset)
+
+
+		#data_list_current.append(dataset1)
+
+
+		#data_cont.total_channels_list.append(dataset.datasets_list[0].channels_number + dataset.datasets_list[0].cross_number)
+		#data_cont.repetitions_list.append(dataset.repetitions)
+
+		#data_cont.peaks_list.append([None] * dataset.repetitions)
+
+		#data_cont.list_of_channel_pairs.append([None])
+
+
+
+		
+
+	def Tree_selection(self, event):
+
+		index = self.tree.selection()
+		num1, num = index[0].split('I')
+
+
+		
+
+		num = int(num, 16)-1
+
+		self.file_number = num
+
+		if self.dataset_list[self.file_number].endswith('.czi'):
+
+			self.eg = func.File_sFCS_czi(self.dataset_list[self.file_number])
+
+			self.image.imshow(self.eg.carpet_full,origin="lower", aspect="auto", cmap="rainbow")
+			self.canvas1.draw_idle()
+
+			
+
+			self.figure1.tight_layout()
+
+
+		if self.dataset_list[self.file_number].endswith('.lsm'):
+
+			eg= func.File_sFCS(self.dataset_list[self.file_number])
+
+			bins = 1
+			slices = 1
+
+			binned_data = eg.intensity_carpet_plot(1, bin_size=bins, n_slices = slices)
+
+			
+			self.image.imshow(binned_data,origin="lower", aspect="auto", cmap="rainbow")
+			self.canvas1.draw_idle()
+
+			
+
+			self.figure1.tight_layout()
+
+			self.Plot_this_file()
+        
+
+		#print(self.dataset_list[num])
+
+		
+
+
+
+
+	def Import(self):
+
+		if data_cont.initialdirectory == '':
+			data_cont.initialdirectory = __file__
+
+		ftypes = [('CZI .czi', '*.czi'), ('LSM .lsm', '*.lsm'), ('Tif .tif', '*.tif'), ('All files', '*'), ]
+		
+
+		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(data_cont.initialdirectory),title = "Select file", filetypes = ftypes)
+
+		for filename_index in range (0, len(filenames)):
+			filename = filenames[filename_index]
+			if filename != "":
+
+				data_cont.initialdirectory = os.path.dirname(filename)
+
+
+				self.name = os.path.basename(filename)
+
+				self.dataset_list.append(filename)
+
+				self.dataset_names.append(self.name)
+		
+
+			
+
+				treetree = d_tree.Data_tree (self.tree, self.name, 0)
+				self.tree.selection_set(treetree.child_id)
+			
+
+		
+
+			
+
+	def __init__ (self, frame0, win_width, win_height, dpi_all):
+
+		self.dictionary_of_extracted = {}
+
+		self.dataset_list = []
+		self.dataset_names = []
+		self.file_number = 0
+
+
+
+		pixel = tk.PhotoImage(width=1, height=1)
+
+
+		
+
+		self.frame01 = tk.Frame(frame0)
+		self.frame01.pack(side="top", fill="x")
+
+
+		self.Import_Button = tk.Button(self.frame01, text="Import", command=self.Import)
+		self.Import_Button.pack(side = "left", anchor = "nw")
+
+		self.Clear_Button = tk.Button(self.frame01, text="Delete dataset", command=self.Empty_function)
+		self.Clear_Button.pack(side = "left", anchor = "nw")
+
+		self.Clear_all_Button = tk.Button(self.frame01, text="Delete all", command=self.Empty_function)
+		self.Clear_all_Button.pack(side = "left", anchor = "nw")
+
+
+		self.frame02 = tk.Frame(frame0)
+		self.frame02.pack(side="left", fill="x", anchor = "nw")
+
+		self.frame04 = tk.Frame(frame0)
+		self.frame04.pack(side="left", fill="x", anchor = "nw")
+
+
+		self.frame03 = tk.Frame(self.frame02)
+		self.frame03.pack(side="top", fill="x")
+
+
+
+		self.scrollbar = tk.Scrollbar(self.frame03)
+		self.scrollbar.pack(side = "left", fill = "y")
+
+
+		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10)
+		self.Datalist.pack(side = "left", anchor = "nw")
+		
+		
+		
+		self.tree=CheckboxTreeview(self.Datalist)
+		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
+		self.tree.pack()
+
+
+		self.tree.config(yscrollcommand = self.scrollbar.set)
+		self.scrollbar.config(command = self.tree.yview)
+
+		self.tree.bind('<<TreeviewSelect>>', self.Tree_selection)
+
+		self.Datalist.config(width = 100, height = 10)
+
+		self.frame024 = tk.Frame(self.frame02)
+		self.frame024.pack(side = "top", fill = "x", anchor='nw')
+
+		self.frame0003 = tk.Frame(self.frame024)
+		self.frame0003.pack(side = "left", fill = "x")
+
+
+		#self.chkbtn = tk.Checkbutton(self.frame0003, text="ch1", variable=1, command=Norm)
+		#self.chkbtn.grid(row = 0, column = 0, sticky='w')
+
+		self.frame023 = tk.Frame(self.frame02)
+		self.frame023.pack(side="left", fill="x")
+
+
+		self.Extract_button = tk.Button(self.frame023, text="Corr carpet", command=self.Corr_carpet)
+		self.Extract_button.grid(row = 0, column = 0, sticky="EW")
+
+		self.Extract_all_button = tk.Button(self.frame023, text="All carpets", command=self.Extraxt_all_traces)
+		self.Extract_all_button.grid(row = 0, column = 1, sticky="EW")
+
+		self.Binning_label = tk.Label(self.frame023,  text = "Pixel binning: ")
+		self.Binning_label.grid(row = 1, column = 0, sticky = 'ew')
+
+
+		self.Binning__choice = ttk.Combobox(self.frame023,values = ["1","2","4","8"],  width = 18 )
+		self.Binning__choice.config(state = "readonly")
+		self.Binning__choice.grid(row = 1, column = 1, sticky = 'ew')
+		self.Binning__choice.set("4")
+
+		self.Repetitions_label = tk.Label(self.frame023,  text = "Repetitions: ")
+		self.Repetitions_label.grid(row = 2, column = 0, sticky = 'ew')
+
+		self.Repetitions_entry = tk.Entry(self.frame023, width = 9)
+		self.Repetitions_entry.grid(row = 2, column = 1, sticky='ew')
+		self.Repetitions_entry.insert("end", str(10))
+
+		self.Timestep_label = tk.Label(self.frame023,  text = "Timestep: ")
+		self.Timestep_label.grid(row = 3, column = 0, sticky = 'ew')
+
+		self.Timestep_entry = tk.Entry(self.frame023, width = 9)
+		self.Timestep_entry.grid(row = 3, column = 1, sticky='ew')
+		self.Timestep_entry.insert("end", str(0.0003))
+
+		self.Display_label = tk.Label(self.frame023,  text = "Display: ")
+		self.Display_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
+
+		self.Rep_Display_label = tk.Label(self.frame023,  text = "Repetition: ")
+		self.Rep_Display_label.grid(row = 5, column = 0, sticky = 'ew')
+
+		self.Rep_Display__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
+		self.Rep_Display__choice.config(state = "readonly")
+		self.Rep_Display__choice.grid(row = 5, column = 1, sticky = 'ew')
+		self.Rep_Display__choice.set("1")
+
+
+		self.Chan_Display_label = tk.Label(self.frame023,  text = "Channel: ")
+		self.Chan_Display_label.grid(row = 6, column = 0, sticky = 'ew')
+
+		self.channels_to_display = ['1']
+
+		self.Chan_Display__choice = ttk.Combobox(self.frame023,values = self.channels_to_display,  width = 18 )
+		self.Chan_Display__choice.config(state = "readonly")
+		self.Chan_Display__choice.grid(row = 6, column = 1, sticky = 'ew')
+		self.Chan_Display__choice.set("all")
+
+
+
+		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Plot_this_file)
+		self.Display_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
+
+		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Transfer_extracted)
+		self.Transfer_button.grid(row = 8, column = 0, sticky="EW")
+
+		self.Transfer_all_button = tk.Button(self.frame023, text="Transfer all", command=self.Transfer_all_extracted)
+		self.Transfer_all_button.grid(row = 8, column = 1, sticky="EW")
+
+
+		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
+
+
+
+
+		gs = self.figure1.add_gridspec(3, 2)
+
+
+		self.image = self.figure1.add_subplot(gs[:1, :2])
+
+		self.image.set_title("sFCS image")
+
+		#self.image.ticklabel_format(axis = "y", scilimits = (0,0))
+		
+
+		
+
+
+		self.traces = self.figure1.add_subplot(gs[1, :2])
+
+		self.traces.set_title("Selected Traces")
+
+		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
+		self.traces.set_ylabel('intensity (a.u.)')
+		self.traces.set_xlabel('Time (s)')
+
+		self.corr_carpet = self.figure1.add_subplot(gs[2, 0])
+
+		self.corr_carpet.set_title("Correlation carpet")
+		self.corr_carpet.set_ylabel('Diff. Coeff.')
+		self.corr_carpet.set_ylabel('G (tau)')
+		self.corr_carpet.set_xlabel('Delay time')
+		
+
+
+		self.corr = self.figure1.add_subplot(gs[2, 1])
+
+		self.corr.set_title("Correlation curves")
+		self.corr.set_ylabel('Diff. Coeff.')
+		self.corr.set_ylabel('G (tau)')
+		self.corr.set_xlabel('Delay time')
+
+
+
+
+
+		self.canvas1 = FigureCanvasTkAgg(self.figure1, self.frame04)
+		self.canvas1.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas1, self.frame04)
+		self.toolbar.update()
+		self.canvas1.get_tk_widget().pack()
+
+		self.figure1.tight_layout()
+
+		self.framepb = tk.Frame(frame0)
+		self.framepb.pack(side="top", fill="x")
+
+		cid = self.figure1.canvas.mpl_connect('button_press_event', self.onclick)
+
+
 class Sidecut_sFCS:
 	def __init__(self,lsm_file_name):
 		self.lsm_file_name = lsm_file_name

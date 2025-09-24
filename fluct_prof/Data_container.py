@@ -89,6 +89,8 @@ def Create_root():
 
 	data_frame_sFCS = main_w.sFCS_frame(frame1_l, win_width, win_height, dpi_all )
 
+	data_frame_sFCS = main_w.sFCS_carpet(frame2_l, win_width, win_height, dpi_all )
+
 binning_list = []
 
 file_index = 0
