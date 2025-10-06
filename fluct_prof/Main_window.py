@@ -1601,6 +1601,14 @@ class sFCS_carpet:
 		binning = int(self.Binning__choice.get())
 		self.timestep = float(self.Timestep_entry.get())
 
+		self.reps_to_display = []
+
+		for i in range (0, repetitions):
+			self.reps_to_display.append(i+1)
+
+		self.Rep_Display__choice.config(values = self.reps_to_display)
+		self.Rep_Display__choice.set("1")
+
 
 
 		carpet_full = copy.deepcopy(self.eg.carpet_full)
@@ -1634,7 +1642,10 @@ class sFCS_carpet:
 		correlation_carpet_2d = np.stack(correlation_carpet, axis=0)
 
 
+		x_min, x_max = start * self.timestep, end * self.timestep  
 
+			
+		y_min, y_max = 0, self.carpet_binned.shape[0] 
 
 
 
@@ -1647,14 +1658,14 @@ class sFCS_carpet:
 		self.image.cla()
 		self.corr_carpet.cla()
 
-		self.image.imshow(self.carpet_binned, origin="lower", aspect="auto", cmap="rainbow")
-		self.image.set_xlabel("Timepoints")
+		self.image.imshow(self.carpet_binned, origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
+		self.image.set_xlabel("Time (s)")
 		self.image.set_ylabel("Pixels scanned")
 		self.image.set_title("sFCS trace carpet, binning = " + str(binning))
 
 
 		self.corr_carpet.pcolormesh(X, Y, correlation_carpet_2d, shading='auto', cmap='rainbow')
-		self.corr_carpet.set_xlabel("Delay time")
+		self.corr_carpet.set_xlabel("Delay time (s)")
 		self.corr_carpet.set_xscale("log")
 		self.corr_carpet.set_ylabel("Lines")
 		self.corr_carpet.set_title("sFCS correlation carpet")
@@ -1697,8 +1708,8 @@ class sFCS_carpet:
 		self.corr.set_xlabel("Delay time")
 		self.corr.set_ylabel("G(tau)")
 
-		self.selected_line_t = self.image.axhline(y=trace_number, color='red', linestyle='-', linewidth=3)
-		self.selected_line_c = self.corr_carpet.axhline(y=trace_number, color='red', linestyle='-', linewidth=3)
+		self.selected_line_t = self.image.axhline(y=trace_number, color='red', linestyle='--', linewidth=2)
+		self.selected_line_c = self.corr_carpet.axhline(y=trace_number, color='red', linestyle='--', linewidth=2)
 
 		self.canvas1.draw_idle()
 
@@ -1721,6 +1732,93 @@ class sFCS_carpet:
 
 		trace_number = int(round(event.ydata))
 		self.Plot_this_line(trace_number)
+
+
+	def Display(self, event):
+		#print(self.Rep_Display__choice.get())
+
+		repetitions = int(self.Repetitions_entry.get())
+		binning = int(self.Binning__choice.get())
+		self.timestep = float(self.Timestep_entry.get())
+
+		self.reps_to_display = []
+
+		for i in range (0, repetitions):
+			self.reps_to_display.append(i+1)
+
+		#self.Rep_Display__choice.config(values = self.reps_to_display)
+
+
+
+		carpet_full = copy.deepcopy(self.eg.carpet_full)
+
+		rep_length = int(carpet_full.shape[1]/repetitions)
+
+		rep_number = int(self.Rep_Display__choice.get())
+
+		start = rep_length*(rep_number - 1)
+		end = rep_length*rep_number
+
+		if end >= carpet_full.shape[1]:
+			end = carpet_full.shape[1] - 1
+
+
+		carpet = carpet_full[:,start : end]
+
+		dimension = int(carpet.shape[0]/binning)
+
+		self.carpet_binned = carpet.reshape(dimension, binning, carpet.shape[1]).sum(axis=1)
+
+		correlation_carpet = []
+
+		for i in range(self.carpet_binned.shape[0]):
+			trace = self.carpet_binned[i,:]
+			#x = np.linspace(start*timestep, end*timestep, end-start)
+			x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
+			correlation_carpet.append(y1)
+			#print(x1[1] - x1[0])
+
+		correlation_carpet_2d = np.stack(correlation_carpet, axis=0)
+
+
+		x_min, x_max = start * self.timestep, end * self.timestep  
+
+			
+		y_min, y_max = 0, self.carpet_binned.shape[0] 
+
+
+
+		x = x1  # arbitrary X-axis
+		y = np.linspace(1, correlation_carpet_2d.shape[0], correlation_carpet_2d.shape[0])              # keep Y pixel indices
+
+
+		X, Y = np.meshgrid(x, y)
+
+		self.image.cla()
+		self.corr_carpet.cla()
+
+		self.image.imshow(self.carpet_binned, origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
+		self.image.set_xlabel("Time (s)")
+		self.image.set_ylabel("Pixels scanned")
+		self.image.set_title("sFCS trace carpet, binning = " + str(binning))
+
+
+		self.corr_carpet.pcolormesh(X, Y, correlation_carpet_2d, shading='auto', cmap='rainbow')
+		self.corr_carpet.set_xlabel("Delay time (s)")
+		self.corr_carpet.set_xscale("log")
+		self.corr_carpet.set_ylabel("Lines")
+		self.corr_carpet.set_title("sFCS correlation carpet")
+
+		self.canvas1.draw_idle()
+
+			
+
+		self.figure1.tight_layout()
+
+
+		self.selected_line_t = None
+		self.selected_line_c = None
+		self.Plot_this_line(int(correlation_carpet_2d.shape[0]/2))
 
 
 
@@ -1992,7 +2090,18 @@ class sFCS_carpet:
 
 			self.eg = func.File_sFCS_czi(self.dataset_list[self.file_number])
 
-			self.image.imshow(self.eg.carpet_full,origin="lower", aspect="auto", cmap="rainbow")
+			self.timestep = float(self.Timestep_entry.get())
+
+			
+			x_min, x_max = 0, self.eg.carpet_full.shape[1] * self.timestep  
+
+			
+			y_min, y_max = 0, self.eg.carpet_full.shape[0] 
+
+			self.image.imshow(self.eg.carpet_full,origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
+			self.image.set_xlabel("Time (s)")
+			self.image.set_ylabel("Pixels scanned")
+			self.image.set_title("sFCS full carpet")
 			self.canvas1.draw_idle()
 
 			
@@ -2172,10 +2281,12 @@ class sFCS_carpet:
 		self.Rep_Display_label = tk.Label(self.frame023,  text = "Repetition: ")
 		self.Rep_Display_label.grid(row = 5, column = 0, sticky = 'ew')
 
-		self.Rep_Display__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
+		self.Rep_Display__choice = ttk.Combobox(self.frame023,values = ["1"],  width = 18 )
 		self.Rep_Display__choice.config(state = "readonly")
 		self.Rep_Display__choice.grid(row = 5, column = 1, sticky = 'ew')
 		self.Rep_Display__choice.set("1")
+
+		self.Rep_Display__choice.bind("<<ComboboxSelected>>", self.Display)
 
 
 		self.Chan_Display_label = tk.Label(self.frame023,  text = "Channel: ")
@@ -2190,7 +2301,7 @@ class sFCS_carpet:
 
 
 
-		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Plot_this_file)
+		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Display)
 		self.Display_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
 
 		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Transfer_extracted)
