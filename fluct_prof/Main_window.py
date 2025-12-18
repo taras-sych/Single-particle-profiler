@@ -2086,6 +2086,31 @@ class sFCS_carpet:
 
 		self.file_number = num
 
+		if self.dataset_list[self.file_number].endswith('.nd2'):
+
+			print("ND2")
+
+			self.eg = func.File_sFCS_nd2(self.dataset_list[self.file_number])
+
+			
+			self.timestep = float(self.Timestep_entry.get())
+
+			
+			x_min, x_max = 0, self.eg.carpet_full.shape[1] * self.timestep  
+
+			
+			y_min, y_max = 0, self.eg.carpet_full.shape[0] 
+
+			self.image.imshow(self.eg.carpet_full,origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
+			self.image.set_xlabel("Time (s)")
+			self.image.set_ylabel("Pixels scanned")
+			self.image.set_title("sFCS full carpet")
+			self.canvas1.draw_idle()
+
+			
+
+			self.figure1.tight_layout()
+
 		if self.dataset_list[self.file_number].endswith('.czi'):
 
 			self.eg = func.File_sFCS_czi(self.dataset_list[self.file_number])
@@ -2141,7 +2166,7 @@ class sFCS_carpet:
 		if data_cont.initialdirectory == '':
 			data_cont.initialdirectory = __file__
 
-		ftypes = [('CZI .czi', '*.czi'), ('LSM .lsm', '*.lsm'), ('Tif .tif', '*.tif'), ('All files', '*'), ]
+		ftypes = [('CZI .czi', '*.czi'), ('LSM .lsm', '*.lsm'), ('Tif .tif', '*.tif'),('ND2 .nd2', '*.nd2'), ('All files', '*'), ]
 		
 
 		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(data_cont.initialdirectory),title = "Select file", filetypes = ftypes)

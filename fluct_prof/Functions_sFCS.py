@@ -7,6 +7,7 @@ import pandas as pd
 from datetime import datetime
 from fluct_prof import Analyse_sFCS_data_MLE_BIC as data_an
 from czifile import CziFile
+import nd2
 
 
 class File_sFCS:
@@ -194,3 +195,18 @@ class File_sFCS_czi:
             image_data = czi.asarray()  # Convert to numpy array
 
         self.carpet_full = image_data[0, :, 0, 0, 0, :, 0].T
+
+
+class File_sFCS_nd2:
+
+    def __init__(self, filename):
+
+        my_array = nd2.imread(filename)
+
+        my_array = np.transpose(my_array, (1, 0, 2, 3))
+
+        image_data = my_array.reshape(1, my_array.shape[0], my_array.shape[1] *my_array.shape[2], my_array.shape[3])
+
+        channel_number = 0
+
+        self.carpet_full = image_data[0, channel_number, :, :].T
