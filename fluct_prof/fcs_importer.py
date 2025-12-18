@@ -167,6 +167,8 @@ def Fill_datasets_fcs( list_file):
 
     metadata_filled = False
 
+    first_channel = None
+
     while i < len(list_file):
 
         if list_file[i].__contains__("DetectorWavelengthRangeStart1") and metadata_filled == False:
@@ -177,7 +179,9 @@ def Fill_datasets_fcs( list_file):
 
             metadata_filled = True
 
-            channel_index_temp = 1
+            #print(first_channel)
+
+            channel_index_temp = first_channel
 
             while True:
 
@@ -260,6 +264,7 @@ def Fill_datasets_fcs( list_file):
                     
                     short_name = "channel " + str4 + " vs " + str(int(str6))
 
+
                     str1 , str2 = list_file[i+7].split(' = ')
                     corr_array_size = int(str2)
                     array_corr = list_file[i+9:i+9+corr_array_size]
@@ -293,6 +298,10 @@ def Fill_datasets_fcs( list_file):
                         str1, str2 = long_name.split("Ch")
                 
                     short_name = "channel " + str(int(str2))
+
+                    if first_channel == None:
+
+                        first_channel = int(str2)
                     
 
                     str1 , str2 = list_file[i+5].split(' = ')

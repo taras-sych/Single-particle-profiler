@@ -1135,7 +1135,7 @@ class Threshold_window:
 
 			flag_counter += 1
 
-		self.data_frames_import ["Traces"] =pd.concat([pd.DataFrame({"time": x1_dict["channel 1"]}), pd.DataFrame(y1_raw_dict)], axis=1)
+		self.data_frames_import ["Traces"] =pd.concat([pd.DataFrame({"time": x1_dict[data_cont.data_list_raw[data_cont.file_index].datasets_list[rep_index_i].channels_list[channel].short_name]}), pd.DataFrame(y1_raw_dict)], axis=1)
 
 
 		
@@ -2249,6 +2249,9 @@ class Threshold_window:
 			#selected_element = df.at[df['Name'].eq('Jane').idxmax(), 'Age']
 
 			if type(metadata) != type(None):
+
+				#print(metadata['Channel'])
+				#print(item.short_name)
 
 				first_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'Start'])
 				second_part = int(metadata.loc[metadata['Channel'] == item.short_name, 'End'])
