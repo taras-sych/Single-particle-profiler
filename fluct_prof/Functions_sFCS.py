@@ -207,6 +207,6 @@ class File_sFCS_nd2:
 
         image_data = my_array.reshape(1, my_array.shape[0], my_array.shape[1] *my_array.shape[2], my_array.shape[3])
 
-        channel_number = 0
+        channel_number = 1
 
         self.carpet_full = image_data[0, channel_number, :, :].T

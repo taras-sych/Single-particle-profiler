@@ -1211,6 +1211,7 @@ class Threshold_window:
 			str1, str2 = channel.split(' ')
 
 			channel_i = int(str2) - 1
+			#channel_i = 0
 
 			x1 = x1_list [channel_i]
 			y1_raw = y1_raw_list [channel_i]
@@ -1418,15 +1419,15 @@ class Threshold_window:
 
 
 			
-
-		self.data_frames_import ["Intensity peaks"] =pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.yp1_raw_dict)], axis=1) 
+		channel_name = list(self.yp1_raw_above_dict.keys())[0]
+		self.data_frames_import ["Intensity peaks"] =pd.concat([pd.DataFrame({"time": self.xp1_dict[channel_name]}), pd.DataFrame(self.yp1_raw_dict)], axis=1) 
 		for key1 in self.yp1_raw_above_dict.keys():
 			self.data_frames_import ["Intensity peaks"] = pd.concat([self.data_frames_import ["Intensity peaks"], pd.DataFrame({key1: self.yp1_raw_above_dict[key1]})], axis=1)
 
 
 
-		self.data_frames_import ["Prominences"] = pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.prominence_dict)], axis=1) 
-		self.data_frames_import ["Widths"] = pd.concat([pd.DataFrame({"time": self.xp1_dict["channel 1"]}), pd.DataFrame(self.width_dict)], axis=1) 
+		self.data_frames_import ["Prominences"] = pd.concat([pd.DataFrame({"time": self.xp1_dict[channel_name]}), pd.DataFrame(self.prominence_dict)], axis=1) 
+		self.data_frames_import ["Widths"] = pd.concat([pd.DataFrame({"time": self.xp1_dict[channel_name]}), pd.DataFrame(self.width_dict)], axis=1) 
 
 		#------------------------------------------------------------------------------------------------------
 		#--------------   Print peaks statistics   ------------------------------------------------------------
