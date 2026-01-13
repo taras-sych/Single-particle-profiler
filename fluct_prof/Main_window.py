@@ -1595,6 +1595,14 @@ class sFCS_carpet:
 			self.file_number = index
 			self.Extract_trace()
 
+	def Channel_change(self, event):
+
+		self.Corr_carpet()
+
+	def Binning_change(self, event):
+
+		self.Corr_carpet()
+
 	def Corr_carpet(self):
 
 		repetitions = int(self.Repetitions_entry.get())
@@ -1610,47 +1618,65 @@ class sFCS_carpet:
 		self.Rep_Display__choice.set("1")
 
 
+		channel = int(self.Chan_Display__choice.get()) - 1
 
 		carpet_full = copy.deepcopy(self.eg.carpet_full)
 
-		rep_length = int(carpet_full.shape[1]/repetitions)
+		#print("---------")
+		#print(carpet_full[channel].shape)
+		#print("---------")
+
+		rep_length = int(carpet_full[channel].shape[1]/repetitions)
 
 		rep_number = 1
 
 		start = rep_length*(rep_number - 1)
 		end = rep_length*rep_number
 
-		if end >= carpet_full.shape[1]:
-			end = carpet_full.shape[1] - 1
+		if end >= carpet_full[channel].shape[1]:
+			end = carpet_full[channel].shape[1] - 1
 
 
-		carpet = carpet_full[:,start : end]
+		carpet = []
+		for channel in range (len(carpet_full)):
+			carpet.append(carpet_full[channel][:,start : end])
 
-		dimension = int(carpet.shape[0]/binning)
+		dimension = int(carpet[channel].shape[0]/binning)
 
-		self.carpet_binned = carpet.reshape(dimension, binning, carpet.shape[1]).sum(axis=1)
+		self.carpet_binned = []
 
-		correlation_carpet = []
+		correlation_carpet_2d = []
 
-		for i in range(self.carpet_binned.shape[0]):
-			trace = self.carpet_binned[i,:]
-			#x = np.linspace(start*timestep, end*timestep, end-start)
-			x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
-			correlation_carpet.append(y1)
-			#print(x1[1] - x1[0])
+		for channel in range (len(carpet)):
 
-		correlation_carpet_2d = np.stack(correlation_carpet, axis=0)
+			self.carpet_binned.append(carpet[channel].reshape(dimension, binning, carpet[channel].shape[1]).sum(axis=1))
+
+			correlation_carpet = []
+
+			for i in range(self.carpet_binned[channel].shape[0]):
+				trace = self.carpet_binned[channel][i,:]
+				#x = np.linspace(start*timestep, end*timestep, end-start)
+				x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
+				correlation_carpet.append(y1)
+				#print(x1[1] - x1[0])
+
+			correlation_carpet_2d_1 = np.stack(correlation_carpet, axis=0)
+
+			correlation_carpet_2d.append(correlation_carpet_2d_1)
+
+
+		channel = int(self.Chan_Display__choice.get()) - 1
 
 
 		x_min, x_max = start * self.timestep, end * self.timestep  
 
 			
-		y_min, y_max = 0, self.carpet_binned.shape[0] 
+		y_min, y_max = 0, self.carpet_binned[channel].shape[0] 
 
 
 
 		x = x1  # arbitrary X-axis
-		y = np.linspace(1, correlation_carpet_2d.shape[0], correlation_carpet_2d.shape[0])              # keep Y pixel indices
+		y = np.linspace(1, correlation_carpet_2d[channel].shape[0], correlation_carpet_2d[channel].shape[0])              # keep Y pixel indices
 
 
 		X, Y = np.meshgrid(x, y)
@@ -1658,13 +1684,13 @@ class sFCS_carpet:
 		self.image.cla()
 		self.corr_carpet.cla()
 
-		self.image.imshow(self.carpet_binned, origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
+		self.image.imshow(self.carpet_binned[channel], origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
 		self.image.set_xlabel("Time (s)")
 		self.image.set_ylabel("Pixels scanned")
 		self.image.set_title("sFCS trace carpet, binning = " + str(binning))
 
 
-		self.corr_carpet.pcolormesh(X, Y, correlation_carpet_2d, shading='auto', cmap='rainbow')
+		self.corr_carpet.pcolormesh(X, Y, correlation_carpet_2d[channel], shading='auto', cmap='rainbow')
 		self.corr_carpet.set_xlabel("Delay time (s)")
 		self.corr_carpet.set_xscale("log")
 		self.corr_carpet.set_ylabel("Lines")
@@ -1676,37 +1702,50 @@ class sFCS_carpet:
 
 		self.figure1.tight_layout()
 
+		#print ("-----")
+		#print ("Go to traces")
+		#print ("-----")
 
 		self.selected_line_t = None
 		self.selected_line_c = None
-		self.Plot_this_line(int(correlation_carpet_2d.shape[0]/2))
+		self.Plot_this_line(int(correlation_carpet_2d[channel].shape[0]/2))
 
 
 
 		
 	def Plot_this_line(self, trace_number):
 
-		trace = self.carpet_binned[trace_number,:]
-		x = np.linspace(0, self.carpet_binned.shape[1]*self.timestep, self.carpet_binned.shape[1])
-
-		x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
-		#print(x1[1] - x1[0])
-
-		line = self.carpet_binned[trace_number, :]
-
-
-
 		self.traces.cla()
 		self.corr.cla()
 
-		self.traces.plot(x, trace, label="trace", color="blue")
+		for channel in range(len(self.carpet_binned)):
+
+			trace = self.carpet_binned[channel][trace_number,:]
+			x = np.linspace(0, self.carpet_binned[channel].shape[1]*self.timestep, self.carpet_binned[channel].shape[1])
+
+			x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
+			#print(x1[1] - x1[0])
+
+			line = self.carpet_binned[channel][trace_number, :]
+
+			label_tr = "channel " + str(channel + 1)
+			label_corr = "channel " + str(channel + 1)
+
+
+			self.traces.plot(x, trace, label=label_tr)
+
+			self.corr.scatter(x1, y1, label=label_corr)
+
+
 		self.traces.set_xlabel("time (s)")
 		self.traces.set_ylabel("Intensity (a.u.)")
+		self.traces.legend(loc="upper right")
 
-		self.corr.scatter(x1, y1, label="trace", color="blue")
+		
 		self.corr.set_xscale("log")
 		self.corr.set_xlabel("Delay time")
 		self.corr.set_ylabel("G(tau)")
+		self.corr.legend(loc="upper right")
 
 		self.selected_line_t = self.image.axhline(y=trace_number, color='red', linestyle='--', linewidth=2)
 		self.selected_line_c = self.corr_carpet.axhline(y=trace_number, color='red', linestyle='--', linewidth=2)
@@ -2092,16 +2131,27 @@ class sFCS_carpet:
 
 			self.eg = func.File_sFCS_nd2(self.dataset_list[self.file_number])
 
+			self.channels_to_display = []
+
+			for index in range (len(self.eg.carpet_full)):
+				self.channels_to_display.append(str(index + 1))
+
+			self.Chan_Display__choice["values"] = self.channels_to_display
+
+			self.Chan_Display__choice.set("1")
+
+			channel = int(self.Chan_Display__choice.get()) - 1
+
 			
 			self.timestep = float(self.Timestep_entry.get())
 
 			
-			x_min, x_max = 0, self.eg.carpet_full.shape[1] * self.timestep  
+			x_min, x_max = 0, self.eg.carpet_full[channel].shape[1] * self.timestep  
 
 			
-			y_min, y_max = 0, self.eg.carpet_full.shape[0] 
+			y_min, y_max = 0, self.eg.carpet_full[channel].shape[0] 
 
-			self.image.imshow(self.eg.carpet_full,origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
+			self.image.imshow(self.eg.carpet_full[channel],origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
 			self.image.set_xlabel("Time (s)")
 			self.image.set_ylabel("Pixels scanned")
 			self.image.set_title("sFCS full carpet")
@@ -2115,15 +2165,17 @@ class sFCS_carpet:
 
 			self.eg = func.File_sFCS_czi(self.dataset_list[self.file_number])
 
+			channel = int(self.Chan_Display__choice.get()) - 1
+
 			self.timestep = float(self.Timestep_entry.get())
 
 			
-			x_min, x_max = 0, self.eg.carpet_full.shape[1] * self.timestep  
+			x_min, x_max = 0, self.eg.carpet_full[channel].shape[1] * self.timestep  
 
 			
-			y_min, y_max = 0, self.eg.carpet_full.shape[0] 
+			y_min, y_max = 0, self.eg.carpet_full[channel].shape[0] 
 
-			self.image.imshow(self.eg.carpet_full,origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
+			self.image.imshow(self.eg.carpet_full[channel],origin="lower", extent=[x_min, x_max, y_min, y_max], aspect="auto", cmap="rainbow")
 			self.image.set_xlabel("Time (s)")
 			self.image.set_ylabel("Pixels scanned")
 			self.image.set_title("sFCS full carpet")
@@ -2155,6 +2207,8 @@ class sFCS_carpet:
         
 
 		#print(self.dataset_list[num])
+
+		self.Corr_carpet()
 
 		
 
@@ -2284,7 +2338,9 @@ class sFCS_carpet:
 		self.Binning__choice = ttk.Combobox(self.frame023,values = ["1","2","4","8"],  width = 18 )
 		self.Binning__choice.config(state = "readonly")
 		self.Binning__choice.grid(row = 1, column = 1, sticky = 'ew')
-		self.Binning__choice.set("4")
+		self.Binning__choice.set("2")
+		self.Binning__choice.bind("<<ComboboxSelected>>", self.Binning_change)
+		
 
 		self.Repetitions_label = tk.Label(self.frame023,  text = "Repetitions: ")
 		self.Repetitions_label.grid(row = 2, column = 0, sticky = 'ew')
@@ -2322,7 +2378,8 @@ class sFCS_carpet:
 		self.Chan_Display__choice = ttk.Combobox(self.frame023,values = self.channels_to_display,  width = 18 )
 		self.Chan_Display__choice.config(state = "readonly")
 		self.Chan_Display__choice.grid(row = 6, column = 1, sticky = 'ew')
-		self.Chan_Display__choice.set("all")
+		self.Chan_Display__choice.set("1")
+		self.Chan_Display__choice.bind("<<ComboboxSelected>>", self.Channel_change)
 
 
 

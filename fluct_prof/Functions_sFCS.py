@@ -194,7 +194,17 @@ class File_sFCS_czi:
         with CziFile(filename) as czi:
             image_data = czi.asarray()  # Convert to numpy array
 
-        self.carpet_full = image_data[0, :, 0, 0, 0, :, 0].T
+        channels = image_data.shape[2]
+
+        print(channels)
+
+        self.carpet_full = []
+
+        # Series     Time        Color   Z   Y   X   Sample
+
+
+        for channel_number in range (channels):
+            self.carpet_full.append(image_data[0, :, channel_number, 0, 0, :, 0].T)
 
 
 class File_sFCS_nd2:
@@ -205,8 +215,16 @@ class File_sFCS_nd2:
 
         my_array = np.transpose(my_array, (1, 0, 2, 3))
 
+        channels = my_array.shape[0]
+
+        #print (channels)
+
         image_data = my_array.reshape(1, my_array.shape[0], my_array.shape[1] *my_array.shape[2], my_array.shape[3])
 
-        channel_number = 1
+        #channel_number = 1
 
-        self.carpet_full = image_data[0, channel_number, :, :].T
+        self.carpet_full = []
+
+        for channel_number in range (channels):
+
+            self.carpet_full.append(image_data[0, channel_number, :, :].T)
