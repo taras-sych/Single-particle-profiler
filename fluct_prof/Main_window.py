@@ -2427,7 +2427,7 @@ class sFCS_carpet:
 
 		self.Timestep_entry = tk.Entry(self.frame023, width = 9)
 		self.Timestep_entry.grid(row = 3, column = 1, sticky='ew')
-		self.Timestep_entry.insert("end", str(0.0003))
+		self.Timestep_entry.insert("end", str(0.002))
 
 		self.Display_label = tk.Label(self.frame023,  text = "Display: ")
 		self.Display_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
