@@ -1718,6 +1718,8 @@ class sFCS_carpet:
 		self.traces.cla()
 		self.corr.cla()
 
+		#self.dictionary_of_extracted ["traces"] = []
+
 		for channel in range(len(self.carpet_binned)):
 
 			trace = self.carpet_binned[channel][trace_number,:]
@@ -2338,7 +2340,7 @@ class sFCS_carpet:
 		self.Binning__choice = ttk.Combobox(self.frame023,values = ["1","2","4","8"],  width = 18 )
 		self.Binning__choice.config(state = "readonly")
 		self.Binning__choice.grid(row = 1, column = 1, sticky = 'ew')
-		self.Binning__choice.set("2")
+		self.Binning__choice.set("1")
 		self.Binning__choice.bind("<<ComboboxSelected>>", self.Binning_change)
 		
 
@@ -2347,7 +2349,7 @@ class sFCS_carpet:
 
 		self.Repetitions_entry = tk.Entry(self.frame023, width = 9)
 		self.Repetitions_entry.grid(row = 2, column = 1, sticky='ew')
-		self.Repetitions_entry.insert("end", str(10))
+		self.Repetitions_entry.insert("end", str(1))
 
 		self.Timestep_label = tk.Label(self.frame023,  text = "Timestep: ")
 		self.Timestep_label.grid(row = 3, column = 0, sticky = 'ew')
