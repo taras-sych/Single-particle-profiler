@@ -1605,6 +1605,10 @@ class sFCS_carpet:
 
 	def Corr_carpet(self):
 
+		
+
+		#print(name)
+
 		repetitions = int(self.Repetitions_entry.get())
 		binning = int(self.Binning__choice.get())
 		self.timestep = float(self.Timestep_entry.get())
@@ -1655,6 +1659,7 @@ class sFCS_carpet:
 
 			for i in range(self.carpet_binned[channel].shape[0]):
 				trace = self.carpet_binned[channel][i,:]
+
 				#x = np.linspace(start*timestep, end*timestep, end-start)
 				x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
 				correlation_carpet.append(y1)
@@ -1715,28 +1720,94 @@ class sFCS_carpet:
 		
 	def Plot_this_line(self, trace_number):
 
+		#repetitions = int(self.Repetitions_entry.get())
+
+		repetitions = 1
+
+		name = self.dataset_names [self.file_number]
+
 		self.traces.cla()
 		self.corr.cla()
 
 		#self.dictionary_of_extracted ["traces"] = []
+
+		dataset_list_arg = []
+
+		channels_list_arg = []
 
 		for channel in range(len(self.carpet_binned)):
 
 			trace = self.carpet_binned[channel][trace_number,:]
 			x = np.linspace(0, self.carpet_binned[channel].shape[1]*self.timestep, self.carpet_binned[channel].shape[1])
 
+			Tr = fcs_importer.XY_plot(x,trace)
+
 			x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
 			#print(x1[1] - x1[0])
+
+			AutoCorr = fcs_importer.XY_plot(x1,y1)
 
 			line = self.carpet_binned[channel][trace_number, :]
 
 			label_tr = "channel " + str(channel + 1)
 			label_corr = "channel " + str(channel + 1)
 
+			long_name = name + "channel " + str(channel + 1)
+
+			short_name = "channel " + str(channel + 1)
+
+			Ch_dataset = fcs_importer.fcs_channel (long_name, Tr, AutoCorr, short_name)
+
+			channels_list_arg.append(Ch_dataset)
+
 
 			self.traces.plot(x, trace, label=label_tr)
 
 			self.corr.scatter(x1, y1, label=label_corr)
+
+
+		cross_list_arg = []
+
+		if len(self.carpet_binned) > 1:
+			channel1 = 0
+			while channel1 < len(self.carpet_binned):
+				channel2 = channel1 + 1
+				while channel2 < len(self.carpet_binned):
+					trace1 = self.carpet_binned[channel1][trace_number,:]
+					trace2 = self.carpet_binned[channel2][trace_number,:]
+
+					x1, y1 = corr_py.correlate_full (self.timestep, trace1, trace2)
+
+					label_corr = "channel " + str(channel1 + 1) + " vs " + "channel " + str(channel2 + 1)
+
+					self.corr.scatter(x1, y1, label=label_corr)
+
+					CrossCorr_12 = fcs_importer.XY_plot(x1,y1)
+
+					short_name_12 = "channel " + str(channel1 + 1) + " vs " + "channel " + str(channel2 + 1)
+
+					x1, y1 = corr_py.correlate_full (self.timestep, trace2, trace1)
+
+					CrossCorr_21 = fcs_importer.XY_plot(x1,y1)
+
+					short_name_21 = "channel " + str(channel2 + 1) + " vs " + "channel " + str(channel1 + 1)
+
+					Cross_dataset = fcs_importer.fcs_cross (short_name_12, CrossCorr_12, short_name_12)
+					cross_list_arg.append(Cross_dataset)
+					Cross_dataset = fcs_importer.fcs_cross (short_name_21, CrossCorr_21, short_name_21)
+					cross_list_arg.append(Cross_dataset)
+
+					channel2 += 1
+
+				channel1 += 1
+
+		FCS_Dataset =  fcs_importer.Dataset_fcs(len(self.carpet_binned), len(cross_list_arg), channels_list_arg, cross_list_arg )
+
+		dataset_list_arg.append(FCS_Dataset)
+
+		dataset = fcs_importer.Full_dataset_fcs(repetitions, dataset_list_arg)
+
+		self.dictionary_of_extracted [name] = dataset
 
 
 		self.traces.set_xlabel("time (s)")
