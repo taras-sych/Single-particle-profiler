@@ -1496,15 +1496,19 @@ class sFCS_carpet:
 
 	def Transfer_extracted(self):
 		name = self.dataset_names [self.file_number]
-		if name in self.dictionary_of_extracted:
+		binning = int(self.Binning__choice.get())
 
-			dataset = self.dictionary_of_extracted[name]
+		name1 = name + "_binning_" + str(binning) + "_line_" + str(self.trace_number_param)
+		
+		if name1 in self.dictionary_of_extracted:
 
-			treetree = d_tree.Data_tree (data_cont.data_frame.tree, name, dataset.repetitions)
+			dataset = self.dictionary_of_extracted[name1]
+
+			treetree = d_tree.Data_tree (data_cont.data_frame.tree, name1, dataset.repetitions)
 			
 			data_cont.tree_list.append(treetree)
 
-			data_cont.tree_list_name.append(name)
+			data_cont.tree_list_name.append(name1)
 
 			data_cont.binning_list.append(1)
 
@@ -1713,6 +1717,7 @@ class sFCS_carpet:
 
 		self.selected_line_t = None
 		self.selected_line_c = None
+		self.trace_number_param = int(correlation_carpet_2d[channel].shape[0]/2)
 		self.Plot_this_line(int(correlation_carpet_2d[channel].shape[0]/2))
 
 
@@ -1725,6 +1730,8 @@ class sFCS_carpet:
 		repetitions = 1
 
 		name = self.dataset_names [self.file_number]
+
+		binning = int(self.Binning__choice.get())
 
 		self.traces.cla()
 		self.corr.cla()
@@ -1807,7 +1814,9 @@ class sFCS_carpet:
 
 		dataset = fcs_importer.Full_dataset_fcs(repetitions, dataset_list_arg)
 
-		self.dictionary_of_extracted [name] = dataset
+		name1 = name + "_binning_" + str(binning) + "_line_" + str(trace_number)
+
+		self.dictionary_of_extracted [name1] = dataset
 
 
 		self.traces.set_xlabel("time (s)")
@@ -1844,6 +1853,7 @@ class sFCS_carpet:
 
 		trace_number = int(round(event.ydata))
 		self.Plot_this_line(trace_number)
+		self.trace_number_param = trace_number
 
 
 	def Display(self, event):
