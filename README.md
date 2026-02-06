@@ -1,5 +1,10 @@
-# This is an incomplete branch "Multiparametric imaging SPP", not for publishing
-
+# This is a branch for sFCS release 
+# What's new:
+1. Scanning Fluorescence Correlation Spectroscopy, formats available:
+  - .lsm
+  - .czi
+  - .nd2
+  - .tif
 # Single particle profiler
 ## High throughput analysis of freely diffusing fluorescent particles.
 
