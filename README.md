@@ -1,6 +1,8 @@
 # This is a branch for sFCS release 
 # What's new:
-1. Scanning Fluorescence Correlation Spectroscopy, formats available:
+1. Scanning Fluorescence Correlation Spectroscopy
+2. Scanning Fluorescence Correlation Spectroscopy for side-scan of biological objects
+3. Formats available:
   - .lsm
   - .czi
   - .nd2
