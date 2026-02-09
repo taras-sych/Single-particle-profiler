@@ -41,17 +41,10 @@
 
 
 ## For standalone distributions, see the link below:
-https://drive.google.com/drive/folders/1E48Apdwgemc6TjAFaYCvr_2vAziwJcbK
+https://drive.google.com/drive/folders/1AOrHfZpbEuAi8_NUn8C_G5wGw4NIdZlG
 
 ## Manuals are available: 
-How to analyze SPP (based on previous release):
-https://www.youtube.com/watch?v=pgXFNSjlXHk&list=PLvnnxg3kwLpWJjBRsYiTrF1a5CBaAzQK4
-
-How to analyze SPP (including iSPP, based on this release):
-https://www.youtube.com/watch?v=p5afSZSkbfE
-
-How to acquire data for SPP and iSPP:
-https://www.youtube.com/watch?v=IicPvjPySDY&list=PLvnnxg3kwLpWX5M-e-14hhWQVPsPEQ5jB
+https://www.youtube.com/watch?v=Q6DqTy6itn4
 
 ## Papers here (when using, cite):
 ### Single Particle Profiler (SPP):
