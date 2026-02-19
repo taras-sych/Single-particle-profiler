@@ -1,4 +1,5 @@
 import tifffile
+import czifile
 import matplotlib.pyplot as plt
 import numpy as np
 import Correlation as corr_py
@@ -12,9 +13,30 @@ import nd2
 
 class File_sFCS:
     def __init__(self,lsm_file_name):
+        print(lsm_file_name)
         self.lsm_file_name = lsm_file_name
-        self.array =  tifffile.imread(self.lsm_file_name, key = 0)
-        print(type(self.array), self.array.shape)
+        #read 1 line scanning FCS files
+        #read CZI
+        if lsm_file_name.endswith("czi"):
+            image = czifile.imread(self.lsm_file_name)
+            #image[0,t,c,0,0,y,0]
+            reshaped_image = image[0, :, :, 0, 0, :, 0]
+            reshaped_image = reshaped_image.transpose(1, 0, 2)
+            self.array = reshaped_image
+
+        #read TIF
+        elif lsm_file_name.endswith("tif"):
+            image = tifffile.imread(self.lsm_file_name)
+            if len(image.shape) == 3:
+                self.array =  tifffile.imread(self.lsm_file_name)
+            elif len(image.shape) == 4:
+                self.array =  image.reshape((image.shape[1], image.shape[0], image.shape[3]))
+                print("tif reshaped")
+
+        #read LSM
+        else:
+            self.array = tifffile.imread(self.lsm_file_name, key = 0)
+            print(self.array.shape)
         
     def isolate_channel(self,channel_no):
         if len(self.array.shape) == 2:

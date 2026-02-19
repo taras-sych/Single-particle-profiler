@@ -13,6 +13,7 @@ import lmfit
 import time
 
 import tifffile
+import czifile
 
 import pandas as pd
 
@@ -205,17 +206,10 @@ class Left_frame :
 
 	def Import(self):
 
-		
-
-
-		
-
-		
-
 		if data_cont.initialdirectory == '':
 			data_cont.initialdirectory = __file__
 
-		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('CSV files', '*.csv'), ('LSM files', '*.lsm'), ('All files', '*'), ]
+		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('CSV files', '*.csv'), ('LSM files', '*.lsm'), ('All files', '*'), ('CZI .czi', '*.czi'), ]
 		
 
 		filenames = []
@@ -990,7 +984,9 @@ class sFCS_frame:
 		for i in range (0, repetitions):
 			self.reps_to_display.append(i+1)
 
-		bins = int(self.Binning__choice.get())
+		bins = self.Binning__choice.get()
+		lower_lim = int(self.borders_entry.get())
+		upper_lim = int(self.borders_entry_end.get())
 		timestep = float(self.Timestep_entry.get())
 
 		list_of_y = []
@@ -1004,7 +1000,7 @@ class sFCS_frame:
 
 			#try:
 
-			y = sedec.isolate_maxima(channel_no, bins)
+			y = sedec.isolate_maxima(channel_no, bins, lower_lim, upper_lim)
 
 			list_of_y.append(y)
 
@@ -1264,7 +1260,7 @@ class sFCS_frame:
 		if data_cont.initialdirectory == '':
 			data_cont.initialdirectory = __file__
 
-		ftypes = [('LSM .lsm', '*.lsm'), ('Tif .tif', '*.tif'), ('All files', '*'), ]
+		ftypes = [('CZI .czi', '*.czi'), ('LSM .lsm', '*.lsm'), ('Tif .tif', '*.tif'), ('All files', '*'), ]
 		
 
 		filenames =  tk.filedialog.askopenfilenames(initialdir=os.path.dirname(data_cont.initialdirectory),title = "Select file", filetypes = ftypes)
@@ -1367,75 +1363,92 @@ class sFCS_frame:
 
 		self.frame023 = tk.Frame(self.frame02)
 		self.frame023.pack(side="left", fill="x")
-
+		
+		gridrow = 0
 
 		self.Extract_button = tk.Button(self.frame023, text="Extract trace", command=self.Extract_trace)
 		self.Extract_button.grid(row = 0, column = 0, sticky="EW")
-
 		self.Extract_all_button = tk.Button(self.frame023, text="Extract all", command=self.Extraxt_all_traces)
-		self.Extract_all_button.grid(row = 0, column = 1, sticky="EW")
+		self.Extract_all_button.grid(row = gridrow, column = 1, sticky="EW")
+		gridrow += 1
 
 		self.Binning_label = tk.Label(self.frame023,  text = "Pixel binning: ")
-		self.Binning_label.grid(row = 1, column = 0, sticky = 'ew')
+		self.Binning_label.grid(row = gridrow, column = 0, sticky = 'ew')
 
-
-		self.Binning__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
+		self.Binning__choice = ttk.Combobox(self.frame023,values = ["1","2","3","Gaussian fit"],  width = 18 )
 		self.Binning__choice.config(state = "readonly")
-		self.Binning__choice.grid(row = 1, column = 1, sticky = 'ew')
-		self.Binning__choice.set("3")
+		self.Binning__choice.grid(row = gridrow, column = 1, sticky = 'ew')
+		self.Binning__choice.set("Gaussian fit")
+		gridrow += 1
+
+		self.borders_label = tk.Label(self.frame023,  text = "Borders from: ", width = 9)
+		self.borders_label.grid(row = gridrow, column = 0, sticky = 'ew')
+
+		self.borders_entry = tk.Entry(self.frame023, width = 9)
+		self.borders_entry.grid(row = gridrow, column = 1, sticky='ew')
+		self.borders_entry.insert("end", str(0))
+		gridrow += 1
+
+		self.borders_label_end = tk.Label(self.frame023,  text = "to: ", width = 9)
+		self.borders_label_end.grid(row = gridrow, column = 0, sticky = 'ew')
+
+		self.borders_entry_end = tk.Entry(self.frame023, width = 9)
+		self.borders_entry_end.grid(row = gridrow, column = 1, sticky='ew')
+		self.borders_entry_end.insert("end", str(128))
+		gridrow += 1
 
 		self.Repetitions_label = tk.Label(self.frame023,  text = "Repetitions: ")
-		self.Repetitions_label.grid(row = 2, column = 0, sticky = 'ew')
+		self.Repetitions_label.grid(row = gridrow, column = 0, sticky = 'ew')
 
 		self.Repetitions_entry = tk.Entry(self.frame023, width = 9)
-		self.Repetitions_entry.grid(row = 2, column = 1, sticky='ew')
+		self.Repetitions_entry.grid(row = gridrow, column = 1, sticky='ew')
 		self.Repetitions_entry.insert("end", str(1))
+		gridrow += 1
 
 		self.Timestep_label = tk.Label(self.frame023,  text = "Timestep: ")
-		self.Timestep_label.grid(row = 3, column = 0, sticky = 'ew')
+		self.Timestep_label.grid(row = gridrow, column = 0, sticky = 'ew')
 
 		self.Timestep_entry = tk.Entry(self.frame023, width = 9)
-		self.Timestep_entry.grid(row = 3, column = 1, sticky='ew')
+		self.Timestep_entry.grid(row = gridrow, column = 1, sticky='ew')
 		self.Timestep_entry.insert("end", str(0.001))
+		gridrow += 1
 
 		self.Display_label = tk.Label(self.frame023,  text = "Display: ")
-		self.Display_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
+		self.Display_label.grid(row = gridrow, column = 0, columnspan = 2, sticky = 'w')
+		gridrow += 1
 
 		self.Rep_Display_label = tk.Label(self.frame023,  text = "Repetition: ")
-		self.Rep_Display_label.grid(row = 5, column = 0, sticky = 'ew')
+		self.Rep_Display_label.grid(row = gridrow, column = 0, sticky = 'ew')
 
 		self.Rep_Display__choice = ttk.Combobox(self.frame023,values = ["1","2","3"],  width = 18 )
 		self.Rep_Display__choice.config(state = "readonly")
-		self.Rep_Display__choice.grid(row = 5, column = 1, sticky = 'ew')
+		self.Rep_Display__choice.grid(row = gridrow, column = 1, sticky = 'ew')
 		self.Rep_Display__choice.set("1")
-
+		gridrow += 1
 
 		self.Chan_Display_label = tk.Label(self.frame023,  text = "Channel: ")
-		self.Chan_Display_label.grid(row = 6, column = 0, sticky = 'ew')
+		self.Chan_Display_label.grid(row = gridrow, column = 0, sticky = 'ew')
 
 		self.channels_to_display = ['1']
 
 		self.Chan_Display__choice = ttk.Combobox(self.frame023,values = self.channels_to_display,  width = 18 )
 		self.Chan_Display__choice.config(state = "readonly")
-		self.Chan_Display__choice.grid(row = 6, column = 1, sticky = 'ew')
+		self.Chan_Display__choice.grid(row = gridrow, column = 1, sticky = 'ew')
 		self.Chan_Display__choice.set("all")
-
-
+		gridrow += 1
 
 		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Plot_this_file)
-		self.Display_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
+		self.Display_button.grid(row = gridrow, column = 0, columnspan =2, sticky="EW")
+		gridrow += 1
 
 		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Transfer_extracted)
-		self.Transfer_button.grid(row = 8, column = 0, sticky="EW")
+		self.Transfer_button.grid(row = gridrow, column = 0, sticky="EW")
 
 		self.Transfer_all_button = tk.Button(self.frame023, text="Transfer all", command=self.Transfer_all_extracted)
-		self.Transfer_all_button.grid(row = 8, column = 1, sticky="EW")
-
+		self.Transfer_all_button.grid(row = gridrow, column = 1, sticky="EW")
+		gridrow += 1
 
 		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
-
-
-
 
 		gs = self.figure1.add_gridspec(3, 1)
 
@@ -2540,40 +2553,120 @@ class sFCS_carpet:
 class Sidecut_sFCS:
 	def __init__(self,lsm_file_name):
 		self.lsm_file_name = lsm_file_name
-		self.array =  tifffile.imread(self.lsm_file_name, key = 0)
+		if lsm_file_name.endswith("czi"):
+			image = czifile.imread(self.lsm_file_name)
+			reshaped_image = image[0, :, :, 0, 0, :, 0]
+			# This will give you a new array with the shape (20, 10, 30)
+			reshaped_image = reshaped_image.transpose(1, 0, 2)
+			self.array = reshaped_image
+		
+		elif lsm_file_name.endswith("tif"):
+			image = tifffile.imread(self.lsm_file_name)
+			if len(image.shape) == 3:
+				self.array =  tifffile.imread(self.lsm_file_name)
+			elif len(image.shape) == 4:
+				self.array =  image.reshape((image.shape[1], image.shape[0], image.shape[3]))
+				print("tif reshaped")
+		
+		#read LSM
+		else:
+			self.array = tifffile.imread(self.lsm_file_name, key = 0)
+		print(self.array.shape)
    
 	def isolate_channel(self,channel_no):
 		if len(self.array.shape) == 2:
 			return self.array
 		else:
 			return self.array[channel_no-1]
-        
-	def isolate_maxima(self, channel_no, bins):
+		
+	@staticmethod
+	def gaussian(x,a,m,s,c):
+		return a*np.exp(-(x-m)**2/(2*s**2))+c
+
+	def isolate_maxima(self, channel_no, maxima_bins, lower_lim = 0, upper_lim = 128):
 		self.maxima = []
 
-		if len(self.array.shape) == 3:
-			array_to_analyze = self.array[channel_no]
-
-		else:
-			array_to_analyze = self.array
-
-		for i in array_to_analyze: 
-        
-			max_value = 0
-			max_index = 0
-			for j in range(0,len(i)):
-				if i[j] > max_value:
-					max_value = i[j]
-					max_index = j
-			try:
-				for j in range (0, bins-1):
-					max_value += i[max_index - j] + i[max_index + j]
-
-			except:
+		if maxima_bins == "Gaussian fit":
+			all_bins = []
+			max_indices = []
+			if len(self.array.shape) == 3:
+				array_to_analyze = self.array[channel_no]
+			else:
+				array_to_analyze = self.array
+			for i, i_array_full in enumerate(array_to_analyze):
+				if not i % 1000:
+					print(i)
+				i_array = i_array_full[lower_lim:upper_lim]
 				max_value = 0
+				max_index = 0
 
-			self.maxima.append(max_value)
-		self.maxima = np.array(self.maxima)
+				#calculate membrane pixels with gaussian
+				i_array_max = np.max(i_array)
+				i_array_std = np.std(i_array)
+				n = i if i < 100 else 100	#if there are less than 100 times processed, as many as possible should be taken for averaging if fit fails
+				max_indices_mean = np.mean(max_indices[i-n:i])
+				try:
+					initial_guess = [i_array_max, np.argmax(i_array), i_array_std, 0]
+					popt, _ = curve_fit(Sidecut_sFCS.gaussian, np.arange(0,len(i_array),1), i_array, p0=initial_guess, maxfev=200)
+					max_index = int(popt[1]) #maximum = peak of gaussian
+					bins = int(2.5*popt[2]) #bin width = 2.5 sigma
+				except (RuntimeError, ValueError):
+					#print(i, "fit failed initially, try different starting conditions")
+					initial_guess = [i_array_max, max_indices_mean, i_array_std, 0]
+					try:
+						popt, _ = curve_fit(Sidecut_sFCS.gaussian, np.arange(0,len(i_array),1), i_array, p0=initial_guess, maxfev=200)
+						max_index = int(popt[1])
+						bins = int(2.5*popt[2])
+					except (RuntimeError, ValueError):
+						#print(i, "fit failed, using average values")
+						if i == 0:
+							max_index = (upper_lim - lower_lim) / 2
+							bins = (upper_lim - lower_lim) / 2 - 1
+							#print("round 0 ", max_index, bins)
+						else :
+							if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
+								max_index = max_indices_mean
+							if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
+								bins = np.mean(all_bins[i-n:i])
+				if i == 0:	#for the case if there is no prior maxima to average, and the fit fails, it will assume the trace is in the center
+					if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
+						max_index = (upper_lim - lower_lim) / 2
+					if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
+						bins = (upper_lim - lower_lim) / 2 - 1
+				else :
+					if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
+						max_index = max_indices_mean
+					if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
+						bins = np.mean(all_bins[i-n:i])
+				
+				max_index = int(max_index)
+				for k in range (-int(bins), int(bins)+1):
+					max_value += i_array[max_index + k]
+					if i == 0:
+						print(max_index+k, i_array[max_index + k])
+				
+				all_bins.append(bins)
+				self.maxima.append(max_value)
+				max_indices.append(max_index)
+			self.maxima = np.array(self.maxima)
+			print("maxima array ", channel_no, self.maxima)
+		else:
+			if len(self.array.shape) == 3:
+				array_to_analyze = self.array[channel_no]
+
+			else:
+				array_to_analyze = self.array
+
+			for i, i_array_full in enumerate(array_to_analyze):
+				if not i % 1000:
+					print(i)
+				i_array = i_array_full[lower_lim:upper_lim]
+				max = 0
+				for j in range(-int(maxima_bins),int(maxima_bins)):
+					if np.argmax(i_array) + j < len(i_array) and np.argmax(i_array) + j > 0:
+						max_buffer = np.argmax(i_array) + j
+						max += i_array[max_buffer]
+				self.maxima.append(max)
 		return self.maxima
     
 	def maxs_single_autoc_plot(self, channel_no, rep_no, number_of_reps, timestep):
