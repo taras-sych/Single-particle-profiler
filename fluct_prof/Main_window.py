@@ -81,10 +81,11 @@ from fluct_prof import Functions_sFCS as func
 
 class Left_frame :
 
+	def double_exp_bleaching(self, x, A1, a1, A2, a2, C):
+		return C + A1*np.exp(-a1*x) + A2*np.exp(-a2*x)
 
-
-
-
+	def polynomial_bleaching(self, x, a,b,c,d,e):
+		return a*x**4 + b*x**3 + c*x**2 + d*x + e
 
 
 	def Plot_this_data(self, datasets_pos, rep):
@@ -854,6 +855,12 @@ class Left_frame :
 
 class sFCS_frame:
 
+	def double_exp_bleaching(self, x, A1, a1, A2, a2, C):
+		return C + A1*np.exp(-a1*x) + A2*np.exp(-a2*x)
+
+	def polynomial_bleaching(self, x, a,b,c,d,e):
+		return a*x**4 + b*x**3 + c*x**2 + d*x + e
+
 	def Transfer_all_extracted(self):
 		for index in range (len(self.dataset_names)):
 			self.file_number = index
@@ -965,7 +972,7 @@ class sFCS_frame:
 
 
 	def Extract_trace(self):
-
+		bleaching_correction = self.bleaching_choice.get()
 		name = self.dataset_names [self.file_number]
 		sedec = Sidecut_sFCS(self.dataset_list[self.file_number])
 		if len(sedec.array.shape) == 3:
@@ -1065,7 +1072,28 @@ class sFCS_frame:
 
 				
 
-				Tr = fcs_importer.XY_plot(x,y)
+				if(bleaching_correction == "Double Exponential"):
+					popt, pcov = curve_fit(self.double_exp_bleaching, x, y)
+					print("bleaching parameters: ", popt)
+					y_bc = []	#bleaching corrected y
+					for i,ys in enumerate(y):
+						correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+						#print(correction_factor)
+						y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+
+					Tr1 = fcs_importer.XY_plot(x,y_bc)
+				elif(bleaching_correction == "Polynomial"):
+					popt, pcov = curve_fit(self.polynomial_bleaching, x, y)
+					print("bleaching parameters: ", popt)
+					y_bc = []	#bleaching corrected y
+					for i,ys in enumerate(y):
+						correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+						#print(correction_factor)
+						y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+					Tr = fcs_importer.XY_plot(x,y_bc)
+				else:
+					Tr = fcs_importer.XY_plot(x,y)
 
 				timestep = x[1] - x[0]
 
@@ -1112,8 +1140,28 @@ class sFCS_frame:
 					x = x1
 
 					
+					if(bleaching_correction == "Double Exponential"):
+						popt, pcov = curve_fit(self.double_exp_bleaching, x, y)
+						print("bleaching parameters: ", popt)
+						y_bc = []	#bleaching corrected y
+						for i,ys in enumerate(y):
+							correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+							#print(correction_factor)
+							y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
 
-					Tr1 = fcs_importer.XY_plot(x,y)
+						Tr1 = fcs_importer.XY_plot(x,y_bc)
+					elif(bleaching_correction == "Polynomial"):
+						popt, pcov = curve_fit(self.polynomial_bleaching, x, y)
+						print("bleaching parameters: ", popt)
+						y_bc = []	#bleaching corrected y
+						for i,ys in enumerate(y):
+							correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+							#print(correction_factor)
+							y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+						Tr1 = fcs_importer.XY_plot(x,y_bc)
+					else:
+						Tr1 = fcs_importer.XY_plot(x,y)
 
 					channel2 = channel1 + 1
 					while channel2 < channels_number:
@@ -1143,9 +1191,29 @@ class sFCS_frame:
 
 						x = x1
 
-						
 
-						Tr2 = fcs_importer.XY_plot(x,y)
+						if(bleaching_correction == "Double Exponential"):
+							popt, pcov = curve_fit(self.double_exp_bleaching, x, y)
+							print("bleaching parameters: ", popt)
+							y_bc = []	#bleaching corrected y
+							for i,ys in enumerate(y):
+								correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+								#print(correction_factor)
+								y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+
+							Tr2 = fcs_importer.XY_plot(x,y_bc)
+						elif(bleaching_correction == "Polynomial"):
+							popt, pcov = curve_fit(self.polynomial_bleaching, x, y)
+							print("bleaching parameters: ", popt)
+							y_bc = []	#bleaching corrected y
+							for i,ys in enumerate(y):
+								correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+								#print(correction_factor)
+								y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+							Tr2 = fcs_importer.XY_plot(x,y_bc)
+						else:
+							Tr2 = fcs_importer.XY_plot(x,y)
 
 						timestep = Tr1.x[1] - Tr1.x[0]
 
@@ -1370,6 +1438,15 @@ class sFCS_frame:
 		self.Extract_button.grid(row = 0, column = 0, sticky="EW")
 		self.Extract_all_button = tk.Button(self.frame023, text="Extract all", command=self.Extraxt_all_traces)
 		self.Extract_all_button.grid(row = gridrow, column = 1, sticky="EW")
+		gridrow += 1
+
+		self.bleaching_label = tk.Label(self.frame023,  text = "Bleaching: ")
+		self.bleaching_label.grid(row = gridrow, column = 0, sticky = 'ew')
+
+		self.bleaching_choice = ttk.Combobox(self.frame023,values = ["No","Double Exponential","Polynomial"],  width = 18)
+		self.bleaching_choice.config(state = "readonly")
+		self.bleaching_choice.grid(row = gridrow, column = 1, sticky = 'ew')
+		self.bleaching_choice.set("Double Exponential")
 		gridrow += 1
 
 		self.Binning_label = tk.Label(self.frame023,  text = "Pixel binning: ")
