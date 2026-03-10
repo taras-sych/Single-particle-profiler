@@ -149,8 +149,43 @@ class Left_frame :
 		
 		
 	def Continue_Import(self):
-		#print("Continuing import")
+		print("Continuing import")
 		self.dataset_list = fcs_importer.Fill_datasets_fcs(self.lines)
+
+
+		for self.dataset in self.dataset_list:
+
+			if self.dataset.position != None:
+
+				self.name1 = self.dataset.position + "__" + self.name 
+			else:
+				self.name1 = self.name
+
+			treetree = d_tree.Data_tree (self.tree, self.name1, self.dataset.repetitions)
+			self.tree.selection_set(treetree.child_id)
+			data_cont.tree_list.append(treetree)
+
+			data_cont.tree_list_name.append(self.name1)
+
+			data_cont.binning_list.append(1)
+
+
+			data_cont.data_list_raw.append(self.dataset)
+
+
+			#data_list_current.append(dataset1)
+
+
+			data_cont.total_channels_list.append(self.dataset.datasets_list[0].channels_number + self.dataset.datasets_list[0].cross_number)
+			data_cont.repetitions_list.append(self.dataset.repetitions)
+
+			data_cont.peaks_list.append([None] * self.dataset.repetitions)
+
+			data_cont.list_of_channel_pairs.append([None])
+
+	def Continue_Import_RAW(self):
+		print("Continuing import")
+		self.dataset_list = fcs_importer.Fill_datasets_RAW(self.lines)
 
 
 		for self.dataset in self.dataset_list:
@@ -210,7 +245,7 @@ class Left_frame :
 		if data_cont.initialdirectory == '':
 			data_cont.initialdirectory = __file__
 
-		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('CSV files', '*.csv'), ('LSM files', '*.lsm'), ('All files', '*'), ('CZI .czi', '*.czi'), ]
+		ftypes = [('FCS .fcs', '*.fcs'), ('FCS .SIN', '*.SIN'), ('Text files', '*.txt'), ('CSV files', '*.csv'), ('LSM files', '*.lsm'), ('All files', '*'), ('CZI .czi', '*.czi'), ('RAW .raw', '*.raw'), ]
 		
 
 		filenames = []
@@ -309,13 +344,39 @@ class Left_frame :
 						
 						Button_check_all = tk.Button(self.win_check, text="Check/uncheck all", command=self.check_positions)
 						Button_check_all.grid(row = CarrierRows + 2, column = 0, columnspan = CarrierColumns+1, sticky='ew')
-
 						Button_ok = tk.Button(self.win_check, text="OK", command=self.Continue_Import)
 						Button_ok.grid(row = CarrierRows + 3, column = 0, columnspan = CarrierColumns+1, sticky='ew')
 					
 					else:
 						self.Continue_Import()
+				if filename.endswith('.RAW') or filename.endswith('.raw'):
+					self.dataset_list = fcs_importer.Fill_datasets_RAW(filename, bleaching_correction = self.bleaching_choice)
 
+					for self.dataset in self.dataset_list:
+
+						self.name1 = self.dataset.position + "__" + self.name 
+
+						treetree = d_tree.Data_tree (self.tree, self.name1, self.dataset.repetitions)
+						self.tree.selection_set(treetree.child_id)
+						data_cont.tree_list.append(treetree)
+
+						data_cont.tree_list_name.append(self.name1)
+
+						data_cont.binning_list.append(1)
+
+
+						data_cont.data_list_raw.append(self.dataset)
+
+
+						#data_list_current.append(dataset1)
+
+
+						data_cont.total_channels_list.append(self.dataset.datasets_list[0].channels_number + self.dataset.datasets_list[0].cross_number)
+						data_cont.repetitions_list.append(self.dataset.repetitions)
+
+						data_cont.peaks_list.append([None] * self.dataset.repetitions)
+
+						data_cont.list_of_channel_pairs.append([None])
 
 				if filename.endswith('.SIN'): 
 					self.dataset = fcs_importer.Fill_datasets_sin(lines)
@@ -705,7 +766,13 @@ class Left_frame :
 		self.Clear_all_Button = tk.Button(self.frame01, text="Delete all", command=self.Delete_all_datasets)
 		self.Clear_all_Button.pack(side = "left", anchor = "nw")
 
-		
+		self.bleaching_label = tk.Label(self.frame01,  text = "Bleaching: ")
+		self.bleaching_label.pack(side = "left", anchor = "nw")
+
+		self.bleaching_choice = ttk.Combobox(self.frame01,values = ["No","Double Exponential","Polynomial"],  width = 18)
+		self.bleaching_choice.config(state = "readonly")
+		self.bleaching_choice.pack(side = "left", anchor = "nw")
+		self.bleaching_choice.set("Double Exponential")
 
 
 		self.frame02 = tk.Frame(frame0)

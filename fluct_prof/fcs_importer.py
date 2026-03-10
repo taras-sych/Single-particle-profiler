@@ -9,8 +9,10 @@ import pandas as pd
 
 from fluct_prof import Correlation as corr_py
 
-
-
+import fcsfiles
+from fcsfiles import ConfoCor3Raw
+from scipy.signal import savgol_filter
+from scipy.optimize import curve_fit
 
 
 class XY_plot:
@@ -125,6 +127,11 @@ class Full_dataset_fcs:
 #---------------------------------------------------  
         
 #---------------------------------------------------
+def double_exp_bleaching(self, x, A1, a1, A2, a2, C):
+		return C + A1*np.exp(-a1*x) + A2*np.exp(-a2*x)
+
+def polynomial_bleaching(self, x, a,b,c,d,e):
+    return a*x**4 + b*x**3 + c*x**2 + d*x + e
 
 def Fill_datasets_fcs( list_file):
 
@@ -415,7 +422,7 @@ def Fill_datasets_fcs( list_file):
 
 
 
-
+    print(full_dataset_list)
     return full_dataset_list
 
 #---------------------------------------------------  
@@ -659,3 +666,73 @@ def Fill_datasets_csv( df, dir_output, filename):
                             channels_cross_list.append(channel)"""
 
     
+def Fill_datasets_RAW(filename, bleaching_correction, binning = 1):
+
+    channels_fluct_list = []
+    channels_cross_list = []
+    dataset_list=[]
+    full_dataset_list=[]
+
+    fcs = ConfoCor3Raw(filename)
+    print("filename",fcs.filename)
+    print("frequency:",fcs.frequency)
+    times = fcs.asarray()
+    int(times[10858])
+    times, bincounts = fcs.asarray(bins=len(times)/binning)
+
+    x = times
+    y = bincounts
+    timestep = (x[1] - x[0])/1000
+
+    if(bleaching_correction == "Double Exponential"):
+        popt, pcov = curve_fit(double_exp_bleaching, x, y)
+        print("bleaching parameters: ", popt)
+        y_bc = []	#bleaching corrected y
+        for i,ys in enumerate(y):
+            correction_factor = np.sqrt(double_exp_bleaching(x[i], *popt)/polynomial_bleaching(0, *popt))
+            #print(correction_factor)
+            y_bc.append(ys/correction_factor+double_exp_bleaching(0, *popt)*(1-correction_factor))
+
+        x1, y1 = corr_py.correlate_full (timestep, y_bc, y_bc)
+    elif(bleaching_correction == "Polynomial"):
+        popt, pcov = curve_fit(polynomial_bleaching, x, y)
+        print("bleaching parameters: ", popt)
+        y_bc = []	#bleaching corrected y
+        for i,ys in enumerate(y):
+            correction_factor = np.sqrt(polynomial_bleaching(x[i], *popt)/polynomial_bleaching(0, *popt))
+            #print(correction_factor)
+            y_bc.append(ys/correction_factor+polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+        x1, y1 = corr_py.correlate_full (timestep, y_bc, y_bc)
+    else:
+        x1, y1 = corr_py.correlate_full (timestep, y, y)
+
+
+    array_corr = XY_plot(x1,y1)
+
+    array_fluct = XY_plot(x, y)
+
+    channel = fcs_channel("RAW1", array_fluct, array_corr, "channel RAW1")
+
+    channels_fluct_list.append(channel)
+
+    print("channels fluct list", channels_fluct_list)
+
+    dataset_list.append(Dataset_fcs(len(channels_fluct_list), len(channels_cross_list), channels_fluct_list, channels_cross_list))
+
+    repetitions = 1
+
+    full_dataset = Full_dataset_fcs(repetitions, dataset_list)
+
+    full_dataset_list.append(full_dataset)
+
+    channels_fluct_list = []
+    channels_cross_list = []
+
+    dataset_list = []
+
+    full_dataset.position = ""
+
+    print("full dataset list", full_dataset_list)
+
+    return full_dataset_list
