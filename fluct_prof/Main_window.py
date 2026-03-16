@@ -2726,91 +2726,174 @@ class Sidecut_sFCS:
 	@staticmethod
 	def gaussian(x,a,m,s,c):
 		return a*np.exp(-(x-m)**2/(2*s**2))+c
+	
+	def show_gaussian_overlay_popup(self, fitted_x, fitted_y_data, fitted_y_gauss, channel_no):
+		popup = tk.Toplevel()
+		popup.title(f"Gaussian Overlay - Channel {channel_no}")
+		popup.geometry("900x700")
 
-	def isolate_maxima(self, channel_no, maxima_bins, lower_lim = 0, upper_lim = 128):
+		fig, ax = plt.subplots(figsize=(9, 7))
+
+		# Rohdaten
+		for x, y in zip(fitted_x, fitted_y_data):
+			ax.plot(x, y, alpha=0.08, linewidth=1)
+
+		# Fits
+		for x, yfit in zip(fitted_x, fitted_y_gauss):
+			ax.plot(x, yfit, alpha=0.2, linewidth=1.2)
+
+		ax.set_xlabel("Bin")
+		ax.set_ylabel("Intensity")
+		ax.set_title(f"Overlay of raw traces and Gaussian fits (channel {channel_no})")
+
+		canvas = FigureCanvasTkAgg(fig, master=popup)
+		canvas.draw()
+		canvas.get_tk_widget().pack(fill="both", expand=True)
+
+		def on_close():
+			plt.close(fig)
+			popup.destroy()
+
+		popup.protocol("WM_DELETE_WINDOW", on_close)
+
+	def isolate_maxima(self, channel_no, maxima_bins, lower_lim=0, upper_lim=128, plot_gaussian_overlay=True):
 		self.maxima = []
 
 		if maxima_bins == "Gaussian fit":
 			all_bins = []
 			max_indices = []
+
+			# Für Overlay-Plot
+			fitted_x = []
+			fitted_y_data = []
+			fitted_y_gauss = []
+
 			if len(self.array.shape) == 3:
 				array_to_analyze = self.array[channel_no]
 			else:
 				array_to_analyze = self.array
+
+			x_vals = np.arange(0, upper_lim - lower_lim, 1)
+
 			for i, i_array_full in enumerate(array_to_analyze):
 				if not i % 1000:
 					print(i)
+
 				i_array = i_array_full[lower_lim:upper_lim]
 				max_value = 0
 				max_index = 0
+				bins = 1
 
-				#calculate membrane pixels with gaussian
 				i_array_max = np.max(i_array)
 				i_array_std = np.std(i_array)
-				n = i if i < 100 else 100	#if there are less than 100 times processed, as many as possible should be taken for averaging if fit fails
-				max_indices_mean = np.mean(max_indices[i-n:i])
+
+				n = i if i < 100 else 100
+				if i > 0 and len(max_indices[i - n:i]) > 0:
+					max_indices_mean = np.mean(max_indices[i - n:i])
+				else:
+					max_indices_mean = len(i_array) / 2
+
+				fit_success = False
+				popt = None
+
 				try:
-					initial_guess = [i_array_max, np.argmax(i_array), i_array_std, 0]
-					popt, _ = curve_fit(Sidecut_sFCS.gaussian, np.arange(0,len(i_array),1), i_array, p0=initial_guess, maxfev=200)
-					max_index = int(popt[1]) #maximum = peak of gaussian
-					bins = int(2.5*popt[2]) #bin width = 2.5 sigma
+					initial_guess = [i_array_max, np.argmax(i_array), max(i_array_std, 1e-6), 0]
+					popt, _ = curve_fit(
+						Sidecut_sFCS.gaussian,
+						x_vals,
+						i_array,
+						p0=initial_guess,
+						maxfev=1000
+					)
+					max_index = int(round(popt[1]))
+					bins = int(round(2.5 * abs(popt[2])))
+					fit_success = True
+
 				except (RuntimeError, ValueError):
-					#print(i, "fit failed initially, try different starting conditions")
-					initial_guess = [i_array_max, max_indices_mean, i_array_std, 0]
+					initial_guess = [i_array_max, max_indices_mean, max(i_array_std, 1e-6), 0]
 					try:
-						popt, _ = curve_fit(Sidecut_sFCS.gaussian, np.arange(0,len(i_array),1), i_array, p0=initial_guess, maxfev=200)
-						max_index = int(popt[1])
-						bins = int(2.5*popt[2])
+						popt, _ = curve_fit(
+							Sidecut_sFCS.gaussian,
+							x_vals,
+							i_array,
+							p0=initial_guess,
+							maxfev=1000
+						)
+						max_index = int(round(popt[1]))
+						bins = int(round(2.5 * abs(popt[2])))
+						fit_success = True
+
 					except (RuntimeError, ValueError):
-						#print(i, "fit failed, using average values")
 						if i == 0:
-							max_index = (upper_lim - lower_lim) / 2
-							bins = (upper_lim - lower_lim) / 2 - 1
-							#print("round 0 ", max_index, bins)
-						else :
-							if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
-								max_index = max_indices_mean
-							if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
-								bins = np.mean(all_bins[i-n:i])
-				if i == 0:	#for the case if there is no prior maxima to average, and the fit fails, it will assume the trace is in the center
+							max_index = int((upper_lim - lower_lim) / 2)
+							bins = int((upper_lim - lower_lim) / 2 - 1)
+						else:
+							max_index = int(round(max_indices_mean))
+							prev_bins = all_bins[i - n:i]
+							if len(prev_bins) > 0:
+								bins = int(round(np.mean(prev_bins)))
+							else:
+								bins = int((upper_lim - lower_lim) / 2 - 1)
+
+				if i == 0:
 					if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
-						max_index = (upper_lim - lower_lim) / 2
+						max_index = int((upper_lim - lower_lim) / 2)
 					if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
-						bins = (upper_lim - lower_lim) / 2 - 1
-				else :
+						bins = int((upper_lim - lower_lim) / 2 - 1)
+				else:
 					if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
-						max_index = max_indices_mean
+						max_index = int(round(max_indices_mean))
 					if max_index - bins < 0 or max_index + bins + 1 > len(i_array):
-						bins = np.mean(all_bins[i-n:i])
-				
-				max_index = int(max_index)
-				for k in range (-int(bins), int(bins)+1):
+						prev_bins = all_bins[i - n:i]
+						if len(prev_bins) > 0:
+							bins = int(round(np.mean(prev_bins)))
+
+				bins = max(1, bins)
+				max_index = max(bins, min(max_index, len(i_array) - bins - 1))
+
+				for k in range(-int(bins), int(bins) + 1):
 					max_value += i_array[max_index + k]
-					if i == 0:
-						print(max_index+k, i_array[max_index + k])
-				
+
 				all_bins.append(bins)
 				self.maxima.append(max_value)
 				max_indices.append(max_index)
+
+				if plot_gaussian_overlay and fit_success and popt is not None and not i%100:
+					fitted_x.append(x_vals.copy())
+					fitted_y_data.append(i_array.copy())
+					fitted_y_gauss.append(Sidecut_sFCS.gaussian(x_vals, *popt))
+
 			self.maxima = np.array(self.maxima)
 			print("maxima array ", channel_no, self.maxima)
+
+			if plot_gaussian_overlay and len(fitted_y_data) > 0:
+				self.show_gaussian_overlay_popup(
+					fitted_x,
+					fitted_y_data,
+					fitted_y_gauss,
+					channel_no
+				)
+
 		else:
 			if len(self.array.shape) == 3:
 				array_to_analyze = self.array[channel_no]
-
 			else:
 				array_to_analyze = self.array
 
 			for i, i_array_full in enumerate(array_to_analyze):
 				if not i % 1000:
 					print(i)
+
 				i_array = i_array_full[lower_lim:upper_lim]
-				max = 0
-				for j in range(-int(maxima_bins),int(maxima_bins)):
-					if np.argmax(i_array) + j < len(i_array) and np.argmax(i_array) + j > 0:
-						max_buffer = np.argmax(i_array) + j
-						max += i_array[max_buffer]
-				self.maxima.append(max)
+				max_sum = 0
+				peak_idx = np.argmax(i_array)
+
+				for j in range(-int(maxima_bins), int(maxima_bins)):
+					if 0 <= peak_idx + j < len(i_array):
+						max_sum += i_array[peak_idx + j]
+
+				self.maxima.append(max_sum)
+
 		return self.maxima
     
 	def maxs_single_autoc_plot(self, channel_no, rep_no, number_of_reps, timestep):
