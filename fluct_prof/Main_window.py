@@ -43,6 +43,7 @@ import copy
 import numpy as np
 
 from scipy.signal import find_peaks
+from skimage import filters
 
 from scipy.optimize import curve_fit
 import random
@@ -775,42 +776,46 @@ class Left_frame :
 		self.bleaching_choice.set("Double Exponential")
 
 
-		self.frame02 = tk.Frame(frame0)
-		self.frame02.pack(side="left", fill="x", anchor = "nw")
+		self.frame02 = tk.Frame(frame0, width=320)
+		self.frame02.pack(side="left", fill="y", anchor="nw")
+		self.frame02.pack_propagate(False)
 
 		self.frame04 = tk.Frame(frame0)
-		self.frame04.pack(side="left", fill="x", anchor = "nw")
+		self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
 
 		
 
 
 		self.frame03 = tk.Frame(self.frame02)
-		self.frame03.pack(side="top", fill="x")
+		self.frame03.pack(side="top", fill="both", expand=False)
 
 
-
+		"""
 		self.scrollbar = tk.Scrollbar(self.frame03)
 		self.scrollbar.pack(side = "right", fill = "y")
-
-
 		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10, selectbackground="blue")
 		self.Datalist.pack(side = "left", anchor = "nw")
-		
-		
-		
-
-
 		self.tree=CheckboxTreeview(self.Datalist)
 		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
 		self.tree.pack()
-
-
 		self.tree.config(yscrollcommand = self.scrollbar.set)
+		"""
+
+		self.tree_container = tk.Frame(self.frame03)
+		self.tree_container.pack(side="left", fill="both", expand=True)
+		self.tree = CheckboxTreeview(self.tree_container)
+		self.tree.heading("#0", text="Imported datasets", anchor=tk.W)
+		self.tree.pack(side="left", fill="both", expand=True)
+
+		self.scrollbar = tk.Scrollbar(self.tree_container, orient="vertical", command=self.tree.yview)
+		self.scrollbar.pack(side="right", fill="y")
+		self.tree.configure(yscrollcommand=self.scrollbar.set)
+
 		self.scrollbar.config(command = self.tree.yview)
 
 		self.tree.bind('<<TreeviewSelect>>', self.Plot_data)
 
-		self.Datalist.config(width = 100, height = 10)
+		#self.Datalist.config(width = 100, height = 10)
 
 		self.frame025 = tk.Frame(self.frame02)
 		self.frame025.pack(side = "top", fill = "x", anchor='nw')
@@ -836,7 +841,9 @@ class Left_frame :
 		#self.chkbtn.grid(row = 0, column = 0, sticky='w')
 
 		self.frame023 = tk.Frame(self.frame02)
-		self.frame023.pack(side="left", fill="x")
+		self.frame023.pack(side="left", fill="x", anchor="nw")
+		self.frame023.columnconfigure(0, weight=1)
+		self.frame023.columnconfigure(1, weight=1)
 
 
 		self.Restruct_button = tk.Button(self.frame023, text="Restructure data", command=fun.Restruct_fun)
@@ -861,8 +868,8 @@ class Left_frame :
 		self.Output_button = tk.Button(self.frame023, text="Output", command=fun.Export_function)
 		self.Output_button.grid(row = 6, column = 0, sticky="EW")
 
-		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
-
+		#self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
+		self.figure1 = Figure(dpi=dpi_all, constrained_layout=True)
 
 
 
@@ -907,11 +914,24 @@ class Left_frame :
 
 
 		self.canvas1 = FigureCanvasTkAgg(self.figure1, self.frame04)
-		self.canvas1.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
+		self.canvas1.get_tk_widget().pack(side="top", fill="both", expand=True)
 
-		self.toolbar = NavigationToolbar2Tk(self.canvas1, self.frame04)
+		"""
+		def on_resize(event):
+			# Convert pixel size to inches for matplotlib
+			w_inches = event.width / self.figure1.dpi
+			h_inches = event.height / self.figure1.dpi
+			self.figure1.set_size_inches(w_inches, h_inches, forward=False)
+			self.figure1.tight_layout()
+			self.canvas1.draw_idle()
+
+		self.canvas1.get_tk_widget().bind("<Configure>", on_resize)
+		"""
+		self.toolbar_frame = tk.Frame(self.frame04)
+		self.toolbar_frame.pack(side="bottom", fill="x")
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas1, self.toolbar_frame)
 		self.toolbar.update()
-		self.canvas1.get_tk_widget().pack()
 
 		self.figure1.tight_layout()
 
@@ -1371,9 +1391,15 @@ class sFCS_frame:
 		slices = 1
 
 		binned_data = eg.intensity_carpet_plot(1, bin_size=bins, n_slices = slices)
-
-		
-		self.image.imshow(binned_data,origin="lower", aspect="auto", cmap="rainbow")
+		binned_data2 = eg.intensity_carpet_plot(0, bin_size=bins, n_slices = slices)
+		bdf = binned_data.flatten()		#flatten to find max/min in list
+		bdf2 = binned_data2.flatten()	
+		val = filters.threshold_otsu(binned_data)	#otsu threshold to compensate for spikes in intensity
+		val2 = filters.threshold_otsu(binned_data2)
+		self.image.grid(False)	#deactivate grid
+		self.image2.grid(False)	#deactivate grid
+		self.image.imshow(binned_data,origin="lower", aspect="auto", cmap = "rainbow", vmin=min(bdf), vmax=(max(bdf)+val)/2)
+		self.image2.imshow(binned_data2,origin="lower", aspect="auto", cmap = "rainbow", vmin=min(bdf2), vmax=(max(bdf2)+val2)/2)
 		self.canvas1.draw_idle()
 
 		
@@ -1452,52 +1478,40 @@ class sFCS_frame:
 		self.Clear_all_Button = tk.Button(self.frame01, text="Delete all", command=self.Empty_function)
 		self.Clear_all_Button.pack(side = "left", anchor = "nw")
 
-
-		self.frame02 = tk.Frame(frame0)
-		self.frame02.pack(side="left", fill="x", anchor = "nw")
+		self.frame02 = tk.Frame(frame0, width=320)
+		self.frame02.pack(side="left", fill="y", anchor="nw")
+		self.frame02.pack_propagate(False)
 
 		self.frame04 = tk.Frame(frame0)
-		self.frame04.pack(side="left", fill="x", anchor = "nw")
+		self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
 
 
 		self.frame03 = tk.Frame(self.frame02)
-		self.frame03.pack(side="top", fill="x")
+		self.frame03.pack(side="top", fill="both", expand=False)
 
+		self.tree_container = tk.Frame(self.frame03)
+		self.tree_container.pack(side="left", fill="both", expand=True)
 
+		self.tree = CheckboxTreeview(self.tree_container)
+		self.tree.heading("#0", text="Imported datasets", anchor=tk.W)
+		self.tree.pack(side="left", fill="both", expand=True)
 
-		self.scrollbar = tk.Scrollbar(self.frame03)
-		self.scrollbar.pack(side = "left", fill = "y")
-
-
-		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10)
-		self.Datalist.pack(side = "left", anchor = "nw")
-		
-		
-		
-		self.tree=CheckboxTreeview(self.Datalist)
-		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
-		self.tree.pack()
-
-
-		self.tree.config(yscrollcommand = self.scrollbar.set)
-		self.scrollbar.config(command = self.tree.yview)
+		self.scrollbar = tk.Scrollbar(self.tree_container, orient="vertical", command=self.tree.yview)
+		self.scrollbar.pack(side="right", fill="y")
+		self.tree.configure(yscrollcommand=self.scrollbar.set)
 
 		self.tree.bind('<<TreeviewSelect>>', self.Tree_selection)
 
-		self.Datalist.config(width = 100, height = 10)
-
 		self.frame024 = tk.Frame(self.frame02)
-		self.frame024.pack(side = "top", fill = "x", anchor='nw')
+		self.frame024.pack(side="top", fill="x", anchor='nw')
 
 		self.frame0003 = tk.Frame(self.frame024)
-		self.frame0003.pack(side = "left", fill = "x")
-
-
-		#self.chkbtn = tk.Checkbutton(self.frame0003, text="ch1", variable=1, command=Norm)
-		#self.chkbtn.grid(row = 0, column = 0, sticky='w')
+		self.frame0003.pack(side="left", fill="x")
 
 		self.frame023 = tk.Frame(self.frame02)
-		self.frame023.pack(side="left", fill="x")
+		self.frame023.pack(side="top", fill="x", anchor="nw")
+		self.frame023.columnconfigure(0, weight=1)
+		self.frame023.columnconfigure(1, weight=1)
 		
 		gridrow = 0
 
@@ -1591,51 +1605,88 @@ class sFCS_frame:
 		self.Transfer_all_button = tk.Button(self.frame023, text="Transfer all", command=self.Transfer_all_extracted)
 		self.Transfer_all_button.grid(row = gridrow, column = 1, sticky="EW")
 		gridrow += 1
-
+		"""
 		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
 
-		gs = self.figure1.add_gridspec(3, 1)
+		gs = self.figure1.add_gridspec(8, 1)
 
 
-		self.image = self.figure1.add_subplot(gs[0, 0])
+		self.image = self.figure1.add_subplot(gs[0])
 
-		self.image.set_title("sFCS image")
+		self.image.set_title("sFCS image channel 1")
 
 		self.image.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		
+		self.image2 = self.figure1.add_subplot(gs[1])
 
+		self.image2.set_title("sFCS image channel 2")
+
+		self.image2.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		
-
-
-		self.traces = self.figure1.add_subplot(gs[1, 0])
-
+		self.traces = self.figure1.add_subplot(gs[2:4])
 		self.traces.set_title("Traces")
-
 		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
 		self.traces.set_ylabel('intensity (a.u.)')
 		self.traces.set_xlabel('Time (s)')
-		
 
-
-		self.corr = self.figure1.add_subplot(gs[2, 0])
+		self.corr = self.figure1.add_subplot(gs[4:8])
 
 		self.corr.set_title("Correlation curves")
 		self.corr.set_ylabel('Diff. Coeff.')
 		self.corr.set_ylabel('G (tau)')
 		self.corr.set_xlabel('Delay time')
 
-
-
-
-
 		self.canvas1 = FigureCanvasTkAgg(self.figure1, self.frame04)
-		self.canvas1.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
+		self.canvas1.get_tk_widget().pack(side = "top", anchor = "nw", fill="both", expand=True)
+		self.canvas1.get_tk_widget().config(width=1, height=1)
+
+		def on_resize(event):
+			# Convert pixel size to inches for matplotlib
+			w_inches = event.width / self.figure1.dpi
+			h_inches = event.height / self.figure1.dpi
+			self.figure1.set_size_inches(w_inches, h_inches, forward=False)
+			self.figure1.tight_layout()
+			self.canvas1.draw_idle()
+
+		self.canvas1.get_tk_widget().bind("<Configure>", on_resize)
 
 		self.toolbar = NavigationToolbar2Tk(self.canvas1, self.frame04)
 		self.toolbar.update()
-		self.canvas1.get_tk_widget().pack()
+		#self.canvas1.get_tk_widget().pack()
 
 		self.figure1.tight_layout()
+		"""
+		self.figure1 = Figure(dpi=dpi_all, constrained_layout=True)
+
+		gs = self.figure1.add_gridspec(8, 1)
+
+		self.image = self.figure1.add_subplot(gs[0])
+		self.image.set_title("sFCS image channel 1")
+		self.image.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+
+		self.image2 = self.figure1.add_subplot(gs[1])
+		self.image2.set_title("sFCS image channel 2")
+		self.image2.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+
+		self.traces = self.figure1.add_subplot(gs[2:4])
+		self.traces.set_title("Traces")
+		self.traces.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+		self.traces.set_ylabel("intensity (a.u.)")
+		self.traces.set_xlabel("Time (s)")
+
+		self.corr = self.figure1.add_subplot(gs[4:8])
+		self.corr.set_title("Correlation curves")
+		self.corr.set_ylabel("G (tau)")
+		self.corr.set_xlabel("Delay time")
+
+		self.canvas1 = FigureCanvasTkAgg(self.figure1, self.frame04)
+		self.canvas1.get_tk_widget().pack(side="top", fill="both", expand=True)
+
+		self.toolbar_frame = tk.Frame(self.frame04)
+		self.toolbar_frame.pack(side="bottom", fill="x")
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas1, self.toolbar_frame)
+		self.toolbar.update()
 
 		self.framepb = tk.Frame(frame0)
 		self.framepb.pack(side="top", fill="x")
@@ -2518,38 +2569,27 @@ class sFCS_carpet:
 		self.Clear_all_Button.pack(side = "left", anchor = "nw")
 
 
-		self.frame02 = tk.Frame(frame0)
-		self.frame02.pack(side="left", fill="x", anchor = "nw")
+		self.frame02 = tk.Frame(frame0, width=320)
+		self.frame02.pack(side="left", fill="y", anchor="nw")
+		self.frame02.pack_propagate(False)
 
 		self.frame04 = tk.Frame(frame0)
-		self.frame04.pack(side="left", fill="x", anchor = "nw")
+		self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
 
 
 		self.frame03 = tk.Frame(self.frame02)
-		self.frame03.pack(side="top", fill="x")
+		self.frame03.pack(side="top", fill="both", expand=False)
 
+		self.tree_container = tk.Frame(self.frame03)
+		self.tree_container.pack(side="left", fill="both", expand=True)
 
+		self.tree = CheckboxTreeview(self.tree_container)
+		self.tree.heading("#0", text="Imported datasets", anchor=tk.W)
+		self.tree.pack(side="left", fill="both", expand=True)
 
-		self.scrollbar = tk.Scrollbar(self.frame03)
-		self.scrollbar.pack(side = "left", fill = "y")
-
-
-		self.Datalist = tk.Listbox(self.frame03, width = 150, height = 10)
-		self.Datalist.pack(side = "left", anchor = "nw")
-		
-		
-		
-		self.tree=CheckboxTreeview(self.Datalist)
-		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
-		self.tree.pack()
-
-
-		self.tree.config(yscrollcommand = self.scrollbar.set)
-		self.scrollbar.config(command = self.tree.yview)
-
-		self.tree.bind('<<TreeviewSelect>>', self.Tree_selection)
-
-		self.Datalist.config(width = 100, height = 10)
+		self.scrollbar = tk.Scrollbar(self.tree_container, orient="vertical", command=self.tree.yview)
+		self.scrollbar.pack(side="right", fill="y")
+		self.tree.configure(yscrollcommand=self.scrollbar.set)
 
 		self.frame024 = tk.Frame(self.frame02)
 		self.frame024.pack(side = "top", fill = "x", anchor='nw')
@@ -2561,9 +2601,12 @@ class sFCS_carpet:
 		#self.chkbtn = tk.Checkbutton(self.frame0003, text="ch1", variable=1, command=Norm)
 		#self.chkbtn.grid(row = 0, column = 0, sticky='w')
 
-		self.frame023 = tk.Frame(self.frame02)
-		self.frame023.pack(side="left", fill="x")
+		self.tree.bind('<<TreeviewSelect>>', self.Tree_selection)
 
+		self.frame023 = tk.Frame(self.frame02)
+		self.frame023.pack(side="top", fill="x", anchor="nw")
+		self.frame023.columnconfigure(0, weight=1)
+		self.frame023.columnconfigure(1, weight=1)
 
 		self.Extract_button = tk.Button(self.frame023, text="Corr carpet", command=self.Corr_carpet)
 		self.Extract_button.grid(row = 0, column = 0, sticky="EW")
@@ -2632,66 +2675,40 @@ class sFCS_carpet:
 		self.Transfer_all_button = tk.Button(self.frame023, text="Transfer all", command=self.Transfer_all_extracted)
 		self.Transfer_all_button.grid(row = 8, column = 1, sticky="EW")
 
-
-		self.figure1 = Figure(figsize=(0.85*win_height/dpi_all,0.85*win_height/dpi_all), dpi = dpi_all)
-
-
-
+		self.figure1 = Figure(dpi=dpi_all, constrained_layout=True)
 
 		gs = self.figure1.add_gridspec(3, 2)
 
-
 		self.image = self.figure1.add_subplot(gs[:1, :2])
-
 		self.image.set_title("sFCS image")
 
-		#self.image.ticklabel_format(axis = "y", scilimits = (0,0))
-		
-
-		
-
-
 		self.traces = self.figure1.add_subplot(gs[1, :2])
-
 		self.traces.set_title("Selected Traces")
-
-		self.traces.ticklabel_format(axis = "y", style="sci", scilimits = (0,0))
-		self.traces.set_ylabel('intensity (a.u.)')
-		self.traces.set_xlabel('Time (s)')
+		self.traces.ticklabel_format(axis="y", style="sci", scilimits=(0, 0))
+		self.traces.set_ylabel("intensity (a.u.)")
+		self.traces.set_xlabel("Time (s)")
 
 		self.corr_carpet = self.figure1.add_subplot(gs[2, 0])
-
 		self.corr_carpet.set_title("Correlation carpet")
-		self.corr_carpet.set_ylabel('Diff. Coeff.')
-		self.corr_carpet.set_ylabel('G (tau)')
-		self.corr_carpet.set_xlabel('Delay time')
-		
-
+		self.corr_carpet.set_ylabel("G (tau)")
+		self.corr_carpet.set_xlabel("Delay time")
 
 		self.corr = self.figure1.add_subplot(gs[2, 1])
-
 		self.corr.set_title("Correlation curves")
-		self.corr.set_ylabel('Diff. Coeff.')
-		self.corr.set_ylabel('G (tau)')
-		self.corr.set_xlabel('Delay time')
-
-
-
-
+		self.corr.set_ylabel("G (tau)")
+		self.corr.set_xlabel("Delay time")
 
 		self.canvas1 = FigureCanvasTkAgg(self.figure1, self.frame04)
-		self.canvas1.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
+		self.canvas1.get_tk_widget().pack(side="top", fill="both", expand=True)
 
-		self.toolbar = NavigationToolbar2Tk(self.canvas1, self.frame04)
+		self.toolbar_frame = tk.Frame(self.frame04)
+		self.toolbar_frame.pack(side="bottom", fill="x")
+
+		self.toolbar = NavigationToolbar2Tk(self.canvas1, self.toolbar_frame)
 		self.toolbar.update()
-		self.canvas1.get_tk_widget().pack()
-
-		self.figure1.tight_layout()
-
-		self.framepb = tk.Frame(frame0)
-		self.framepb.pack(side="top", fill="x")
 
 		cid = self.figure1.canvas.mpl_connect('button_press_event', self.onclick)
+		
 
 
 class Sidecut_sFCS:

@@ -10,86 +10,37 @@ global win_height
 global data_frame
 
 def Create_root():
+    global root
+    global win_width
+    global win_height
+    global data_frame
 
-	global root 
-	global win_width
-	global win_height
-	global data_frame
+    root = tk.Tk()
+    root.title("Single Particle Profiler")
 
-	root = tk.Tk()
-	root.title("Single Particle Profiler")
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
 
-	screen_width = root.winfo_screenwidth()
-	screen_height = root.winfo_screenheight()
+    win_width = round(0.5 * screen_width)
+    win_height = round(0.8 * screen_height)
 
-	win_width = round(0.5 * screen_width)
-	win_height = round (0.8 * screen_height)
+    root.geometry(f"{win_width}x{win_height}")
+    root.minsize(1000, 700)
 
-	#fontsize = round(win_width/85)
+    tabs = ttk.Notebook(root, padding=0)
+    tabs.pack(fill="both", expand=True)
 
-	#helv36 = tkFont.Font(size=fontsize)
+    frame0 = tk.Frame(tabs)
+    frame1 = tk.Frame(tabs)
+    frame2 = tk.Frame(tabs)
 
-	line = str(win_width) + "x" + str(win_height)
+    tabs.add(frame0, text="Single Particle Profiler")
+    tabs.add(frame1, text="Scanning FCS (cross)")
+    tabs.add(frame2, text="Scanning FCS (carpet)")
 
-
-	root.geometry(line)
-
-	tabs = ttk.Notebook(root, width=win_width, height=win_height, padding = 0)
-
-	tab = []
-
-	frame0 = tk.Frame(tabs)
-	frame1 = tk.Frame(tabs)
-	frame2 = tk.Frame(tabs)
-
-
-	frame0_l = tk.LabelFrame(frame0)
-	frame0_l.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
-	frame0_l.config(bd=0, width = round(win_width * 0.5), height = win_height)
-	frame0_l.grid_propagate(1)
-
-	frame0_r = tk.LabelFrame(frame0)
-	frame0_r.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
-	frame0_r.config(bd=0, width = round(win_width * 0.5), height = win_height)
-	frame0_r.grid_propagate(1)
-
-	frame1_l = tk.LabelFrame(frame1)
-	frame1_l.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
-	frame1_l.config(bd=0, width = round(win_width * 0.5), height = win_height)
-	frame1_l.grid_propagate(1)
-
-	frame1_r = tk.LabelFrame(frame1)
-	frame1_r.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
-	frame1_r.config(bd=0, width = round(win_width * 0.5), height = win_height)
-	frame1_r.grid_propagate(1)
-
-	frame2_l = tk.LabelFrame(frame2)
-	frame2_l.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
-	frame2_l.config(bd=0, width = round(win_width * 0.5), height = win_height)
-	frame2_l.grid_propagate(1)
-
-	frame2_r = tk.LabelFrame(frame2)
-	frame2_r.pack(side = "left", anchor = "nw", expand = 1, fill = tk.BOTH)
-	frame2_r.config(bd=0, width = round(win_width * 0.5), height = win_height)
-	frame2_r.grid_propagate(1)
-
-
-
-	tabs.add(frame0, text = "Single Particle Profiler")
-	tabs.add(frame1, text = "Scanning FCS (cross)")
-	tabs.add(frame2, text = "Scanning FCS (carpet)")
-
-	tabs_number = 3;
-
-	tabs.pack(side = "left", anchor = "nw")
-
-
-
-	data_frame = main_w.Left_frame(frame0_l, win_width, win_height, dpi_all )
-
-	data_frame_sFCS = main_w.sFCS_frame(frame1_l, win_width, win_height, dpi_all )
-
-	data_frame_sFCS = main_w.sFCS_carpet(frame2_l, win_width, win_height, dpi_all )
+    data_frame = main_w.Left_frame(frame0, win_width, win_height, dpi_all)
+    data_frame_sFCS = main_w.sFCS_frame(frame1, win_width, win_height, dpi_all)
+    data_frame_sFCS = main_w.sFCS_carpet(frame2, win_width, win_height, dpi_all)
 
 binning_list = []
 
