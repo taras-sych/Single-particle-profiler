@@ -147,7 +147,7 @@ class Diffusion_window :
 						self.channel_index = channel_index_i
 						for param in self.list_of_params:
 							self.full_dict[param]["Init"].delete(0,"end")
-							self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+							self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),7)))
 
 						self.Fit_corr_curve()
 
@@ -159,7 +159,7 @@ class Diffusion_window :
 						self.channel_index = channel_index_i
 						for param in self.list_of_params:
 							self.full_dict[param]["Init"].delete(0,"end")
-							self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+							self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),7)))
 
 						self.Fit_corr_curve()
 
@@ -272,7 +272,7 @@ class Diffusion_window :
 					self.channel_index = channel_index_i
 					for param in self.list_of_params:
 						self.full_dict[param]["Init"].delete(0,"end")
-						self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+						self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),7)))
 
 					self.Fit_corr_curve()
 
@@ -284,7 +284,7 @@ class Diffusion_window :
 					self.channel_index = channel_index_i
 					for param in self.list_of_params:
 						self.full_dict[param]["Init"].delete(0,"end")
-						self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+						self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),7)))
 
 					self.Fit_corr_curve()
 
@@ -326,7 +326,7 @@ class Diffusion_window :
 							self.channel_index = channel_index_i
 							for param in self.list_of_params:
 								self.full_dict[param]["Init"].delete(0,"end")
-								self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+								self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),7)))
 
 							self.Fit_corr_curve()
 
@@ -338,7 +338,7 @@ class Diffusion_window :
 							self.channel_index = channel_index_i
 							for param in self.list_of_params:
 								self.full_dict[param]["Init"].delete(0,"end")
-								self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),3)))
+								self.full_dict[param]["Init"].insert(0,str(round(float(self.list_of_inits_for_fit_all[param]),7)))
 
 							self.Fit_corr_curve()
 
@@ -410,7 +410,7 @@ class Diffusion_window :
 		for param in self.list_of_params:
 			
 			self.full_dict[param]["Init"].delete(0,"end")
-			self.full_dict[param]["Init"].insert(0,str(round(params[param].value,3)))
+			self.full_dict[param]["Init"].insert(0,str(round(params[param].value,7)))
 			popt.append(np.float64(params[param].value))
 			output_dict[param] = np.float64(params[param].value)
 
@@ -428,7 +428,7 @@ class Diffusion_window :
 
 		for key in params:
 			if key.__contains__("txy"):
-				temporary_list.append(round(np.float64(self.Txy_entry.get()) * np.float64(self.D_cal_entry.get()) / params[key].value,3))
+				temporary_list.append(round(np.float64(self.Txy_entry.get()) * np.float64(self.D_cal_entry.get()) / params[key].value,7))
 
 
 		data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, self.channel_index] = temporary_list
@@ -441,8 +441,8 @@ class Diffusion_window :
 
 		if self.channel_index < data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_number:
 
-			data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index] = round(1/params["GN0"].value,3)
-			data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, self.channel_index] = round(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[self.channel_index].count_rate/data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index],3)
+			data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index] = round(1/params["GN0"].value,7)
+			data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, self.channel_index] = round(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[self.channel_index].count_rate/data_cont.data_list_raw[data_cont.file_index].N[data_cont.rep_index, self.channel_index],7)
 			
 
 			if self.fit_all_flag == False:
@@ -475,11 +475,6 @@ class Diffusion_window :
 		for param in params.keys():
 
 			param_list.append( np.float64(params[param].value))
-
-
-		
-
-		
 		
 		if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D":
 
@@ -494,6 +489,15 @@ class Diffusion_window :
 
 		if self.Triplet.get() == 'triplet' and self.Components.get() == '2 components' and self.Dimension.get() == "2D":
 			y_model = fun.Corr_curve_2d_2(x, *param_list)
+
+		if self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D elliptical" :
+			y_model = fun.Corr_curve_2d_gaussian(x, *param_list)
+
+		if self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "1D" :
+			y_model = fun.Corr_curve_1d(x, *param_list)
+
+		if self.Triplet.get() == 'singlet' and self.Components.get() == '2 components' and self.Dimension.get() == "1D" :
+			y_model = fun.Corr_curve_1d_2(x, *param_list)
 
 
 		return y_model - ydata
@@ -545,7 +549,7 @@ class Diffusion_window :
 
 						
 
-						if key == "cpm" or key == "N" or "D" in key:
+						if key == "cpm" or key == "N" : #or "D" in key
 							pass
 						
 						else:
@@ -565,43 +569,65 @@ class Diffusion_window :
 					self.save_fitparam_dict [data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name]["cpm"] = data_cont.data_list_raw[data_cont.file_index].cpm[data_cont.rep_index, i]
 
 
-					if len(popt) == 7:
+					if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D" :
 						
 						self.curves.plot(x1, fun.Corr_curve_2d(x1, *popt), label = "Fit")
-						self.residuals.plot(x1, fun.Corr_curve_2d(x1, *popt)-y1)
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
-						
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d(x1, *popt))
 
-					if len(popt) == 8:
+					elif self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D" :
 						
 						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
-						self.residuals.plot(x1, fun.Corr_curve_3d(x1, *popt)-y1)
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d(x1, *popt))
 
-					if len(popt) == 10:
+					elif self.Triplet.get() == 'triplet' and self.Components.get() == '2 components' and self.Dimension.get() == "2D" :
 						
 						self.curves.plot(x1, fun.Corr_curve_2d_2(x1, *popt), label = "Fit")
-						self.residuals.plot(x1, fun.Corr_curve_2d_2(x1, *popt)-y1)
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
-
 						
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d_2(x1, *popt))
 
-					if len(popt) == 12:
+					elif self.Triplet.get() == 'singlet' and self.Components.get() == '2 components' and self.Dimension.get() == "3D" :
 						
 						self.curves.plot(x1, fun.Corr_curve_3d_2(x1, *popt), label = "Fit")
-						self.residuals.plot(x1, fun.Corr_curve_3d_2(x1, *popt)-y1)
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d_2(x1, *popt))
+					
+					elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D elliptical" :
+						
+						self.curves.plot(x1, fun.Corr_curve_2d_gaussian(x1, *popt), label = "Fit")
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d_gaussian(x1, *popt))
+					
+					elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "1D" :
+						print(popt)
+						self.curves.plot(x1, fun.Corr_curve_1d(x1, *popt), label = "Fit")
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_1d(x1, *popt))
+
+						print("plot done")
+
+					elif self.Triplet.get() == 'singlet' and self.Components.get() == '2 components' and self.Dimension.get() == "1D" :
+						
+						self.curves.plot(x1, fun.Corr_curve_1d_2(x1, *popt), label = "Fit")
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_1d_2(x1, *popt))
+
+						print("plot done")
 
 
 
@@ -642,42 +668,63 @@ class Diffusion_window :
 
 						
 
-
-					if len(popt) == 7:
+					if self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D" :
 						
 						self.curves.plot(x1, fun.Corr_curve_2d(x1, *popt), label = "Fit")
-						self.residuals.plot(x1, fun.Corr_curve_2d(x1, *popt)-y1)
 
-						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name) + " Fit"
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d(x1, *popt))
 
-					if len(popt) == 8:
+					elif self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D" :
 						
 						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
-						self.residuals.plot(x1, fun.Corr_curve_3d(x1, *popt)-y1)
 
-						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name) + " Fit"
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d(x1, *popt))
 
-					if len(popt) == 10:
+					elif self.Triplet.get() == 'triplet' and self.Components.get() == '2 components' and self.Dimension.get() == "2D" :
 						
 						self.curves.plot(x1, fun.Corr_curve_2d_2(x1, *popt), label = "Fit")
-						self.residuals.plot(x1, fun.Corr_curve_2d_2(x1, *popt)-y1)
 
-						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name) + " Fit"
-
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+						
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d_2(x1, *popt))
 
-					if len(popt) == 12:
+					elif self.Triplet.get() == 'singlet' and self.Components.get() == '2 components' and self.Dimension.get() == "3D" :
 						
 						self.curves.plot(x1, fun.Corr_curve_3d_2(x1, *popt), label = "Fit")
-						self.residuals.plot(x1, fun.Corr_curve_3d_2(x1, *popt)-y1)
 
-						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].cross_list[i].short_name) + " Fit"
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
 
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_3d_2(x1, *popt))
+					
+					elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D elliptical" :
+						
+						self.curves.plot(x1, fun.Corr_curve_2d_gaussian(x1, *popt), label = "Fit")
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d_gaussian(x1, *popt))
+					
+					elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "1D" :
+						
+						self.curves.plot(x1, fun.Corr_curve_1d(x1, *popt), label = "Fit")
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_1d(x1, *popt))
+
+					elif self.Triplet.get() == 'singlet' and self.Components.get() == '2 components' and self.Dimension.get() == "1D" :
+						
+						self.curves.plot(x1, fun.Corr_curve_1d_2(x1, *popt), label = "Fit")
+
+						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
+
+						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_1d_2(x1, *popt))
+
+				
 
 
 
@@ -884,7 +931,23 @@ class Diffusion_window :
 			self.list_of_min = ['0', '0', '0', '0', '0',  '0', '0', '0', '0', '0']
 			self.list_of_max = ['10', '5', '1', '1', '100000', '100000', '20', '20', '1', '100']
 
+		elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D elliptical" :
+			self.list_of_params = ['GN0','tau_D', 'S']
+			self.list_of_inits = ['1', '1', '1']
+			self.list_of_min = ['0', '0', '0']
+			self.list_of_max = ['100','1000','20']
 
+		elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "1D" :
+			self.list_of_params = ['GN0','tau_D']
+			self.list_of_inits = ['1', '1']
+			self.list_of_min = ['0', '0']
+			self.list_of_max = ['100', '1000']
+
+		elif self.Triplet.get() == 'singlet' and self.Components.get() == '2 components' and self.Dimension.get() == "1D" :
+			self.list_of_params = ['A1', 'A2', 'tau_D1', 'tau_D2']
+			self.list_of_inits = ['1', '1', '1', '1']
+			self.list_of_min = ['0', '0', '0', '0']
+			self.list_of_max = ['1', '1', '1000', '1000']
 
 
 
@@ -1210,7 +1273,7 @@ class Diffusion_window :
 		self.Norm_label = tk.Label(self.frame001, text="FCS curve fitting: ")
 		self.Norm_label.grid(row = 0, column = 0, columnspan = 2, sticky = 'w')
 
-		self.Triplet = ttk.Combobox(self.frame001,values = ["triplet"], width = 9 )
+		self.Triplet = ttk.Combobox(self.frame001,values = ["singlet", "triplet"], width = 9 )
 		self.Triplet.config(state = "readonly")
 		
 		self.Triplet.grid(row = 1, column = 0, sticky='ew')
@@ -1228,7 +1291,7 @@ class Diffusion_window :
 
 		self.Components.bind("<<ComboboxSelected>>", self.Update_fitting)
 
-		self.Dimension = ttk.Combobox(self.frame001,values = ["2D", "3D"], width = 9)
+		self.Dimension = ttk.Combobox(self.frame001,values = ["1D", "2D elliptical", "2D", "3D"], width = 9)
 		self.Dimension.config(state = "readonly")
 		
 		self.Dimension.grid(row = 1, column = 2, sticky='ew')

@@ -49,7 +49,7 @@ from scipy.optimize import curve_fit
 import random
 
 import seaborn as sns
-
+import xlsxwriter
 
 #--------------------------
 #End of importing general modules
@@ -99,7 +99,11 @@ class Left_frame :
 
 		self.corr.cla()
 
-
+		#save intensity traces
+		filename_xlsx = os.path.join("./", f"intensity_trace.xlsx")
+		print(filename_xlsx, "created")
+		workbook = xlsxwriter.Workbook(filename_xlsx)
+		worksheet = workbook.add_worksheet("intensity traces")
 
 		for i in range (datasets_pos.datasets_list[rep].channels_number): 
 
@@ -110,6 +114,12 @@ class Left_frame :
 				self.traces.plot(datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.x, datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.y, label = datasets_pos.datasets_list[rep].channels_list[i].short_name)
 
 				self.corr.plot(datasets_pos.datasets_list[rep].channels_list[i].auto_corr_arr.x, datasets_pos.datasets_list[rep].channels_list[i].auto_corr_arr.y, label = datasets_pos.datasets_list[rep].channels_list[i].short_name)
+
+				worksheet.write(0, 0, "time")
+				worksheet.write(0, 1, "intensity")
+				for row, (x, y) in enumerate(zip(datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.x, datasets_pos.datasets_list[rep].channels_list[i].fluct_arr.y), start=1):
+					worksheet.write(row, 0+2*i, x)
+					worksheet.write(row, 1+2*i, y)
 
 		for i in range (datasets_pos.datasets_list[rep].cross_number):
 
@@ -1160,25 +1170,30 @@ class sFCS_frame:
 				
 
 				if(bleaching_correction == "Double Exponential"):
-					popt, pcov = curve_fit(self.double_exp_bleaching, x, y)
-					print("bleaching parameters: ", popt)
-					y_bc = []	#bleaching corrected y
-					for i,ys in enumerate(y):
-						correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
-						#print(correction_factor)
-						y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+					try:
+						popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+						y_bc = []	#bleaching corrected y
+						for i,ys in enumerate(y):
+							correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+							#print(correction_factor)
+							y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
 
-					Tr1 = fcs_importer.XY_plot(x,y_bc)
+						Tr = fcs_importer.XY_plot(x,y_bc)
+					except RuntimeError:
+						Tr = fcs_importer.XY_plot(x,y)
+
 				elif(bleaching_correction == "Polynomial"):
-					popt, pcov = curve_fit(self.polynomial_bleaching, x, y)
-					print("bleaching parameters: ", popt)
-					y_bc = []	#bleaching corrected y
-					for i,ys in enumerate(y):
-						correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
-						#print(correction_factor)
-						y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+					try:
+						popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+						y_bc = []	#bleaching corrected y
+						for i,ys in enumerate(y):
+							correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+							#print(correction_factor)
+							y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
 
-					Tr = fcs_importer.XY_plot(x,y_bc)
+						Tr = fcs_importer.XY_plot(x,y_bc)
+					except RuntimeError:
+						Tr = fcs_importer.XY_plot(x,y)
 				else:
 					Tr = fcs_importer.XY_plot(x,y)
 
@@ -1228,25 +1243,30 @@ class sFCS_frame:
 
 					
 					if(bleaching_correction == "Double Exponential"):
-						popt, pcov = curve_fit(self.double_exp_bleaching, x, y)
-						print("bleaching parameters: ", popt)
-						y_bc = []	#bleaching corrected y
-						for i,ys in enumerate(y):
-							correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
-							#print(correction_factor)
-							y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+						try:
+							popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+							y_bc = []	#bleaching corrected y
+							for i,ys in enumerate(y):
+								correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+								#print(correction_factor)
+								y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
 
-						Tr1 = fcs_importer.XY_plot(x,y_bc)
+							Tr1 = fcs_importer.XY_plot(x,y_bc)
+						except RuntimeError:
+							Tr1 = fcs_importer.XY_plot(x,y)
+
 					elif(bleaching_correction == "Polynomial"):
-						popt, pcov = curve_fit(self.polynomial_bleaching, x, y)
-						print("bleaching parameters: ", popt)
-						y_bc = []	#bleaching corrected y
-						for i,ys in enumerate(y):
-							correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
-							#print(correction_factor)
-							y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+						try:
+							popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+							y_bc = []	#bleaching corrected y
+							for i,ys in enumerate(y):
+								correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+								#print(correction_factor)
+								y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
 
-						Tr1 = fcs_importer.XY_plot(x,y_bc)
+							Tr1 = fcs_importer.XY_plot(x,y_bc)
+						except RuntimeError:
+							Tr1 = fcs_importer.XY_plot(x,y)
 					else:
 						Tr1 = fcs_importer.XY_plot(x,y)
 
@@ -1280,25 +1300,29 @@ class sFCS_frame:
 
 
 						if(bleaching_correction == "Double Exponential"):
-							popt, pcov = curve_fit(self.double_exp_bleaching, x, y)
-							print("bleaching parameters: ", popt)
-							y_bc = []	#bleaching corrected y
-							for i,ys in enumerate(y):
-								correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
-								#print(correction_factor)
-								y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+							try:	
+								popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+								y_bc = []	#bleaching corrected y
+								for i,ys in enumerate(y):
+									correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+									#print(correction_factor)
+									y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
 
-							Tr2 = fcs_importer.XY_plot(x,y_bc)
+								Tr2 = fcs_importer.XY_plot(x,y_bc)
+							except RuntimeError:
+								Tr2 = fcs_importer.XY_plot(x,y)
 						elif(bleaching_correction == "Polynomial"):
-							popt, pcov = curve_fit(self.polynomial_bleaching, x, y)
-							print("bleaching parameters: ", popt)
-							y_bc = []	#bleaching corrected y
-							for i,ys in enumerate(y):
-								correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
-								#print(correction_factor)
-								y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+							try:
+								popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+								y_bc = []	#bleaching corrected y
+								for i,ys in enumerate(y):
+									correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+									#print(correction_factor)
+									y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
 
-							Tr2 = fcs_importer.XY_plot(x,y_bc)
+								Tr2 = fcs_importer.XY_plot(x,y_bc)
+							except RuntimeError:
+								Tr2 = fcs_importer.XY_plot(x,y)
 						else:
 							Tr2 = fcs_importer.XY_plot(x,y)
 
@@ -2749,19 +2773,22 @@ class Sidecut_sFCS:
 		popup.title(f"Gaussian Overlay - Channel {channel_no}")
 		popup.geometry("900x700")
 
-		fig, ax = plt.subplots(figsize=(9, 7))
+		fig, ax = plt.subplots(figsize=(5, 4))
 
 		# Rohdaten
 		for x, y in zip(fitted_x, fitted_y_data):
-			ax.plot(x, y, alpha=0.08, linewidth=1)
+			ax.plot(x, y, alpha=0.8, linewidth=1, linestyle = '--', color = 'blue', label = "Intensity")
 
 		# Fits
 		for x, yfit in zip(fitted_x, fitted_y_gauss):
-			ax.plot(x, yfit, alpha=0.2, linewidth=1.2)
+			ax.plot(x, yfit, alpha=1, linewidth=1.2, color = 'blue', label = "Gaussian fit")
 
-		ax.set_xlabel("Bin")
-		ax.set_ylabel("Intensity")
+		ax.set_xlabel("Bin", fontsize=24)
+		ax.set_ylabel("Intensity", fontsize=24)
 		ax.set_title(f"Overlay of raw traces and Gaussian fits (channel {channel_no})")
+		ax.grid(False)
+		ax.legend(fontsize=22)
+		ax.tick_params(labelsize=20)        # die Zahlen an den Achsen
 
 		canvas = FigureCanvasTkAgg(fig, master=popup)
 		canvas.draw()
@@ -2875,7 +2902,7 @@ class Sidecut_sFCS:
 				self.maxima.append(max_value)
 				max_indices.append(max_index)
 
-				if plot_gaussian_overlay and fit_success and popt is not None and not i%100:
+				if plot_gaussian_overlay and fit_success and popt is not None and i==2:
 					fitted_x.append(x_vals.copy())
 					fitted_y_data.append(i_array.copy())
 					fitted_y_gauss.append(Sidecut_sFCS.gaussian(x_vals, *popt))
