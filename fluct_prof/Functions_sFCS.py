@@ -218,7 +218,21 @@ class File_sFCS_czi:
 
         channels = image_data.shape[2]
 
+        print(" ")
+        print("-------------------")
+        print("---Channels--------")
         print(channels)
+        print(" ")
+        print(" ")
+
+        print(" ")
+        print("-------------------")
+        print("---Image data shape--------")
+        print(image_data.shape)
+        print(" ")
+        print(" ")
+
+
 
         self.carpet_full = []
 
@@ -226,7 +240,15 @@ class File_sFCS_czi:
 
 
         for channel_number in range (channels):
-            self.carpet_full.append(image_data[0, :, channel_number, 0, 0, :, 0].T)
+            self.carpet_full.append(image_data[0, 0, channel_number, :, 0, 0, :, 0].T)
+
+        print(" ")
+        print("---------------------------------")
+        print(self.carpet_full[0].shape)
+        print("---------------------------------")
+        print(" ")
+        print(" ")
+        print(" ")
 
 
 class File_sFCS_nd2:
@@ -245,8 +267,30 @@ class File_sFCS_nd2:
 
         #channel_number = 1
 
+        print(" ")
+        print("-------------------")
+        print("---Channels--------")
+        print(channels)
+        print(" ")
+        print(" ")
+
+        print(" ")
+        print("-------------------")
+        print("---Image data shape--------")
+        print(image_data.shape)
+        print(" ")
+        print(" ")
+
         self.carpet_full = []
 
         for channel_number in range (channels):
 
             self.carpet_full.append(image_data[0, channel_number, :, :].T)
+
+        print(" ")
+        print("---------------------------------")
+        print(self.carpet_full[0].shape)
+        print("---------------------------------")
+        print(" ")
+        print(" ")
+        print(" ")
