@@ -674,15 +674,20 @@ def Fill_datasets_RAW(filename, bleaching_correction, binning = 1):
     full_dataset_list=[]
 
     fcs = ConfoCor3Raw(filename)
-    print("filename",fcs.filename)
-    print("frequency:",fcs.frequency)
-    times = fcs.asarray()
-    int(times[10858])
-    times, bincounts = fcs.asarray(bins=len(times)/binning)
+    arrival = fcs.asarray()
+    duration = arrival[-1] - arrival[0]
+    n_photons = len(arrival)
 
-    x = times
-    y = bincounts
-    timestep = (x[1] - x[0])/1000
+    print("Duration:", duration)
+    print("Count rate:", n_photons / duration)
+    print("Frequency:", fcs.frequency)
+
+    bin_time = 1e-6
+    n_bins = int(round(duration / bin_time))
+
+    x, y = fcs.asarray(bins=n_bins)
+    timestep = x[1] - x[0]
+    print("Timestep:", timestep)
 
     if(bleaching_correction == "Double Exponential"):
         popt, pcov = curve_fit(double_exp_bleaching, x, y)

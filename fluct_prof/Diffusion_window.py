@@ -547,9 +547,7 @@ class Diffusion_window :
 
 					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, i].keys():
 
-						
-
-						if key == "cpm" or key == "N" : #or "D" in key
+						if key == "cpm" or key == "N" or "D" in key:
 							pass
 						
 						else:
@@ -578,7 +576,7 @@ class Diffusion_window :
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d(x1, *popt))
 
 					elif self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D" :
-						
+
 						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
@@ -610,7 +608,7 @@ class Diffusion_window :
 						self.save_plot_dict [key] = fcs_importer.XY_plot(x1, fun.Corr_curve_2d_gaussian(x1, *popt))
 					
 					elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "1D" :
-						print(popt)
+
 						self.curves.plot(x1, fun.Corr_curve_1d(x1, *popt), label = "Fit")
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
@@ -649,10 +647,11 @@ class Diffusion_window :
 
 					popt = []
 
-
 					for key in data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k].keys():
-
-						popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k][key]))
+						if key == "cpm" or key == "N" or "D" in key:
+							pass
+						else:
+							popt.append(np.float64(data_cont.data_list_raw[data_cont.file_index].diff_fitting[data_cont.rep_index, k][key]))
 
 					diff_list1 = data_cont.data_list_raw[data_cont.file_index].diff_coeffs[data_cont.rep_index, k]
 					temp_keys = []
@@ -678,6 +677,7 @@ class Diffusion_window :
 
 					elif self.Triplet.get() == 'triplet' and self.Components.get() == '1 component' and self.Dimension.get() == "3D" :
 						
+						print(popt)
 						self.curves.plot(x1, fun.Corr_curve_3d(x1, *popt), label = "Fit")
 
 						key = str(data_cont.data_list_raw[data_cont.file_index].datasets_list[data_cont.rep_index].channels_list[i].short_name) + " Fit"
@@ -845,35 +845,46 @@ class Diffusion_window :
 		self.Fitting_frame()
 
 	def Fitting_frame(self):
-
+		"""
 		self.frame00004.destroy()
-
 		self.frame00004 = tk.Frame(self.frame002)
-
 		self.mycanvas = tk.Canvas(self.frame00004)
 		self.mycanvas.pack(side = "left")
-		
-
 		self.param_scrollbar  = tk.Scrollbar(self.frame00004, orient = "vertical", command = self.mycanvas.yview)
 		self.param_scrollbar.pack( side = "right", fill = "y" )
-
 		self.mycanvas.configure (yscrollcommand = self.param_scrollbar.set)
-
 		self.mycanvas.bind('<Configure>', lambda e: self.mycanvas.configure(scrollregion = self.mycanvas.bbox('all')))
-
-
-
 		#self.frame004 = tk.Listbox(self.frame00004, height = 20, yscrollcommand = self.param_scrollbar.set )
 		#self.frame004.pack( side = "left", fill = "x" , expand = 0)
-
-		
-
-
 		self.frame004 = tk.Frame(self.mycanvas)
 		self.mycanvas.create_window ((0,0), window=self.frame004, anchor="nw")
-
 		self.frame00004.pack(side = "top", fill = "both", expand = "yes")
+		"""
 
+		self.frame00004.destroy()
+		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004.pack(side="top", fill="both", expand=True)
+
+		self.param_scrollbar = tk.Scrollbar(self.frame00004, orient="vertical")
+		self.param_scrollbar.pack(side="right", fill="y")
+
+		self.mycanvas = tk.Canvas(self.frame00004, highlightthickness=0)
+		self.mycanvas.pack(side="left", fill="both", expand=True)
+
+		self.param_scrollbar.config(command=self.mycanvas.yview)
+		self.mycanvas.configure(yscrollcommand=self.param_scrollbar.set)
+
+		self.frame004 = tk.Frame(self.mycanvas)
+		self.param_window = self.mycanvas.create_window((0, 0), window=self.frame004, anchor="nw")
+
+		def _on_canvas_configure(e):
+			self.mycanvas.configure(scrollregion=self.mycanvas.bbox("all"))
+			self.mycanvas.itemconfigure(self.param_window, width=e.width)
+
+		self.mycanvas.bind("<Configure>", _on_canvas_configure)
+
+		for c, w in enumerate([0, 2, 0, 1, 1]):   # Param, Init, Var, Min, Max
+			self.frame004.grid_columnconfigure(c, weight=w)
 
 		
 
@@ -932,19 +943,19 @@ class Diffusion_window :
 			self.list_of_max = ['10', '5', '1', '1', '100000', '100000', '20', '20', '1', '100']
 
 		elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "2D elliptical" :
-			self.list_of_params = ['GN0','tau_D', 'S']
+			self.list_of_params = ['GN0','txy', 'S']
 			self.list_of_inits = ['1', '1', '1']
 			self.list_of_min = ['0', '0', '0']
 			self.list_of_max = ['100','1000','20']
 
 		elif self.Triplet.get() == 'singlet' and self.Components.get() == '1 component' and self.Dimension.get() == "1D" :
-			self.list_of_params = ['GN0','tau_D']
+			self.list_of_params = ['GN0','tx']
 			self.list_of_inits = ['1', '1']
 			self.list_of_min = ['0', '0']
 			self.list_of_max = ['100', '1000']
 
 		elif self.Triplet.get() == 'singlet' and self.Components.get() == '2 components' and self.Dimension.get() == "1D" :
-			self.list_of_params = ['A1', 'A2', 'tau_D1', 'tau_D2']
+			self.list_of_params = ['A1', 'A2', 'tx1', 'tx2']
 			self.list_of_inits = ['1', '1', '1', '1']
 			self.list_of_min = ['0', '0', '0', '0']
 			self.list_of_max = ['1', '1', '1000', '1000']
@@ -1005,7 +1016,7 @@ class Diffusion_window :
 			self.fixed_list.append(tk.IntVar(value = 1))
 			thisdict = {
 						"Name": tk.Label(self.frame004, text=param),
-						"Init": tk.Entry(self.frame004, width = 5),
+						"Init": tk.Entry(self.frame004, width = 10),
 						"Var": tk.Checkbutton(self.frame004, variable=self.fixed_list[row_index-2]),
 						"Min": tk.Entry(self.frame004, width = 5),
 						"Max": tk.Entry(self.frame004, width = 5),
@@ -1014,16 +1025,16 @@ class Diffusion_window :
 
 			self.full_dict[param] = thisdict
 
-			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'w')
-			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'w')
+			thisdict["Name"].grid(row = row_index, column = 0, sticky = 'ew')
+			thisdict["Init"].grid(row = row_index, column = 1, sticky = 'ew')
 			thisdict["Init"].delete(0,"end")
 			thisdict["Init"].insert(0,self.list_of_inits[row_index-2])
 			thisdict["Var"].grid(row = row_index, column = 2, sticky = 'w')
 			
-			thisdict["Min"].grid(row = row_index, column = 3, sticky = 'w')
+			thisdict["Min"].grid(row = row_index, column = 3, sticky = 'ew')
 			thisdict["Min"].delete(0,"end")
 			thisdict["Min"].insert(0,self.list_of_min[row_index-2])
-			thisdict["Max"].grid(row = row_index, column = 4, sticky = 'w')
+			thisdict["Max"].grid(row = row_index, column = 4, sticky = 'ew')
 			thisdict["Max"].delete(0,"end")
 			thisdict["Max"].insert(0,self.list_of_max[row_index-2])
 
@@ -1153,26 +1164,57 @@ class Diffusion_window :
 
 		self.win_diff.geometry(self.line1)
 
+		"""
 		self.frame002 = tk.Frame(self.win_diff)
 		self.frame002.pack(side = "left", anchor = "nw")
-
 		self.frame0002 = tk.Frame(self.frame002)
 		self.frame0002.pack(side = "top", anchor = "nw")
-
-
-
 		self.scrollbar = tk.Scrollbar(self.frame0002)
 		self.scrollbar.pack(side = "left", fill = "y")
-
-
 		self.Datalist = tk.Listbox(self.frame0002, width = 100, height = 10)
 		self.Datalist.pack(side = "top", anchor = "nw")
-		
-		
-		
 		self.tree = CheckboxTreeview(self.Datalist)
 		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
-		self.tree.pack()
+		self.tree.pack(fill="both", expand=True)
+		self.tree.column("#0", stretch=True)
+		
+		self.Datalist.config(width = 100, height = 10)
+
+
+		self.Check_all_button = tk.Button(self.frame0002, text="Select all", command=self.Select_all)
+		self.Check_all_button.pack(side = "right", fill = "y")
+
+		self.UnCheck_all_button = tk.Button(self.frame0002, text="Deselect all", command=self.Deselect_all)
+		self.UnCheck_all_button.pack(side = "right", fill = "y")
+		"""
+
+		self.frame002 = tk.Frame(self.win_diff, width=round(0.25*self.th_width))
+		self.frame002.pack(side="left", fill="both", expand=False)
+		self.frame002.pack_propagate(False)
+
+		self.frame0002 = tk.Frame(self.frame002)
+		self.frame0002.pack(side="top", fill="both", expand=True)
+
+		# Buttons zuerst nach unten, sonst frisst der Tree den Platz
+		self.button_frame = tk.Frame(self.frame0002)
+		self.button_frame.pack(side="bottom", fill="x")
+
+		self.Check_all_button = tk.Button(self.button_frame, text="Select all", command=self.Select_all)
+		self.Check_all_button.pack(side="right")
+
+		self.UnCheck_all_button = tk.Button(self.button_frame, text="Deselect all", command=self.Deselect_all)
+		self.UnCheck_all_button.pack(side="right")
+
+		self.scrollbar = tk.Scrollbar(self.frame0002)
+		self.scrollbar.pack(side="right", fill="y")
+
+		self.tree = CheckboxTreeview(self.frame0002)
+		self.tree.heading("#0", text="Imported datasets", anchor=tk.W)
+		self.tree.column("#0", width=200, stretch=True)
+		self.tree.pack(side="left", fill="both", expand=True)
+
+		self.tree.config(yscrollcommand=self.scrollbar.set)
+		self.scrollbar.config(command=self.tree.yview)
 
 
 		self.tree.config(yscrollcommand = self.scrollbar.set)
@@ -1182,14 +1224,6 @@ class Diffusion_window :
 
 
 
-		self.Datalist.config(width = 100, height = 10)
-
-
-		self.Check_all_button = tk.Button(self.frame0002, text="Select all", command=self.Select_all)
-		self.Check_all_button.pack(side = "right", fill = "y")
-
-		self.UnCheck_all_button = tk.Button(self.frame0002, text="Deselect all", command=self.Deselect_all)
-		self.UnCheck_all_button.pack(side = "right", fill = "y")
 
 		for i in range(0, len(data_cont.tree_list_name)):
 			name = data_cont.tree_list_name[i]
@@ -1205,10 +1239,13 @@ class Diffusion_window :
 
 
 		self.frame001 = tk.Frame(self.frame002)
-		self.frame001.pack(side = "top", anchor = "nw")
+		self.frame001.pack(side = "top", anchor = "nw", fill="x")
+
+		for c in range(3):
+			self.frame001.grid_columnconfigure(c, weight=1, uniform="fitcol")
 
 		self.frame000 = tk.Frame(self.win_diff)
-		self.frame000.pack(side = "left", anchor = "nw")
+		self.frame000.pack(side = "left", anchor = "nw", expand = True)
 
 
 		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
@@ -1238,14 +1275,16 @@ class Diffusion_window :
 		self.canvas5 = FigureCanvasTkAgg(self.figure5, self.frame000)
 		self.canvas5.get_tk_widget().pack(side = "top", anchor = "nw", fill="x", expand=True)
 
-		self.toolbar = NavigationToolbar2Tk(self.canvas5, self.frame000)
+		self.toolbar = NavigationToolbar2Tk(self.canvas5, self.frame000, pack_toolbar=False)
 		self.toolbar.update()
-		self.canvas5.get_tk_widget().pack()
+		self.toolbar.pack(side="bottom", fill="x")
+
+		self.canvas5.get_tk_widget().pack(side="top", fill="both", expand=True)
 
 		self.figure5.tight_layout()
 
 		self.frame00000001 = tk.Frame(self.frame000)
-		self.frame00000001.pack(side = "top", anchor = "nw")
+		self.frame00000001.pack(side="bottom", fill="x")
 
 		self.Export_plot_button = tk.Button(self.frame00000001, text="Save plot data", command=self.Save_plot_data)
 		self.Export_plot_button.pack(side = "left", anchor = "nw")
@@ -1359,7 +1398,7 @@ class Diffusion_window :
 
 
 		self.frame00004 = tk.Frame(self.frame002)
-		self.frame00004.pack(side = "top", anchor = "nw")
+		self.frame00004.pack(side = "top", anchor = "nw", fill="x")
 
 		self.Fitting_frame()
 		

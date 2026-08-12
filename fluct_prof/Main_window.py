@@ -300,7 +300,7 @@ class Left_frame :
 
 				if filename.endswith('.fcs'):
 
-					i = 0;
+					i = 0
 
 					while i < len(self.lines):
 
