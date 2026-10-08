@@ -751,11 +751,25 @@ class Left_frame :
 
 		pixel = tk.PhotoImage(width=1, height=1)
 
+		self.frame01 = tk.Frame(frame0)
+		self.frame01.pack(side="top", fill="x")
+
+
+		self.frame_navigator = tk.PanedWindow(frame0, orient="horizontal")
+		self.frame_navigator.pack_propagate(0)
+
+		self.frame0_x = tk.Frame(self.frame_navigator)
+		self.frame_navigator.add(self.frame0_x)
 
 		
 
-		self.frame01 = tk.Frame(frame0)
-		self.frame01.pack(side="top", fill="x")
+		self.frame04 = tk.Frame(frame0)
+		self.frame_navigator.add(self.frame04)
+
+		self.frame_navigator.pack(side=tk.TOP, expand=1, fill=tk.BOTH)
+		
+
+		
 
 
 		self.Import_Button = tk.Button(self.frame01, text="Import", command=self.Import)
@@ -776,12 +790,12 @@ class Left_frame :
 		self.bleaching_choice.set("Double Exponential")
 
 
-		self.frame02 = tk.Frame(frame0, width=320)
-		self.frame02.pack(side="left", fill="y", anchor="nw")
+		self.frame02 = tk.Frame(self.frame0_x, width=320)
+		self.frame02.pack(side="left", fill="both", expand=1, anchor="nw")
 		self.frame02.pack_propagate(False)
 
-		self.frame04 = tk.Frame(frame0)
-		self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
+		#self.frame04 = tk.Frame(frame0)
+		#self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
 
 		
 
@@ -1468,6 +1482,19 @@ class sFCS_frame:
 		self.frame01 = tk.Frame(frame0)
 		self.frame01.pack(side="top", fill="x")
 
+		self.frame_navigator = tk.PanedWindow(frame0, orient="horizontal")
+		self.frame_navigator.pack_propagate(0)
+
+		self.frame0_x = tk.Frame(self.frame_navigator)
+		self.frame_navigator.add(self.frame0_x)
+
+		
+
+		self.frame04 = tk.Frame(frame0)
+		self.frame_navigator.add(self.frame04)
+
+		self.frame_navigator.pack(side=tk.TOP, expand=1, fill=tk.BOTH)
+
 
 		self.Import_Button = tk.Button(self.frame01, text="Import", command=self.Import)
 		self.Import_Button.pack(side = "left", anchor = "nw")
@@ -1478,12 +1505,12 @@ class sFCS_frame:
 		self.Clear_all_Button = tk.Button(self.frame01, text="Delete all", command=self.Empty_function)
 		self.Clear_all_Button.pack(side = "left", anchor = "nw")
 
-		self.frame02 = tk.Frame(frame0, width=320)
-		self.frame02.pack(side="left", fill="y", anchor="nw")
+		self.frame02 = tk.Frame(self.frame0_x, width=320)
+		self.frame02.pack(side="left", fill="both", expand=1, anchor="nw")
 		self.frame02.pack_propagate(False)
 
-		self.frame04 = tk.Frame(frame0)
-		self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
+		#self.frame04 = tk.Frame(frame0)
+		#self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
 
 
 		self.frame03 = tk.Frame(self.frame02)
@@ -2558,6 +2585,19 @@ class sFCS_carpet:
 		self.frame01 = tk.Frame(frame0)
 		self.frame01.pack(side="top", fill="x")
 
+		self.frame_navigator = tk.PanedWindow(frame0, orient="horizontal")
+		self.frame_navigator.pack_propagate(0)
+
+		self.frame0_x = tk.Frame(self.frame_navigator)
+		self.frame_navigator.add(self.frame0_x)
+
+		
+
+		self.frame04 = tk.Frame(frame0)
+		self.frame_navigator.add(self.frame04)
+
+		self.frame_navigator.pack(side=tk.TOP, expand=1, fill=tk.BOTH)
+
 
 		self.Import_Button = tk.Button(self.frame01, text="Import", command=self.Import)
 		self.Import_Button.pack(side = "left", anchor = "nw")
@@ -2569,12 +2609,12 @@ class sFCS_carpet:
 		self.Clear_all_Button.pack(side = "left", anchor = "nw")
 
 
-		self.frame02 = tk.Frame(frame0, width=320)
-		self.frame02.pack(side="left", fill="y", anchor="nw")
+		self.frame02 = tk.Frame(self.frame0_x, width=320)
+		self.frame02.pack(side="left", fill="both", expand=1, anchor="nw")
 		self.frame02.pack_propagate(False)
 
-		self.frame04 = tk.Frame(frame0)
-		self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
+		#self.frame04 = tk.Frame(frame0)
+		#self.frame04.pack(side="left", fill="both", expand=True, anchor="nw")
 
 
 		self.frame03 = tk.Frame(self.frame02)

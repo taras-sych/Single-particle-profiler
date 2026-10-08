@@ -801,10 +801,10 @@ class Diffusion_window :
 
 		self.frame00004.destroy()
 
-		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004 = tk.Frame(self.frame002_x)
 
 		self.mycanvas = tk.Canvas(self.frame00004)
-		self.mycanvas.pack(side = "left")
+		self.mycanvas.pack(side = "left", fill = "both", expand = "yes")
 		
 
 		self.param_scrollbar  = tk.Scrollbar(self.frame00004, orient = "vertical", command = self.mycanvas.yview)
@@ -826,6 +826,7 @@ class Diffusion_window :
 		self.mycanvas.create_window ((0,0), window=self.frame004, anchor="nw")
 
 		self.frame00004.pack(side = "top", fill = "both", expand = "yes")
+
 
 
 		
@@ -1090,11 +1091,24 @@ class Diffusion_window :
 
 		self.win_diff.geometry(self.line1)
 
-		self.frame002 = tk.Frame(self.win_diff)
-		self.frame002.pack(side = "left", anchor = "nw")
+		self.frame_navigator = tk.PanedWindow(self.win_diff, orient="horizontal")
+		self.frame_navigator.pack_propagate(0)
 
-		self.frame0002 = tk.Frame(self.frame002)
-		self.frame0002.pack(side = "top", anchor = "nw")
+		self.frame002_x = tk.Frame(self.frame_navigator)
+		self.frame_navigator.add(self.frame002_x)
+
+		
+
+		self.frame000 = tk.Frame(self.win_diff)
+		self.frame_navigator.add(self.frame000)
+
+		self.frame_navigator.pack(side=tk.TOP, expand=1, fill=tk.BOTH)
+
+		#self.frame002 = tk.Frame(self.frame_navigator)
+		#self.frame002.pack(side = "left", anchor = "nw")
+
+		self.frame0002 = tk.Frame(self.frame002_x)
+		self.frame0002.pack(side = "top", anchor = "nw", fill = "x")
 
 
 
@@ -1102,14 +1116,15 @@ class Diffusion_window :
 		self.scrollbar.pack(side = "left", fill = "y")
 
 
-		self.Datalist = tk.Listbox(self.frame0002, width = 100, height = 10)
-		self.Datalist.pack(side = "top", anchor = "nw")
+		#self.Datalist = tk.Listbox(self.frame0002, width = 100, height = 10)
+		#self.Datalist.pack(side = "top", anchor = "nw")
 		
 		
 		
-		self.tree = CheckboxTreeview(self.Datalist)
+		self.tree = CheckboxTreeview(self.frame0002)
 		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
-		self.tree.pack()
+		self.tree.column('#0', stretch=1)
+		self.tree.pack(expand=True, fill='x')
 
 
 		self.tree.config(yscrollcommand = self.scrollbar.set)
@@ -1119,7 +1134,7 @@ class Diffusion_window :
 
 
 
-		self.Datalist.config(width = 100, height = 10)
+		#self.Datalist.config(width = 100, height = 10)
 
 
 		self.Check_all_button = tk.Button(self.frame0002, text="Select all", command=self.Select_all)
@@ -1133,7 +1148,7 @@ class Diffusion_window :
 			treetree = d_tree.Data_tree_fcs_fit (self.tree, name, data_cont.data_list_raw[i])
 
 
-		self.frame003 = tk.Frame(self.frame002)
+		self.frame003 = tk.Frame(self.frame002_x)
 		self.frame003.pack(side = "top", anchor = "nw")
 
 		self.frame0003 = tk.Frame(self.frame003)
@@ -1141,11 +1156,11 @@ class Diffusion_window :
 
 
 
-		self.frame001 = tk.Frame(self.frame002)
+		self.frame001 = tk.Frame(self.frame002_x)
 		self.frame001.pack(side = "top", anchor = "nw")
 
-		self.frame000 = tk.Frame(self.win_diff)
-		self.frame000.pack(side = "left", anchor = "nw")
+		#self.frame000 = tk.Frame(self.win_diff)
+		#self.frame000.pack(side = "left", anchor = "nw")
 
 
 		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
@@ -1295,7 +1310,7 @@ class Diffusion_window :
 
 
 
-		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004 = tk.Frame(self.frame002_x)
 		self.frame00004.pack(side = "top", anchor = "nw")
 
 		self.Fitting_frame()
