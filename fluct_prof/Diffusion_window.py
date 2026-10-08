@@ -847,6 +847,7 @@ class Diffusion_window :
 	def Fitting_frame(self):
 		"""
 		self.frame00004.destroy()
+<<<<<<< HEAD
 
 		self.frame00004 = tk.Frame(self.frame002_x)
 
@@ -1174,6 +1175,7 @@ class Diffusion_window :
 
 		self.win_diff.geometry(self.line1)
 
+<<<<<<< HEAD
 		self.frame_navigator = tk.PanedWindow(self.win_diff, orient="horizontal")
 		self.frame_navigator.pack_propagate(0)
 
@@ -1270,6 +1272,7 @@ class Diffusion_window :
 
 
 
+<<<<<<< HEAD
 		#self.Datalist.config(width = 100, height = 10)
 
 
@@ -1278,6 +1281,8 @@ class Diffusion_window :
 
 		self.UnCheck_all_button = tk.Button(self.frame0002, text="Deselect all", command=self.Deselect_all)
 		self.UnCheck_all_button.pack(side = "right", fill = "y")
+=======
+>>>>>>> 4ccacb457e7a02dd4e6f23ba3f7afff72861b913
 
 		for i in range(0, len(data_cont.tree_list_name)):
 			name = data_cont.tree_list_name[i]
@@ -1292,6 +1297,7 @@ class Diffusion_window :
 
 
 
+<<<<<<< HEAD
 		self.frame001 = tk.Frame(self.frame002_x)
 		self.frame001.pack(side = "top", anchor = "nw")
 
@@ -1306,6 +1312,7 @@ class Diffusion_window :
 
 		self.frame000 = tk.Frame(self.win_diff)
 		self.frame000.pack(side = "left", anchor = "nw", expand = True)
+>>>>>>> 4ccacb457e7a02dd4e6f23ba3f7afff72861b913
 
 
 		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
@@ -1457,8 +1464,13 @@ class Diffusion_window :
 
 
 
+<<<<<<< HEAD
 		self.frame00004 = tk.Frame(self.frame002_x)
 		self.frame00004.pack(side = "top", anchor = "nw")
+=======
+		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004.pack(side = "top", anchor = "nw", fill="x")
+>>>>>>> 4ccacb457e7a02dd4e6f23ba3f7afff72861b913
 
 		self.Fitting_frame()
 		
