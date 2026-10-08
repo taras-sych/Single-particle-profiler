@@ -847,7 +847,7 @@ class Diffusion_window :
 	def Fitting_frame(self):
 		"""
 		self.frame00004.destroy()
-<<<<<<< HEAD
+
 
 		self.frame00004 = tk.Frame(self.frame002_x)
 
@@ -855,11 +855,11 @@ class Diffusion_window :
 		self.mycanvas.pack(side = "left", fill = "both", expand = "yes")
 		
 
-=======
+
 		self.frame00004 = tk.Frame(self.frame002)
 		self.mycanvas = tk.Canvas(self.frame00004)
 		self.mycanvas.pack(side = "left")
->>>>>>> 4ccacb457e7a02dd4e6f23ba3f7afff72861b913
+
 		self.param_scrollbar  = tk.Scrollbar(self.frame00004, orient = "vertical", command = self.mycanvas.yview)
 		self.param_scrollbar.pack( side = "right", fill = "y" )
 		self.mycanvas.configure (yscrollcommand = self.param_scrollbar.set)
@@ -872,7 +872,7 @@ class Diffusion_window :
 		"""
 
 		self.frame00004.destroy()
-		self.frame00004 = tk.Frame(self.frame002)
+		self.frame00004 = tk.Frame(self.frame002_x)
 		self.frame00004.pack(side="top", fill="both", expand=True)
 
 		self.param_scrollbar = tk.Scrollbar(self.frame00004, orient="vertical")
@@ -1175,7 +1175,7 @@ class Diffusion_window :
 
 		self.win_diff.geometry(self.line1)
 
-<<<<<<< HEAD
+#-----------------HEAD
 		self.frame_navigator = tk.PanedWindow(self.win_diff, orient="horizontal")
 		self.frame_navigator.pack_propagate(0)
 
@@ -1198,7 +1198,7 @@ class Diffusion_window :
 
 
 		self.scrollbar = tk.Scrollbar(self.frame0002)
-		self.scrollbar.pack(side = "left", fill = "y")
+		self.scrollbar.pack(side = "right", fill = "y")
 
 
 		#self.Datalist = tk.Listbox(self.frame0002, width = 100, height = 10)
@@ -1210,7 +1210,7 @@ class Diffusion_window :
 		self.tree.heading("#0",text="Imported datasets",anchor=tk.W)
 		self.tree.column('#0', stretch=1)
 		self.tree.pack(expand=True, fill='x')
-=======
+
 		"""
 		self.frame002 = tk.Frame(self.win_diff)
 		self.frame002.pack(side = "left", anchor = "nw")
@@ -1235,12 +1235,12 @@ class Diffusion_window :
 		self.UnCheck_all_button.pack(side = "right", fill = "y")
 		"""
 
-		self.frame002 = tk.Frame(self.win_diff, width=round(0.25*self.th_width))
-		self.frame002.pack(side="left", fill="both", expand=False)
-		self.frame002.pack_propagate(False)
+		#self.frame002 = tk.Frame(self.win_diff, width=round(0.25*self.th_width))
+		#self.frame002.pack(side="left", fill="both", expand=False)
+		#self.frame002.pack_propagate(False)
 
-		self.frame0002 = tk.Frame(self.frame002)
-		self.frame0002.pack(side="top", fill="both", expand=True)
+		#self.frame0002 = tk.Frame(self.frame002)
+		#self.frame0002.pack(side="top", fill="both", expand=True)
 
 		# Buttons zuerst nach unten, sonst frisst der Tree den Platz
 		self.button_frame = tk.Frame(self.frame0002)
@@ -1252,17 +1252,19 @@ class Diffusion_window :
 		self.UnCheck_all_button = tk.Button(self.button_frame, text="Deselect all", command=self.Deselect_all)
 		self.UnCheck_all_button.pack(side="right")
 
-		self.scrollbar = tk.Scrollbar(self.frame0002)
-		self.scrollbar.pack(side="right", fill="y")
+		#self.scrollbar = tk.Scrollbar(self.frame0002)
+		#self.scrollbar.pack(side="right", fill="y")
 
-		self.tree = CheckboxTreeview(self.frame0002)
+		"""self.tree = CheckboxTreeview(self.frame0002)
 		self.tree.heading("#0", text="Imported datasets", anchor=tk.W)
 		self.tree.column("#0", width=200, stretch=True)
 		self.tree.pack(side="left", fill="both", expand=True)
 
+		"""
+
 		self.tree.config(yscrollcommand=self.scrollbar.set)
 		self.scrollbar.config(command=self.tree.yview)
->>>>>>> 4ccacb457e7a02dd4e6f23ba3f7afff72861b913
+
 
 
 		self.tree.config(yscrollcommand = self.scrollbar.set)
@@ -1272,17 +1274,16 @@ class Diffusion_window :
 
 
 
-<<<<<<< HEAD
+#---------------------- HEAD
 		#self.Datalist.config(width = 100, height = 10)
 
 
-		self.Check_all_button = tk.Button(self.frame0002, text="Select all", command=self.Select_all)
+		"""self.Check_all_button = tk.Button(self.frame0002, text="Select all", command=self.Select_all)
 		self.Check_all_button.pack(side = "right", fill = "y")
 
 		self.UnCheck_all_button = tk.Button(self.frame0002, text="Deselect all", command=self.Deselect_all)
-		self.UnCheck_all_button.pack(side = "right", fill = "y")
-=======
->>>>>>> 4ccacb457e7a02dd4e6f23ba3f7afff72861b913
+		self.UnCheck_all_button.pack(side = "right", fill = "y")"""
+
 
 		for i in range(0, len(data_cont.tree_list_name)):
 			name = data_cont.tree_list_name[i]
@@ -1297,22 +1298,22 @@ class Diffusion_window :
 
 
 
-<<<<<<< HEAD
+#----------------- HEAD
 		self.frame001 = tk.Frame(self.frame002_x)
 		self.frame001.pack(side = "top", anchor = "nw")
 
 		#self.frame000 = tk.Frame(self.win_diff)
 		#self.frame000.pack(side = "left", anchor = "nw")
-=======
-		self.frame001 = tk.Frame(self.frame002)
-		self.frame001.pack(side = "top", anchor = "nw", fill="x")
+
+		#self.frame001 = tk.Frame(self.frame002)
+		#self.frame001.pack(side = "top", anchor = "nw", fill="x")
 
 		for c in range(3):
 			self.frame001.grid_columnconfigure(c, weight=1, uniform="fitcol")
 
-		self.frame000 = tk.Frame(self.win_diff)
-		self.frame000.pack(side = "left", anchor = "nw", expand = True)
->>>>>>> 4ccacb457e7a02dd4e6f23ba3f7afff72861b913
+		#self.frame000 = tk.Frame(self.win_diff)
+		#self.frame000.pack(side = "left", anchor = "nw", expand = True)
+
 
 
 		self.figure5 = Figure(figsize=(0.9*self.th_width/dpi_all,0.9*self.th_height/(dpi_all)), dpi = dpi_all)
@@ -1464,13 +1465,13 @@ class Diffusion_window :
 
 
 
-<<<<<<< HEAD
+
 		self.frame00004 = tk.Frame(self.frame002_x)
 		self.frame00004.pack(side = "top", anchor = "nw")
-=======
-		self.frame00004 = tk.Frame(self.frame002)
-		self.frame00004.pack(side = "top", anchor = "nw", fill="x")
->>>>>>> 4ccacb457e7a02dd4e6f23ba3f7afff72861b913
+
+		#self.frame00004 = tk.Frame(self.frame002)
+		#self.frame00004.pack(side = "top", anchor = "nw", fill="x")
+
 
 		self.Fitting_frame()
 		
