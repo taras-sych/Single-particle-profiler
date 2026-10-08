@@ -137,6 +137,24 @@ def Corr_curve_2d_2(tc, offset, GN0, A1, A2, txy1, txy2, alpha1, alpha2, B1, tau
 
 	return offset + GN0 * G_Diff * G_T
 
+#2D free diffusion with gaussian detection volume for mitochondria
+def Corr_curve_2d_gaussian(tau, GN0,tau_D, S):
+	tau_D = tau_D / 1000
+	G_Diff = (1+tau/tau_D)**(-1/2) * (1+tau/(S**2*tau_D))**(-1/2)
+	return GN0 * G_Diff
+
+def Corr_curve_1d(tau, GN0,tau_D):
+	tau_D = tau_D / 1000
+	G_Diff = (1+tau/tau_D)**(-1/2)
+	return GN0 * G_Diff
+
+def Corr_curve_1d_2(tau, A1, A2, tau_D1, tau_D2):
+	tau_D1 = tau_D1 / 1000
+	tau_D2 = tau_D2 / 1000
+
+	G_Diff = A1*(1+tau/tau_D1)**(-1/2) + A2*(1+tau/tau_D2)**(-1/2)
+	return G_Diff
+
 
 def Gauss(x, a, x0, sigma):
 
@@ -889,53 +907,48 @@ def Export_function():
 
 
 
+		gn0s = {}  # channel name -> [GN0 per repetition]
+
 		for name in chan.keys():
-
 			try:
-
 				channel = chan[name]
-
-				dict_temp_list =[]
+				rows = []
 				for rep1 in data_c.output_numbers_dict[file1]:
+					fit = data_c.data_list_raw[file1].diff_fitting[rep1, channel]
+					row = dict(fit)  # copy all fitting keys at once
 
-					dict_temp = {}				
-
-					for key in data_c.data_list_raw[file1].diff_fitting[rep1, channel].keys():
-
-
-						dict_temp[key] = data_c.data_list_raw[file1].diff_fitting[rep1, channel][key]
-
-
-					counter = 1
-					
-					for item in data_c.data_list_raw[file1].diff_coeffs[rep1, channel]:
-
-						key = "D_" + str(counter)
-
-						dict_temp[key] = item
-
-						counter+=1
-
+					for counter, item in enumerate(
+						data_c.data_list_raw[file1].diff_coeffs[rep1, channel], start=1
+					):
+						row["D_" + str(counter)] = item
 
 					try:
-						dict_temp["N"] = data_c.data_list_raw[file1].N[rep1, channel]
-
-						dict_temp["cpm"] = data_c.data_list_raw[file1].cpm[rep1, channel]
-
+						row["N"] = data_c.data_list_raw[file1].N[rep1, channel]
+						row["cpm"] = data_c.data_list_raw[file1].cpm[rep1, channel]
 					except:
 						pass
 
+					rows.append(row)
 
-					dict_temp_list.append(dict_temp)
-
-
-				df1 = pd.DataFrame.from_records(dict_temp_list)
-
-
-				df1.to_excel(writer, sheet_name=name)
+				gn0s[name] = [row["GN0"] for row in rows]          # grab GN0s here
+				pd.DataFrame.from_records(rows).to_excel(writer, sheet_name=name)
 
 			except:
 				pass
+
+		# cross-correlations, only when all 4 channels are present
+		if len(chan) == 4:
+			names = list(chan.keys())                               # [g, r, gr, rg]
+			reps = range(len(data_c.output_numbers_dict[file1]))
+			pairs = [("gr vs g", 2, 0), ("gr vs r", 2, 1),
+					("rg vs g", 3, 0), ("rg vs r", 3, 1)]
+
+			cc = pd.DataFrame(
+				{label: [round(gn0s[names[num]][i] / gn0s[names[den]][i], 4) for i in reps]
+				for label, num, den in pairs},
+				index=["repetition" + str(i + 1) for i in reps],
+			)
+			cc.to_excel(writer, sheet_name="CC")
 
 
 
