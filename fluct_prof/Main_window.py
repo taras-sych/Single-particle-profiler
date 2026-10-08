@@ -797,7 +797,7 @@ class Left_frame :
 		self.bleaching_choice = ttk.Combobox(self.frame01,values = ["No","Double Exponential","Polynomial"],  width = 18)
 		self.bleaching_choice.config(state = "readonly")
 		self.bleaching_choice.pack(side = "left", anchor = "nw")
-		self.bleaching_choice.set("Double Exponential")
+		self.bleaching_choice.set("No")
 
 
 		self.frame02 = tk.Frame(self.frame0_x, width=320)
@@ -1578,7 +1578,7 @@ class sFCS_frame:
 		self.bleaching_choice = ttk.Combobox(self.frame023,values = ["No","Double Exponential","Polynomial"],  width = 18)
 		self.bleaching_choice.config(state = "readonly")
 		self.bleaching_choice.grid(row = gridrow, column = 1, sticky = 'ew')
-		self.bleaching_choice.set("Double Exponential")
+		self.bleaching_choice.set("No")
 		gridrow += 1
 
 		self.Binning_label = tk.Label(self.frame023,  text = "Pixel binning: ")
@@ -1868,6 +1868,8 @@ class sFCS_carpet:
 
 	def Corr_carpet(self):
 
+		bleaching_correction = self.bleaching_choice.get()
+
 		
 
 		#print(name)
@@ -1922,6 +1924,38 @@ class sFCS_carpet:
 
 			for i in range(self.carpet_binned[channel].shape[0]):
 				trace = self.carpet_binned[channel][i,:]
+
+				if(bleaching_correction == "Double Exponential"):
+					print("double exponential")
+					try:
+						popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+						y_bc = []	#bleaching corrected y
+						for i,ys in enumerate(y):
+							correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+							#print(correction_factor)
+							y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+
+						Tr = fcs_importer.XY_plot(x,y_bc)
+					except RuntimeError:
+						print("exception")
+						Tr = fcs_importer.XY_plot(x,y)
+
+				elif(bleaching_correction == "Polynomial"):
+					print("polynomial")
+					try:
+						popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+						y_bc = []	#bleaching corrected y
+						for i,ys in enumerate(y):
+							correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+							#print(correction_factor)
+							y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+						Tr = fcs_importer.XY_plot(x,y_bc)
+					except RuntimeError:
+						Tr = fcs_importer.XY_plot(x,y)
+				else:
+					print("exception")
+					Tr = fcs_importer.XY_plot(x,y)
 
 				#x = np.linspace(start*timestep, end*timestep, end-start)
 				x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
@@ -2205,6 +2239,9 @@ class sFCS_carpet:
 
 	def Extract_trace(self):
 
+		bleaching_correction = self.bleaching_choice.get()
+		print("bleaching_correction")
+
 		name = self.dataset_names [self.file_number]
 		sedec = Sidecut_sFCS(self.dataset_list[self.file_number])
 		if len(sedec.array.shape) == 3:
@@ -2300,9 +2337,39 @@ class sFCS_carpet:
 
 				x = x1
 
-				
+				if(bleaching_correction == "Double Exponential"):
+					print("double exponential")
+					try:
+						popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+						y_bc = []	#bleaching corrected y
+						for i,ys in enumerate(y):
+							correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+							#print(correction_factor)
+							y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
 
-				Tr = fcs_importer.XY_plot(x,y)
+						Tr = fcs_importer.XY_plot(x,y_bc)
+					except RuntimeError:
+						print("exception")
+						Tr = fcs_importer.XY_plot(x,y)
+
+				elif(bleaching_correction == "Polynomial"):
+					print("polynomial")
+					try:
+						popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+						y_bc = []	#bleaching corrected y
+						for i,ys in enumerate(y):
+							correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+							#print(correction_factor)
+							y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+						Tr = fcs_importer.XY_plot(x,y_bc)
+					except RuntimeError:
+						Tr = fcs_importer.XY_plot(x,y)
+				else:
+					print("exception")
+					Tr = fcs_importer.XY_plot(x,y)
+
+				#Tr = fcs_importer.XY_plot(x,y)
 
 				timestep = x[1] - x[0]
 
@@ -2348,9 +2415,37 @@ class sFCS_carpet:
 
 					x = x1
 
+					if(bleaching_correction == "Double Exponential"):
+						try:
+							popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+							y_bc = []	#bleaching corrected y
+							for i,ys in enumerate(y):
+								correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+								#print(correction_factor)
+								y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+
+							Tr1 = fcs_importer.XY_plot(x,y_bc)
+						except RuntimeError:
+							Tr1 = fcs_importer.XY_plot(x,y)
+
+					elif(bleaching_correction == "Polynomial"):
+						try:
+							popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+							y_bc = []	#bleaching corrected y
+							for i,ys in enumerate(y):
+								correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+								#print(correction_factor)
+								y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+							Tr1 = fcs_importer.XY_plot(x,y_bc)
+						except RuntimeError:
+							Tr1 = fcs_importer.XY_plot(x,y)
+					else:
+						Tr1 = fcs_importer.XY_plot(x,y)
+
 					
 
-					Tr1 = fcs_importer.XY_plot(x,y)
+					#Tr1 = fcs_importer.XY_plot(x,y)
 
 					channel2 = channel1 + 1
 					while channel2 < channels_number:
@@ -2380,9 +2475,34 @@ class sFCS_carpet:
 
 						x = x1
 
-						
+						if(bleaching_correction == "Double Exponential"):
+							try:	
+								popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+								y_bc = []	#bleaching corrected y
+								for i,ys in enumerate(y):
+									correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+									#print(correction_factor)
+									y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
 
-						Tr2 = fcs_importer.XY_plot(x,y)
+								Tr2 = fcs_importer.XY_plot(x,y_bc)
+							except RuntimeError:
+								Tr2 = fcs_importer.XY_plot(x,y)
+						elif(bleaching_correction == "Polynomial"):
+							try:
+								popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+								y_bc = []	#bleaching corrected y
+								for i,ys in enumerate(y):
+									correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+									#print(correction_factor)
+									y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+								Tr2 = fcs_importer.XY_plot(x,y_bc)
+							except RuntimeError:
+								Tr2 = fcs_importer.XY_plot(x,y)
+						else:
+							Tr2 = fcs_importer.XY_plot(x,y)
+
+						#Tr2 = fcs_importer.XY_plot(x,y)
 
 						timestep = Tr1.x[1] - Tr1.x[0]
 
@@ -2696,48 +2816,57 @@ class sFCS_carpet:
 		self.Repetitions_entry.grid(row = 2, column = 1, sticky='ew')
 		self.Repetitions_entry.insert("end", str(1))
 
+		self.bleaching_label = tk.Label(self.frame023,  text = "Bleaching: ")
+		self.bleaching_label.grid(row = 3, column = 0, sticky = 'ew')
+
+		self.bleaching_choice = ttk.Combobox(self.frame023,values = ["No","Double Exponential","Polynomial"],  width = 18)
+		self.bleaching_choice.config(state = "readonly")
+		self.bleaching_choice.grid(row = 3, column = 1, sticky = 'ew')
+		self.bleaching_choice.set("No")
+		#gridrow += 1
+
 		self.Timestep_label = tk.Label(self.frame023,  text = "Timestep: ")
-		self.Timestep_label.grid(row = 3, column = 0, sticky = 'ew')
+		self.Timestep_label.grid(row = 4, column = 0, sticky = 'ew')
 
 		self.Timestep_entry = tk.Entry(self.frame023, width = 9)
-		self.Timestep_entry.grid(row = 3, column = 1, sticky='ew')
+		self.Timestep_entry.grid(row = 4, column = 1, sticky='ew')
 		self.Timestep_entry.insert("end", str(0.002))
 
 		self.Display_label = tk.Label(self.frame023,  text = "Display: ")
-		self.Display_label.grid(row = 4, column = 0, columnspan = 2, sticky = 'w')
+		self.Display_label.grid(row = 5, column = 0, columnspan = 2, sticky = 'w')
 
 		self.Rep_Display_label = tk.Label(self.frame023,  text = "Repetition: ")
-		self.Rep_Display_label.grid(row = 5, column = 0, sticky = 'ew')
+		self.Rep_Display_label.grid(row = 6, column = 0, sticky = 'ew')
 
 		self.Rep_Display__choice = ttk.Combobox(self.frame023,values = ["1"],  width = 18 )
 		self.Rep_Display__choice.config(state = "readonly")
-		self.Rep_Display__choice.grid(row = 5, column = 1, sticky = 'ew')
+		self.Rep_Display__choice.grid(row = 6, column = 1, sticky = 'ew')
 		self.Rep_Display__choice.set("1")
 
 		self.Rep_Display__choice.bind("<<ComboboxSelected>>", self.Display)
 
 
 		self.Chan_Display_label = tk.Label(self.frame023,  text = "Channel: ")
-		self.Chan_Display_label.grid(row = 6, column = 0, sticky = 'ew')
+		self.Chan_Display_label.grid(row = 7, column = 0, sticky = 'ew')
 
 		self.channels_to_display = ['1']
 
 		self.Chan_Display__choice = ttk.Combobox(self.frame023,values = self.channels_to_display,  width = 18 )
 		self.Chan_Display__choice.config(state = "readonly")
-		self.Chan_Display__choice.grid(row = 6, column = 1, sticky = 'ew')
+		self.Chan_Display__choice.grid(row = 7, column = 1, sticky = 'ew')
 		self.Chan_Display__choice.set("1")
 		self.Chan_Display__choice.bind("<<ComboboxSelected>>", self.Channel_change)
 
 
 
 		self.Display_button = tk.Button(self.frame023, text="Display", command=self.Display)
-		self.Display_button.grid(row = 7, column = 0, columnspan =2, sticky="EW")
+		self.Display_button.grid(row = 8, column = 0, columnspan =2, sticky="EW")
 
 		self.Transfer_button = tk.Button(self.frame023, text="Transfer curve", command=self.Transfer_extracted)
-		self.Transfer_button.grid(row = 8, column = 0, sticky="EW")
+		self.Transfer_button.grid(row = 9, column = 0, sticky="EW")
 
 		self.Transfer_all_button = tk.Button(self.frame023, text="Transfer all", command=self.Transfer_all_extracted)
-		self.Transfer_all_button.grid(row = 8, column = 1, sticky="EW")
+		self.Transfer_all_button.grid(row = 9, column = 1, sticky="EW")
 
 		self.figure1 = Figure(dpi=dpi_all, constrained_layout=True)
 
