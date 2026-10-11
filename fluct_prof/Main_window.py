@@ -1745,6 +1745,12 @@ class sFCS_frame:
 
 class sFCS_carpet:
 
+	def double_exp_bleaching(self, x, A1, a1, A2, a2, C):
+		return C + A1*np.exp(-a1*x) + A2*np.exp(-a2*x)
+
+	def polynomial_bleaching(self, x, a,b,c,d,e):
+		return a*x**4 + b*x**3 + c*x**2 + d*x + e
+
 	def Transfer_all_extracted(self):
 		for index in range (len(self.dataset_names)):
 			self.file_number = index
@@ -1866,6 +1872,108 @@ class sFCS_carpet:
 
 		self.Corr_carpet()
 
+
+
+	def Bleaching_correction_func_trace(self, x, trace, bleaching_correction):
+
+		#print(x)
+
+		y = trace
+
+		#x = np.linspace(0, timestep * (len(y) - 1), len(y))
+
+		if(bleaching_correction == "Double Exponential"):
+			#print("double exponential")
+			try:
+				popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+				#print(popt)
+				y_bc = []	#bleaching corrected y
+				for i,ys in enumerate(y):
+					correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.double_exp_bleaching(0, *popt))
+					#print(self.double_exp_bleaching(x[i], *popt), self.double_exp_bleaching(0, *popt), correction_factor)
+					y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+
+				trace = y_bc
+			except RuntimeError:
+				print("exception")
+				trace = y
+
+		elif(bleaching_correction == "Polynomial"):
+			#print("polynomial")
+			try:
+				popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+				y_bc = []	#bleaching corrected y
+				for i,ys in enumerate(y):
+					correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+					#print(correction_factor)
+					y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+				trace = y_bc
+			except RuntimeError:
+				trace = y
+		else:
+			print("No")
+			trace = y
+
+
+		#print(trace)
+		#trace = np.asarray(trace)
+		return np.asarray(trace)
+
+	
+	def Bleaching_correction_func_carpet(self, carpet, bleaching_correction):
+		#print(bleaching_correction)
+
+		timestep = float(self.Timestep_entry.get())
+
+		carpet_corrected = []
+
+		for i in range(carpet.shape[0]):
+			y = carpet[i,:]
+
+			x = np.linspace(0, timestep * (len(y) - 1), len(y))
+
+			if(bleaching_correction == "Double Exponential"):
+				print("double exponential")
+				try:
+					popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
+					y_bc = []	#bleaching corrected y
+					for i,ys in enumerate(y):
+						correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+						#print(correction_factor)
+						y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
+
+					trace = y_bc
+				except RuntimeError:
+					print("exception")
+					trace = y
+
+			elif(bleaching_correction == "Polynomial"):
+				print("polynomial")
+				try:
+					popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
+					y_bc = []	#bleaching corrected y
+					for i,ys in enumerate(y):
+						correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
+						#print(correction_factor)
+						y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
+
+					trace = y_bc
+				except RuntimeError:
+					trace = y
+			else:
+				print("No")
+				trace = y
+
+
+			carpet_corrected.append(trace)
+
+		carpet_corrected_2d = np.stack(carpet_corrected, axis=0)
+
+
+		return carpet_corrected_2d
+
+
 	def Corr_carpet(self):
 
 		bleaching_correction = self.bleaching_choice.get()
@@ -1918,45 +2026,18 @@ class sFCS_carpet:
 
 		for channel in range (len(carpet)):
 
-			self.carpet_binned.append(carpet[channel].reshape(dimension, binning, carpet[channel].shape[1]).sum(axis=1))
+			self.carpet_binned_non_corrected = carpet[channel].reshape(dimension, binning, carpet[channel].shape[1]).sum(axis=1)
+
+			
+
+			#self.carpet_binned.append(self.Bleaching_correction_func(self.carpet_binned_non_corrected, bleaching_correction))
+
+			self.carpet_binned.append(self.carpet_binned_non_corrected)
 
 			correlation_carpet = []
 
 			for i in range(self.carpet_binned[channel].shape[0]):
 				trace = self.carpet_binned[channel][i,:]
-
-				if(bleaching_correction == "Double Exponential"):
-					print("double exponential")
-					try:
-						popt, pcov = curve_fit(self.double_exp_bleaching, x, y, maxfev = 10000)
-						y_bc = []	#bleaching corrected y
-						for i,ys in enumerate(y):
-							correction_factor = np.sqrt(self.double_exp_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
-							#print(correction_factor)
-							y_bc.append(ys/correction_factor+self.double_exp_bleaching(0, *popt)*(1-correction_factor))
-
-						Tr = fcs_importer.XY_plot(x,y_bc)
-					except RuntimeError:
-						print("exception")
-						Tr = fcs_importer.XY_plot(x,y)
-
-				elif(bleaching_correction == "Polynomial"):
-					print("polynomial")
-					try:
-						popt, pcov = curve_fit(self.polynomial_bleaching, x, y, maxfev = 10000)
-						y_bc = []	#bleaching corrected y
-						for i,ys in enumerate(y):
-							correction_factor = np.sqrt(self.polynomial_bleaching(x[i], *popt)/self.polynomial_bleaching(0, *popt))
-							#print(correction_factor)
-							y_bc.append(ys/correction_factor+self.polynomial_bleaching(0, *popt)*(1-correction_factor))
-
-						Tr = fcs_importer.XY_plot(x,y_bc)
-					except RuntimeError:
-						Tr = fcs_importer.XY_plot(x,y)
-				else:
-					print("exception")
-					Tr = fcs_importer.XY_plot(x,y)
-
 				#x = np.linspace(start*timestep, end*timestep, end-start)
 				x1, y1 = corr_py.correlate_full (self.timestep, trace, trace)
 				correlation_carpet.append(y1)
@@ -2018,6 +2099,8 @@ class sFCS_carpet:
 		
 	def Plot_this_line(self, trace_number):
 
+		bleaching_correction = self.bleaching_choice.get()
+
 		#repetitions = int(self.Repetitions_entry.get())
 
 		repetitions = 1
@@ -2037,8 +2120,11 @@ class sFCS_carpet:
 
 		for channel in range(len(self.carpet_binned)):
 
-			trace = self.carpet_binned[channel][trace_number,:]
+			trace_1 = self.carpet_binned[channel][trace_number,:]
+
 			x = np.linspace(0, self.carpet_binned[channel].shape[1]*self.timestep, self.carpet_binned[channel].shape[1])
+
+			trace = self.Bleaching_correction_func_trace(x, trace_1, bleaching_correction)
 
 			Tr = fcs_importer.XY_plot(x,trace)
 
