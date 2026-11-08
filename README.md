@@ -1,7 +1,7 @@
-# This is a branch for sFCS release 
+# This is a Py_profiler release v 2.0 for sFCS analysis
 # What's new:
-1. Scanning Fluorescence Correlation Spectroscopy
-2. Scanning Fluorescence Correlation Spectroscopy for side-scan of biological objects
+1. Scanning Fluorescence Correlation Spectroscopy (carpet)
+2. Scanning Fluorescence Correlation Spectroscopy for cross-scan of biological objects
 3. Formats available:
   - .lsm
   - .czi
@@ -41,7 +41,7 @@
 
 
 ## For standalone distributions, see the link below:
-https://drive.google.com/drive/folders/1AOrHfZpbEuAi8_NUn8C_G5wGw4NIdZlG
+https://drive.google.com/drive/folders/1OWq8Q6Capyk90PWl82zl6-o9PXKETVEa?usp=sharing
 
 ## Manuals are available: 
 https://www.youtube.com/watch?v=Q6DqTy6itn4
