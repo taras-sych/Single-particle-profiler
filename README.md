@@ -44,7 +44,7 @@
 https://drive.google.com/drive/folders/1OWq8Q6Capyk90PWl82zl6-o9PXKETVEa?usp=sharing
 
 ## Manuals are available: 
-https://www.youtube.com/watch?v=Q6DqTy6itn4
+https://youtu.be/yBJOFG8e6_g
 
 ## Papers here (when using, cite):
 ### Single Particle Profiler (SPP):
