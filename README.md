@@ -20,7 +20,7 @@ What can it do:
 Reads files (.fcs, .SIN, .xlsx)
 
 ## For standalone distributions, see the link below:
-https://drive.google.com/drive/folders/1g4QfDf5ELMhdDLFAQRrEJdAcNTQbkbjV?usp=sharing
+https://drive.google.com/drive/folders/1ey2MzNwkRJjkgGpyCl5GiUl5SxqW1-lv?usp=sharing
 
 ## Manual is available here: 
 https://www.youtube.com/watch?v=pgXFNSjlXHk&list=PLvnnxg3kwLpWJjBRsYiTrF1a5CBaAzQK4
