@@ -41,7 +41,7 @@
 
 
 ## For standalone distributions, see the link below:
-https://drive.google.com/drive/folders/1AOrHfZpbEuAi8_NUn8C_G5wGw4NIdZlG
+https://drive.google.com/drive/folders/1N0axViUELfAy7xQZ4QdPSr3xTD66uVot?usp=sharing
 
 ## Manuals are available: 
 https://www.youtube.com/watch?v=Q6DqTy6itn4
