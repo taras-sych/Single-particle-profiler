@@ -32,7 +32,7 @@
 
 
 ## For standalone distributions, see the link below:
-https://drive.google.com/drive/folders/1E48Apdwgemc6TjAFaYCvr_2vAziwJcbK
+https://drive.google.com/drive/folders/1ry_kRaZCSjIEZda-GzrropkaTDQAkRUT?usp=sharing
 
 ## Manuals are available: 
 How to analyze SPP (based on previous release):
