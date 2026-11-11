@@ -2,7 +2,7 @@
 # What's new:
 1. Scanning Fluorescence Correlation Spectroscopy (carpet)
 2. Scanning Fluorescence Correlation Spectroscopy for cross-scan of biological objects
-3. Formats available:
+3. New formats available:
   - .lsm
   - .czi
   - .nd2
@@ -36,12 +36,14 @@
    - .lsm
    - .tif
    - .txt
+   - .czi
+   - .nd2
    - to adapt any other format, see the format of .txt file and save your data as .txt
    - formats for Picoquant are currently developed
 
 
 ## For standalone distributions, see the link below:
-https://drive.google.com/drive/folders/1OWq8Q6Capyk90PWl82zl6-o9PXKETVEa?usp=sharing
+https://drive.google.com/drive/folders/1uTfOLNaRqrJuQtZkjBu_NR-0FROy8y-w?usp=sharing
 
 ## Manuals are available: 
 https://youtu.be/yBJOFG8e6_g
